@@ -1,0 +1,5 @@
+.vs
+bin
+obj
+appSettings.json
+appSettings.Development.json
