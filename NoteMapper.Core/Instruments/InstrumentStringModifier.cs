@@ -5,7 +5,7 @@ namespace NoteMapper.Core.Instruments
 {
     public class InstrumentStringModifier
     {
-        private static Regex _parseRegex = new Regex(@"^(?<name>\w+):(?<modifiers>.+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex _parseRegex = new Regex(@"^(?<name>\w+)\|(?<modifiers>.+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static Regex _parseModifierRegex = new Regex(@"^(?<string>\d+)(?<offset>(\+|\-)\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private InstrumentStringModifier(string name, IDictionary<int, int> offsets)

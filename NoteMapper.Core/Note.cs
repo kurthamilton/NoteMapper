@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core
@@ -10,7 +9,8 @@ namespace NoteMapper.Core
 
         private static IReadOnlyCollection<string> _notes = new[] 
         { 
-            "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#" 
+            // start at C to align with octave indexes incrementing at C
+            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B",
         };
 
         public Note(int index)
@@ -66,6 +66,11 @@ namespace NoteMapper.Core
         public static int GetNoteIndex(int index)
         {
             return index % _notes.Count;
+        }
+
+        public bool InScale(Scale scale)
+        {
+            return scale.Contains(this);
         }
 
         public Note Next(int offset)

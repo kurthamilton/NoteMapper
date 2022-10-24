@@ -15,48 +15,74 @@ namespace NoteMapper.Core.Instruments.Implementations
 
         public override IReadOnlyCollection<InstrumentString> Strings { get; }
 
-        public static PedalSteelGuitar Custom(IReadOnlyCollection<string> strings, IReadOnlyCollection<string> modifiers)
+        public static PedalSteelGuitar Custom(PedalSteelGuitarConfig config)
         {
-            List<InstrumentStringModifier> modifierList = new List<InstrumentStringModifier>();
-            foreach (string m in modifiers)
+            List<InstrumentStringModifier> modifiers = new List<InstrumentStringModifier>();
+            foreach (string m in config.Modifiers)
             {
                 InstrumentStringModifier modifier = InstrumentStringModifier.Parse(m);
-                modifierList.Add(modifier);
+                modifiers.Add(modifier);
             }
 
-            List<InstrumentString> stringList = new List<InstrumentString>();
-            for (int i = 0; i < strings.Count; i++)
+            foreach (KeyValuePair<string, string> pair in config.MutuallyExclusiveModifiers)
             {
-                InstrumentString @string = InstrumentString.Parse(i, strings.ElementAt(i), modifierList);
-                stringList.Add(@string);
+                InstrumentStringModifier? modifier1 = modifiers
+                    .FirstOrDefault(x => string.Equals(x.Name, pair.Key, StringComparison.InvariantCultureIgnoreCase));
+                InstrumentStringModifier? modifier2 = modifiers
+                    .FirstOrDefault(x => string.Equals(x.Name, pair.Value, StringComparison.InvariantCultureIgnoreCase));
+
+                if (modifier1 == null || modifier2 == null)
+                {
+                    throw new ArgumentException("Mutually exclusive modifier not found", 
+                        nameof(config.MutuallyExclusiveModifiers));
+                }
+
+                modifier1.IsMutuallyExclusiveWith(modifier2);
             }
 
-            return new PedalSteelGuitar(stringList, modifierList);
+            List<InstrumentString> strings = new List<InstrumentString>();
+            for (int i = 0; i < config.Strings.Count; i++)
+            {
+                InstrumentString @string = InstrumentString.Parse(i, config.Strings.ElementAt(i), modifiers);
+                strings.Add(@string);
+            }
+
+            return new PedalSteelGuitar(strings, modifiers);
         }
 
         public static PedalSteelGuitar E9(int frets = 24)
         {
-            return Custom(new[]
+            return Custom(new PedalSteelGuitarConfig
             {
-                $"B2|f=0-{frets}", 
-                $"D3|f=0-{frets}", 
-                $"E3|f=0-{frets}", 
-                $"F#3|f=0-{frets}", 
-                $"G#3|f=0-{frets}", 
-                $"B3|f=0-{frets}", 
-                $"E4|f=0-{frets}", 
-                $"G#4|f=0-{frets}",
-                $"D#4|f=0-{frets}",
-                $"F#4|f=0-{frets}"
-            }, new[]
-            {
-                "A:0+2,5+2", 
-                "B:4+1,7+1", 
-                "C:5+2,6+2", 
-                "LKL:2-1,7-1", 
-                "LKR:2+1,7+1", 
-                "RKL:1-1,8-1", 
-                "RKR:3+1,9+1"
+                Modifiers = new[]
+                {
+                    $"B2|f=0-{frets}",
+                    $"D3|f=0-{frets}",
+                    $"E3|f=0-{frets}",
+                    $"F#3|f=0-{frets}",
+                    $"G#3|f=0-{frets}",
+                    $"B3|f=0-{frets}",
+                    $"E4|f=0-{frets}",
+                    $"G#4|f=0-{frets}",
+                    $"D#4|f=0-{frets}",
+                    $"F#4|f=0-{frets}"
+                },
+                MutuallyExclusiveModifiers = new[]
+                {
+                    new KeyValuePair<string, string>("A", "C"),
+                    new KeyValuePair<string, string>("LKL", "LKR"),
+                    new KeyValuePair<string, string>("RKL", "RKR")
+                },
+                Strings = new[]
+                {
+                    "A|0+2,5+2",
+                    "B|4+1,7+1",
+                    "C|5+2,6+2",
+                    "LKL|2-1,7-1",
+                    "LKR|2+1,7+1",
+                    "RKL|1-1,8-1",
+                    "RKR|3+1,9+1"
+                }
             });
         }
 
@@ -101,12 +127,20 @@ namespace NoteMapper.Core.Instruments.Implementations
             DisableModifiers();
 
             // create set of note permutations without any modifiers applied
-            List<List<InstrumentStringNote>> notePermutations = Strings
-                .Select(x => new List<InstrumentStringNote>
-                {
-                    new InstrumentStringNote(position, x, null)
-                })
+            IReadOnlyCollection<List<InstrumentStringNote>> notePermutations = Strings
+                .Select(x => new List<InstrumentStringNote>())
                 .ToList();
+            for (int i = 0; i < Strings.Count; i++)
+            {
+                InstrumentString @string = Strings.ElementAt(i);
+                Note note = @string.NoteAt(position);
+                if (!note.InScale(scale))
+                {
+                    continue;
+                }
+
+                notePermutations.ElementAt(i).Add(new InstrumentStringNote(position, @string, null));
+            }
 
             IReadOnlyCollection<Permutation> permutations = Permutation.GetPermutations(Modifiers.Count);
             foreach (Permutation permutation in permutations)
@@ -126,7 +160,7 @@ namespace NoteMapper.Core.Instruments.Implementations
                         continue;
                     }
 
-                    List<InstrumentStringNote> modifiedNotes = notePermutations[@string.Index];
+                    List<InstrumentStringNote> modifiedNotes = notePermutations.ElementAt(@string.Index);
                     IReadOnlyCollection<InstrumentStringModifier> modifiers = @string.Modifiers
                         .Where(x => x.Enabled)
                         .ToArray();
