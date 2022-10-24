@@ -6,7 +6,15 @@
         [TestCase("E", ExpectedResult = "E,G#,B")]
         public static string Major(string key)
         {            
-            Chord chord = Chord.Major(key);
+            Chord chord = Chord.Parse(key);
+            return string.Join(",", chord.Select(x => x.Name));
+        }
+
+        [TestCase("Cm", ExpectedResult = "C,D#,G")]
+        [TestCase("Em", ExpectedResult = "E,G,B")]
+        public static string Minor(string key)
+        {
+            Chord chord = Chord.Parse(key);
             return string.Join(",", chord.Select(x => x.Name));
         }
     }

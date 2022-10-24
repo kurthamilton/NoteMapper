@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Web", "NoteMapper.Web\NoteMapper.Web.csproj", "{0A59931F-429A-4D3F-BB0A-6BB3BE03FF7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Core", "NoteMapper.Core\NoteMapper.Core.csproj", "{FC283160-0241-4A7A-A495-989D89D1C7A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteMapper.Core", "NoteMapper.Core\NoteMapper.Core.csproj", "{FC283160-0241-4A7A-A495-989D89D1C7A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Core.Tests", "NoteMapper.Core.Tests\NoteMapper.Core.Tests.csproj", "{7D1E1600-6555-4FFC-BF67-6D4F7984B648}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteMapper.Core.Tests", "NoteMapper.Core.Tests\NoteMapper.Core.Tests.csproj", "{7D1E1600-6555-4FFC-BF67-6D4F7984B648}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteMapper.Web.Api", "NoteMapper.Web.Api\NoteMapper.Web.Api.csproj", "{B2A653C6-85DA-4E17-B33A-3CDF4682B3EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0A59931F-429A-4D3F-BB0A-6BB3BE03FF7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A59931F-429A-4D3F-BB0A-6BB3BE03FF7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A59931F-429A-4D3F-BB0A-6BB3BE03FF7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A59931F-429A-4D3F-BB0A-6BB3BE03FF7E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FC283160-0241-4A7A-A495-989D89D1C7A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FC283160-0241-4A7A-A495-989D89D1C7A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC283160-0241-4A7A-A495-989D89D1C7A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{7D1E1600-6555-4FFC-BF67-6D4F7984B648}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D1E1600-6555-4FFC-BF67-6D4F7984B648}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D1E1600-6555-4FFC-BF67-6D4F7984B648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2A653C6-85DA-4E17-B33A-3CDF4682B3EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2A653C6-85DA-4E17-B33A-3CDF4682B3EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2A653C6-85DA-4E17-B33A-3CDF4682B3EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2A653C6-85DA-4E17-B33A-3CDF4682B3EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

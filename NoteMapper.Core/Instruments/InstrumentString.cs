@@ -14,7 +14,7 @@ namespace NoteMapper.Core.Instruments
 
             Note[] notes = new Note[positions + 1];
 
-            Note note = Note.FromName(openNote);
+            Note note = Note.Parse(openNote);
             OpenNote = note;
             notes[0] = note;
 

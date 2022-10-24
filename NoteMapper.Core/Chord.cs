@@ -11,15 +11,9 @@ namespace NoteMapper.Core
 
         public IReadOnlyCollection<Note> Notes { get; }
 
-        public static Chord Major(string key)
+        public static Chord Parse(string key)
         {
-            Note note = Note.FromName(key);
-            return Major(note);
-        }
-
-        public static Chord Major(Note note)
-        {            
-            Scale scale = Scale.Major(note);
+            Scale scale = Scale.Parse(key);
             return new Chord(new[]
             {
                 scale.Notes.ElementAt(0),

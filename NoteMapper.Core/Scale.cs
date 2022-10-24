@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace NoteMapper.Core
 {
     public class Scale : IEnumerable<Note>
     {
+        private static readonly Regex KeyRegex = new Regex("^(?<note>[A-Ga-g]#?)(?<minor>m)?$", RegexOptions.Compiled);
+
         private static readonly string MajorIntervals = "221222";
+        private static readonly string MinorIntervals = "212212";
 
         private readonly Lazy<IReadOnlyDictionary<int, Note>> _notes;
 
@@ -16,19 +20,21 @@ namespace NoteMapper.Core
                 new ReadOnlyDictionary<int, Note>(Notes.ToDictionary(x => x.NoteIndex)));
         }
 
-        public IReadOnlyCollection<Note> Notes { get; }
+        public IReadOnlyCollection<Note> Notes { get; }        
 
-        public static Scale Major(string key)
+        public static Scale Parse(string key)
         {
-            Note note = Note.FromName(key);
-            return Major(note);
+            Match match = KeyRegex.Match(key);
+            if (!match.Success)
+            {
+                throw new ArgumentException("Invalid format", nameof(key));
+            }
+
+            Note note = Note.Parse(match.Groups["note"].Value);
+            bool minor = match.Groups["minor"].Success;
+
+            return minor ? Minor(note) : Major(note);
         }
-
-        public static Scale Major(Note key)
-        {
-            IEnumerable<Note> notes = ParseIntervals(key, MajorIntervals);
-            return new Scale(notes);
-        }        
 
         public bool Contains(Note note)
         {
@@ -68,6 +74,18 @@ namespace NoteMapper.Core
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private static Scale Major(Note key)
+        {
+            IEnumerable<Note> notes = ParseIntervals(key, MajorIntervals);
+            return new Scale(notes);
+        }
+
+        private static Scale Minor(Note key)
+        {
+            IEnumerable<Note> notes = ParseIntervals(key, MinorIntervals);
+            return new Scale(notes);
         }
 
         private static IEnumerable<Note> ParseIntervals(Note startingNote, string intervals)

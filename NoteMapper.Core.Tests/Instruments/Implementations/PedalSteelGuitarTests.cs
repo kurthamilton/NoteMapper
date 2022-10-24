@@ -18,10 +18,8 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }                
             });
 
-            Scale scale = Scale.Major("F");
-
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = 
-                psg.GetPermutations(scale, 5).ToArray();
+                psg.GetPermutations("F", 5).ToArray();
 
             string[] expected = new[]
             {
@@ -56,10 +54,8 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            Scale scale = Scale.Major("F");
-
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
-                psg.GetPermutations(scale, 5).ToArray();
+                psg.GetPermutations("F", 5).ToArray();
 
             string[] expected = new[]
             {
@@ -94,10 +90,8 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            Scale scale = Scale.Major("F");
-
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
-                psg.GetPermutations(scale, 6).ToArray();
+                psg.GetPermutations("F", 6).ToArray();
 
             string?[] expected = new[]
             {

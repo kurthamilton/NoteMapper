@@ -37,9 +37,14 @@ namespace NoteMapper.Core
 
         public string Name { get; }
 
-        public int OctaveIndex { get; }
+        public int OctaveIndex { get; }        
 
-        public static Note FromName(string name)
+        public static int GetNoteIndex(int index)
+        {
+            return index % _notes.Count;
+        }
+
+        public static Note Parse(string name)
         {
             Match match = _noteRegex.Match(name);
             if (!match.Success)
@@ -61,11 +66,6 @@ namespace NoteMapper.Core
             index += octave * _notes.Count;
 
             return new Note(index);
-        }
-
-        public static int GetNoteIndex(int index)
-        {
-            return index % _notes.Count;
         }
 
         public bool InScale(Scale scale)

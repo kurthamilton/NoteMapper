@@ -7,7 +7,7 @@
         [TestCase("C4", 5, ExpectedResult = "F4")]
         public static string Next(string name, int offset)
         {
-            Note note = Note.FromName(name);
+            Note note = Note.Parse(name);
             Note next = note.Next(offset);
             return next.ToString();
         }

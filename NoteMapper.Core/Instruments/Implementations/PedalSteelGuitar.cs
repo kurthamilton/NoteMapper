@@ -1,5 +1,4 @@
-﻿using System.Transactions;
-using NoteMapper.Core.Permutations;
+﻿using NoteMapper.Core.Permutations;
 
 namespace NoteMapper.Core.Instruments.Implementations
 {
@@ -50,11 +49,70 @@ namespace NoteMapper.Core.Instruments.Implementations
             return new PedalSteelGuitar(strings, modifiers);
         }
 
+        public static PedalSteelGuitar C6(int frets = 24)
+        {
+            return Custom(new PedalSteelGuitarConfig
+            {
+                Modifiers = new[]
+                {
+                    "4|2+2,6+2",
+                    "5|0+2,1+1,5-1",
+                    "6|4-1,8+1",
+                    "7|6+2,7+2",
+                    "8|0-3,1-1,3+1,9+1",
+                    "LKL|6-1",
+                    "LKR|6+1",
+                    "RKL|7-1",
+                    "RKR|7+1"
+                },
+                MutuallyExclusiveModifiers = new[]
+                {
+                    new KeyValuePair<string, string>("4", "6"),
+                    new KeyValuePair<string, string>("4", "7"),
+                    new KeyValuePair<string, string>("4", "8"),
+                    new KeyValuePair<string, string>("5", "7"),
+                    new KeyValuePair<string, string>("5", "8"),
+                    new KeyValuePair<string, string>("6", "8"),
+                    new KeyValuePair<string, string>("LKL", "LKR"),
+                    new KeyValuePair<string, string>("RKL", "RKR")
+                },
+                Strings = new[]
+                {
+                    $"C1|f=0-{frets}",
+                    $"F1|f=0-{frets}",
+                    $"A1|f=0-{frets}",
+                    $"C2|f=0-{frets}",
+                    $"E2|f=0-{frets}",
+                    $"G2|f=0-{frets}",
+                    $"A2|f=0-{frets}",
+                    $"C3|f=0-{frets}",
+                    $"E3|f=0-{frets}",
+                    $"G3|f=0-{frets}"
+                }
+            });
+        }
+
         public static PedalSteelGuitar E9(int frets = 24)
         {
             return Custom(new PedalSteelGuitarConfig
             {
                 Modifiers = new[]
+                {
+                    "A|0+2,5+2",
+                    "B|4+1,7+1",
+                    "C|5+2,6+2",
+                    "LKL|2-1,7-1",
+                    "LKR|2+1,7+1",
+                    "RKL|1-1,8-1",
+                    "RKR|3+1,9+1"
+                },
+                MutuallyExclusiveModifiers = new[]
+                {
+                    new KeyValuePair<string, string>("A", "C"),
+                    new KeyValuePair<string, string>("LKL", "LKR"),
+                    new KeyValuePair<string, string>("RKL", "RKR")
+                },
+                Strings = new[]
                 {
                     $"B2|f=0-{frets}",
                     $"D3|f=0-{frets}",
@@ -66,22 +124,6 @@ namespace NoteMapper.Core.Instruments.Implementations
                     $"G#4|f=0-{frets}",
                     $"D#4|f=0-{frets}",
                     $"F#4|f=0-{frets}"
-                },
-                MutuallyExclusiveModifiers = new[]
-                {
-                    new KeyValuePair<string, string>("A", "C"),
-                    new KeyValuePair<string, string>("LKL", "LKR"),
-                    new KeyValuePair<string, string>("RKL", "RKR")
-                },
-                Strings = new[]
-                {
-                    "A|0+2,5+2",
-                    "B|4+1,7+1",
-                    "C|5+2,6+2",
-                    "LKL|2-1,7-1",
-                    "LKR|2+1,7+1",
-                    "RKL|1-1,8-1",
-                    "RKR|3+1,9+1"
                 }
             });
         }
@@ -122,8 +164,10 @@ namespace NoteMapper.Core.Instruments.Implementations
             return true;
         }
 
-        public IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> GetPermutations(Scale scale, int position)
+        public override IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> GetPermutations(string key, int position)
         {
+            Scale scale = Scale.Parse(key);
+
             DisableModifiers();
 
             // create set of note permutations without any modifiers applied
