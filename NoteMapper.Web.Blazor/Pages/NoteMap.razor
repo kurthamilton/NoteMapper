@@ -48,30 +48,55 @@ else
 
     @if (Instrument != null)    
     {
-        <div class="fretboard">
-            <div class="fretboard__heading">
-                <div class="string__name"></div>
-
-                @for(int i = 0; i <= Instrument.Strings.ElementAt(0).Positions; i++)
-                {
-                    <div class="string__fret">@i</div>
-                }
-            </div>
-            @foreach (InstrumentString @string in Instrument.Strings)
-            {
-                <div class="fretboard__string">
-                    <div class="string__name">
-                        @(@string.OpenNote.Name)
-                    </div>
-
-                    @for(int i = 0; i <= @string.Positions; i++)
+        <table class="table-fixed">
+            <tbody class="fretboard">
+                <tr class="fretboard__heading">
+                    <th class="string__name"></th>
+                    @for (int i = 0; i <= Instrument.Strings.ElementAt(0).Positions; i++)
                     {
-                        <div class="string__fret">
-                        </div>
+                        <td class="string__fret">@i</td>
                     }
-                </div>
-            }
-        </div>
+                </tr>
+
+                @foreach (InstrumentString @string in Instrument.Strings)
+                {
+                    <tr class="fretboard__string">
+                        <th class="string__name">
+                            @(@string.OpenNote.Name)
+                        </th>
+
+                        @for (int i = 0; i <= @string.Positions; i++)
+                        {
+                            <td class="string__fret">
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+
+            <tbody class="separator">
+                <tr>
+                    <td></td>
+                </tr>
+            </tbody>
+
+            <tbody class="modifiers">
+                @foreach (InstrumentStringModifier modifier in Instrument.Modifiers)
+                {
+                    <tr class="modifiers__modifier">
+                        <th class="modifier__name">
+                            @modifier.Name
+                        </th>
+
+                        @for (int i = 0; i <= Instrument.Strings.ElementAt(0).Positions; i++)
+                        {
+                            <td class="modifier__fret"></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
     }    
 }
 

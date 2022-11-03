@@ -105,7 +105,7 @@ namespace NoteMapper.Core.Instruments.Implementations
                 Modifiers = new[]
                 {
                     PedalSteelGuitarConfig.GetModifierConfig("A", 0, 2, 5, 2),
-                    PedalSteelGuitarConfig.GetModifierConfig("A", 4, 1, 7, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("B", 4, 1, 7, 1),
                     PedalSteelGuitarConfig.GetModifierConfig("C", 5, 2, 6, 2),
                     PedalSteelGuitarConfig.GetModifierConfig("LKL", 2, -1, 7, -1),
                     PedalSteelGuitarConfig.GetModifierConfig("LKR", 2, 1, 7, 1),

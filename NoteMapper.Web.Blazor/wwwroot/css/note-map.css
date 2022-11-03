@@ -9,17 +9,28 @@
 .fretboard {
 }
 
+.modifiers {
+}
+
+.separator {
+    height: 1rem;
+}
+
 .fretboard__heading {
-    display: flex;
     font-size: var(--fretboard-fontsize-smaller);    
 }
 
+.modifiers__modifier,
 .fretboard__string {
-    display: flex;
     border-top: 1px solid var(--fretboard-bordercolor-strings);
+}
+
+.modifiers__modifier:last-child,
+.fretboard__string:last-child {
     border-bottom: 1px solid var(--fretboard-bordercolor-strings);
 }
 
+.modifier__name,
 .string__name {
     font-size: var(--fretboard-fontsize-smaller);
     padding-right: var(--fretboard-padding);
@@ -27,12 +38,13 @@
     width: var(--fretboard-width-frets);
 }
 
+.modifier__fret,
 .string__fret {
     border-left: 1px solid var(--fretboard-bordercolor-frets);
     text-align: center;
-    width: var(--fretboard-width-frets);
 }
 
-    .string__fret:last-child {
-        border-right: 1px solid var(--fretboard-bordercolor-frets);
-    }
+.modifier__fret:last-child,
+.string__fret:last-child {
+    border-right: 1px solid var(--fretboard-bordercolor-frets);
+}
