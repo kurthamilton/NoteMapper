@@ -1,0 +1,42 @@
+﻿@page "/instruments"
+
+<PageTitle>Instruments</PageTitle>
+
+@using NoteMapper.Core.Instruments
+@using NoteMapper.Services
+@using NoteMapper.Web.Blazor.Data
+@inject IInstrumentFactory InstrumentFactory
+
+<h1>Instruments</h1>
+
+@if (instruments == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instrument in instruments)
+            {
+                <tr>
+                    <td>@instrument.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyCollection<InstrumentBase>? instruments;
+
+    protected override void OnInitialized()
+    {
+        instruments = InstrumentFactory.GetInstruments();
+    }
+}

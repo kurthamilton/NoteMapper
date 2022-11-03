@@ -39,6 +39,13 @@ namespace NoteMapper.Core
 
         public int OctaveIndex { get; }        
 
+        public static IReadOnlyCollection<string> GetNotes()
+        {
+            return _notes
+                .OrderBy(x => x)
+                .ToArray();
+        }
+
         public static int GetNoteIndex(int index)
         {
             return index % _notes.Count;

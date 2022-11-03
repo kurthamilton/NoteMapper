@@ -1,51 +1,80 @@
-using System.Diagnostics.Metrics;
 using Microsoft.AspNetCore.Mvc;
 using NoteMapper.Core.Instruments;
 using NoteMapper.Core.Instruments.Implementations;
-using NoteMapper.Web.Api.Models.Permutations;
+using NoteMapper.Services;
+using NoteMapper.Web.Api.Models.Instruments.Requests;
+using NoteMapper.Web.Api.Models.Permutations.Requests;
+using NoteMapper.Web.Api.Models.Permutations.Responses;
 
 namespace NoteMapper.Web.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class PermutationsController : ControllerBase
-    {        
-        [HttpGet(Name = "{name}")]
-        public PermutationsResponse? GetPermutations(string name, int position, string key)
+    {
+        private readonly IInstrumentFactory _instrumentFactory;
+
+        public PermutationsController(IInstrumentFactory instrumentFactory)
         {
-            StringedInstrumentBase? instrument = GetInstrument(name) as StringedInstrumentBase;
+            _instrumentFactory = instrumentFactory;
+        }
+
+        [HttpPost]
+        [Route("")]
+        public PermutationsResponse? GetPermutations(PermutationsRequest request)
+        {
+            StringedInstrumentBase? instrument = GetInstrument(request.Instrument) as StringedInstrumentBase;
             if (instrument == null)
             {
                 Response.StatusCode = 404;
                 return null;
             }
 
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = 
-                instrument.GetPermutations(key, position);
+            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
+                instrument.GetPermutations(request.Key ?? "", request.Position);
 
-            PermutationsResponseString[] strings = permutations
-                .Select(@string => new PermutationsResponseString
+            PermutationsResponse response = new PermutationsResponse(permutations
+                .Select(@string => new PermutationString(@string.Select(x => new PermutationNote
                 {
-                    Notes = @string.Select(x => new PermutationsResponseStringNote
-                    {
-                        Modifier = x.Modifier?.Name ?? "",
-                        Name = x.Note.Name
-                    }).ToArray()
-                })
-                .ToArray();
-
-            PermutationsResponse response = new PermutationsResponse(strings);
+                    Modifier = x.Modifier?.Name ?? "",
+                    Name = x.Note.Name
+                }))));
             return response;
         }
 
-        private InstrumentBase? GetInstrument(string instrument)
+        private InstrumentBase? GetInstrument(RequestInstrument request)
         {
-            switch (instrument)
+            InstrumentBase? instrument = _instrumentFactory.GetInstrument(request.Name);
+            if (instrument != null)
             {
-                case "PedalSteelC6":
-                    return PedalSteelGuitar.C6();
-                case "PedalSteelE9":
-                    return PedalSteelGuitar.E9();
+                return instrument;
+            }
+
+            switch (request.Name)
+            {
+                case "PedalSteelGuitar":
+                    return PedalSteelGuitar.Custom(request.Name, new PedalSteelGuitarConfig
+                    {
+                        Modifiers = request.Modifiers
+                            .Select(x =>
+                            {
+                                int[] offsets = new int[x.Offsets.Length * 2];
+                                for (int i = 0; i < x.Offsets.Length; i++)
+                                {
+                                    offsets[i * 2] = x.Offsets[i].StringIndex;
+                                    offsets[i * 2 + 1] = x.Offsets[i].Offset;
+                                }
+
+                                return PedalSteelGuitarConfig.GetModifierConfig(x.Name, offsets);
+                            })
+                            .ToArray(),
+                        MutuallyExclusiveModifiers = request.MutuallyExclusiveModifiers
+                            .Select(x => new KeyValuePair<string, string>(x[0], x[1]))
+                            .ToArray(),
+                        Strings = request.Strings
+                            .Select(x => PedalSteelGuitarConfig.GetStringConfig(x.Note, x.Frets))
+                            .ToArray()
+                    });                
                 default:
                     return null;
             }

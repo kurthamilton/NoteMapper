@@ -8,7 +8,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
         [Test]
         public static void GetPermutations_NoModifers_ReturnsStandardNotes()
         {
-            PedalSteelGuitar psg = PedalSteelGuitar.Custom(new PedalSteelGuitarConfig
+            PedalSteelGuitar psg = PedalSteelGuitar.Custom("custom", new PedalSteelGuitarConfig
             { 
                 Strings = new[]
                 {
@@ -38,7 +38,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
         [Test]
         public static void GetPermutations_InvalidModifiedNotesAreIgnored()
         {
-            PedalSteelGuitar psg = PedalSteelGuitar.Custom(new PedalSteelGuitarConfig
+            PedalSteelGuitar psg = PedalSteelGuitar.Custom("custom", new PedalSteelGuitarConfig
             {
                 Modifiers = new[]
                 {
@@ -74,7 +74,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
         [Test]
         public static void GetPermutations_StringHasNoValidNote_ReturnsEmpty()
         {
-            PedalSteelGuitar psg = PedalSteelGuitar.Custom(new PedalSteelGuitarConfig
+            PedalSteelGuitar psg = PedalSteelGuitar.Custom("custom", new PedalSteelGuitarConfig
             {
                 Modifiers = new[]
                 {

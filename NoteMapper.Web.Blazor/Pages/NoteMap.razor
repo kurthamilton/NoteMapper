@@ -1,0 +1,105 @@
+﻿@page "/note-map"
+
+<PageTitle>Note Map</PageTitle>
+
+@using NoteMapper.Core.Instruments
+@using NoteMapper.Services
+@using NoteMapper.Services.Web
+@using NoteMapper.Services.Web.ViewModels
+@using NoteMapper.Web.Blazor.Data
+@inject IInstrumentFactory InstrumentFactory;
+@inject IMusicTheoryService MusicTheoryService;
+@inject INoteMapViewModelService NoteMapViewModelService;
+
+<h1>Note Map</h1>
+
+@if (Model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{    
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class=form-group>
+                <label for="instrument">Instrument</label>
+                <select class="form-control" id="instrument"
+                    @onchange="OnInstrumentChange">
+                    <option></option>
+                    @foreach (string instrument in Model.Instruments)
+                    {
+                        <option>@instrument</option>
+                    }
+                </select>
+            </div>
+
+            <div class=form-group>
+                <label for="key">Key</label>
+                <select class="form-control" id="key" @onchange="OnKeyChange">
+                    <option></option>
+                    @foreach (KeyListItemViewModel key in Model.Keys)
+                    {
+                        <option value="@key.ShortName">@key.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>     
+
+    @if (Instrument != null)    
+    {
+        <div class="fretboard">
+            <div class="fretboard__heading">
+                <div class="string__name"></div>
+
+                @for(int i = 0; i <= Instrument.Strings.ElementAt(0).Positions; i++)
+                {
+                    <div class="string__fret">@i</div>
+                }
+            </div>
+            @foreach (InstrumentString @string in Instrument.Strings)
+            {
+                <div class="fretboard__string">
+                    <div class="string__name">
+                        @(@string.OpenNote.Name)
+                    </div>
+
+                    @for(int i = 0; i <= @string.Positions; i++)
+                    {
+                        <div class="string__fret">
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }    
+}
+
+@code {
+    NoteMapCriteriaViewModel? Model;
+    StringedInstrumentBase? Instrument;
+    NoteMapPermutationsViewModel? Permutations;
+    private string? selectedKey;
+
+    protected override void OnInitialized()
+    {
+        Model = NoteMapViewModelService.GetNoteMapCriteriaViewModel();
+    }
+
+    void OnInstrumentChange(ChangeEventArgs e)
+    {
+        Instrument = InstrumentFactory.GetInstrument((string?)e.Value) as StringedInstrumentBase;
+        SetPermutations();
+    }
+
+    void OnKeyChange(ChangeEventArgs e)
+    {        
+        selectedKey = (string?)e.Value;
+        SetPermutations();
+    }
+
+    void SetPermutations()
+    {
+        Permutations = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument, selectedKey ?? "");
+    }
+}

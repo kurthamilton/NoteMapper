@@ -27,7 +27,7 @@ namespace NoteMapper.Core
             Match match = KeyRegex.Match(key);
             if (!match.Success)
             {
-                throw new ArgumentException("Invalid format", nameof(key));
+                throw new ArgumentException();
             }
 
             Note note = Note.Parse(match.Groups["note"].Value);

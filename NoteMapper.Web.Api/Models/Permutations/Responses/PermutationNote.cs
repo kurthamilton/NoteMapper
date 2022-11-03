@@ -1,6 +1,6 @@
-﻿namespace NoteMapper.Web.Api.Models.Permutations
+﻿namespace NoteMapper.Web.Api.Models.Permutations.Responses
 {
-    public class PermutationsResponseStringNote
+    public class PermutationNote
     {
         public string Modifier { get; set; } = "";
 

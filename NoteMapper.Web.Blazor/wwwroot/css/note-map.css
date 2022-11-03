@@ -1,0 +1,38 @@
+﻿:root {
+    --fretboard-bordercolor-frets: #ccc;
+    --fretboard-bordercolor-strings: #000;
+    --fretboard-fontsize-smaller: 0.8rem;
+    --fretboard-padding: 0.4rem;
+    --fretboard-width-frets: 5%;
+}
+
+.fretboard {
+}
+
+.fretboard__heading {
+    display: flex;
+    font-size: var(--fretboard-fontsize-smaller);    
+}
+
+.fretboard__string {
+    display: flex;
+    border-top: 1px solid var(--fretboard-bordercolor-strings);
+    border-bottom: 1px solid var(--fretboard-bordercolor-strings);
+}
+
+.string__name {
+    font-size: var(--fretboard-fontsize-smaller);
+    padding-right: var(--fretboard-padding);
+    text-align: right;
+    width: var(--fretboard-width-frets);
+}
+
+.string__fret {
+    border-left: 1px solid var(--fretboard-bordercolor-frets);
+    text-align: center;
+    width: var(--fretboard-width-frets);
+}
+
+    .string__fret:last-child {
+        border-right: 1px solid var(--fretboard-bordercolor-frets);
+    }

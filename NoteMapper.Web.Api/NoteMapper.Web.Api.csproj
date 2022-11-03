@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NoteMapper.Core\NoteMapper.Core.csproj" />
+    <ProjectReference Include="..\NoteMapper.Infrastructure\NoteMapper.Infrastructure.csproj" />
+    <ProjectReference Include="..\NoteMapper.Services\NoteMapper.Services.csproj" />
   </ItemGroup>
 
 </Project>

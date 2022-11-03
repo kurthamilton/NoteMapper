@@ -4,17 +4,23 @@ namespace NoteMapper.Core.Instruments.Implementations
 {
     public class PedalSteelGuitar : StringedInstrumentBase
     {                
-        private PedalSteelGuitar(IEnumerable<InstrumentString> strings, IEnumerable<InstrumentStringModifier> modifiers)
+        private PedalSteelGuitar(string name, IEnumerable<InstrumentString> strings, 
+            IEnumerable<InstrumentStringModifier> modifiers)
         {
-            Strings = strings.ToArray();
             Modifiers = modifiers.ToArray();
+            Name = name;
+            Strings = strings.ToArray();
         }
 
-        public IReadOnlyCollection<InstrumentStringModifier> Modifiers { get; }
+        public override IReadOnlyCollection<InstrumentStringModifier> Modifiers { get; }
+
+        public override string Name { get; }
 
         public override IReadOnlyCollection<InstrumentString> Strings { get; }
 
-        public static PedalSteelGuitar Custom(PedalSteelGuitarConfig config)
+        public override string Type => "PedalSteelGuitar";
+
+        public static PedalSteelGuitar Custom(string name, PedalSteelGuitarConfig config)
         {
             List<InstrumentStringModifier> modifiers = new List<InstrumentStringModifier>();
             foreach (string m in config.Modifiers)
@@ -46,24 +52,24 @@ namespace NoteMapper.Core.Instruments.Implementations
                 strings.Add(@string);
             }
 
-            return new PedalSteelGuitar(strings, modifiers);
+            return new PedalSteelGuitar(name, strings, modifiers);
         }
 
         public static PedalSteelGuitar C6(int frets = 24)
         {
-            return Custom(new PedalSteelGuitarConfig
+            return Custom("Pedal Steel C6", new PedalSteelGuitarConfig
             {
                 Modifiers = new[]
                 {
-                    "4|2+2,6+2",
-                    "5|0+2,1+1,5-1",
-                    "6|4-1,8+1",
-                    "7|6+2,7+2",
-                    "8|0-3,1-1,3+1,9+1",
-                    "LKL|6-1",
-                    "LKR|6+1",
-                    "RKL|7-1",
-                    "RKR|7+1"
+                    PedalSteelGuitarConfig.GetModifierConfig("4", 2, 2, 6, 2),
+                    PedalSteelGuitarConfig.GetModifierConfig("5", 0, 2, 1, 1, 5, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("6", 4, -1, 8, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("7", 6, 2, 7, 2),
+                    PedalSteelGuitarConfig.GetModifierConfig("8", 0, -3, 1, -1, 3, 1, 9, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("LKL", 6, -1),
+                    PedalSteelGuitarConfig.GetModifierConfig("LKR", 6, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("RKL", 7, -1),
+                    PedalSteelGuitarConfig.GetModifierConfig("RKR", 7, 1),
                 },
                 MutuallyExclusiveModifiers = new[]
                 {
@@ -78,33 +84,33 @@ namespace NoteMapper.Core.Instruments.Implementations
                 },
                 Strings = new[]
                 {
-                    $"C1|f=0-{frets}",
-                    $"F1|f=0-{frets}",
-                    $"A1|f=0-{frets}",
-                    $"C2|f=0-{frets}",
-                    $"E2|f=0-{frets}",
-                    $"G2|f=0-{frets}",
-                    $"A2|f=0-{frets}",
-                    $"C3|f=0-{frets}",
-                    $"E3|f=0-{frets}",
-                    $"G3|f=0-{frets}"
+                    PedalSteelGuitarConfig.GetStringConfig("G3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("E3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("C3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("A2", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("G2", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("E2", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("C2", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("A1", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("F1", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("C1", frets)
                 }
             });
         }
 
         public static PedalSteelGuitar E9(int frets = 24)
         {
-            return Custom(new PedalSteelGuitarConfig
+            return Custom("Pedal Steel E9", new PedalSteelGuitarConfig
             {
                 Modifiers = new[]
                 {
-                    "A|0+2,5+2",
-                    "B|4+1,7+1",
-                    "C|5+2,6+2",
-                    "LKL|2-1,7-1",
-                    "LKR|2+1,7+1",
-                    "RKL|1-1,8-1",
-                    "RKR|3+1,9+1"
+                    PedalSteelGuitarConfig.GetModifierConfig("A", 0, 2, 5, 2),
+                    PedalSteelGuitarConfig.GetModifierConfig("A", 4, 1, 7, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("C", 5, 2, 6, 2),
+                    PedalSteelGuitarConfig.GetModifierConfig("LKL", 2, -1, 7, -1),
+                    PedalSteelGuitarConfig.GetModifierConfig("LKR", 2, 1, 7, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("RKL", 1, -1, 8, -1),
+                    PedalSteelGuitarConfig.GetModifierConfig("RKR", 3, 1, 9, 1),
                 },
                 MutuallyExclusiveModifiers = new[]
                 {
@@ -114,16 +120,16 @@ namespace NoteMapper.Core.Instruments.Implementations
                 },
                 Strings = new[]
                 {
-                    $"B2|f=0-{frets}",
-                    $"D3|f=0-{frets}",
-                    $"E3|f=0-{frets}",
-                    $"F#3|f=0-{frets}",
-                    $"G#3|f=0-{frets}",
-                    $"B3|f=0-{frets}",
-                    $"E4|f=0-{frets}",
-                    $"G#4|f=0-{frets}",
-                    $"D#4|f=0-{frets}",
-                    $"F#4|f=0-{frets}"
+                    PedalSteelGuitarConfig.GetStringConfig("F#4", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("D#4", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("G#4", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("E4", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("B3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("G#3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("F#3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("E3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("D3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("B2", frets)
                 }
             });
         }
@@ -166,7 +172,11 @@ namespace NoteMapper.Core.Instruments.Implementations
 
         public override IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> GetPermutations(string key, int position)
         {
-            Scale scale = Scale.Parse(key);
+            Scale? scale = Scale.Parse(key);
+            if (scale == null)
+            {
+                return Array.Empty<InstrumentStringNote[]>();
+            }
 
             DisableModifiers();
 

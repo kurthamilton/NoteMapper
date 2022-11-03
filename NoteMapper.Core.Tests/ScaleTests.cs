@@ -23,7 +23,7 @@ namespace NoteMapper.Core.Tests
         public static string NotesBetween(string key)
         {
             Scale scale = Scale.Parse(key);
-            IEnumerable<Note> notes = scale.NotesBetween(0, 24);
+            IEnumerable<Note>? notes = scale?.NotesBetween(0, 24) ?? Enumerable.Empty<Note>();
             return string.Join(",", notes.Select(x => x.ToString()));
         }
     }

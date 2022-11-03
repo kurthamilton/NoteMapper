@@ -2,6 +2,8 @@
 {
     public abstract class StringedInstrumentBase : InstrumentBase
     {
+        public abstract IReadOnlyCollection<InstrumentStringModifier> Modifiers { get; }
+
         public abstract IReadOnlyCollection<InstrumentString> Strings { get; }
 
         public abstract IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> GetPermutations(string key, int position);
