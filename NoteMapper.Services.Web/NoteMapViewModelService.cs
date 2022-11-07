@@ -31,7 +31,8 @@ namespace NoteMapper.Services.Web
                 : null;
         }
 
-        public NoteMapPermutationsViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string keyName)
+        public NoteMapPermutationsViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string keyName,
+            NoteMapType type)
         {
             if (instrument == null)
             {
@@ -45,7 +46,7 @@ namespace NoteMapper.Services.Web
             }
 
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = 
-                instrument.GetPermutations(key.ShortName, 1);
+                instrument.GetPermutations(key.ShortName, 1, type);
 
             return new NoteMapPermutationsViewModel(permutations);
         }

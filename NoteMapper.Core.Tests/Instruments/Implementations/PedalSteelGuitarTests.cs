@@ -19,7 +19,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             });
 
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = 
-                psg.GetPermutations("F", 5).ToArray();
+                psg.GetPermutations("F", 5, NoteMapType.Scale).ToArray();
 
             string[] expected = new[]
             {
@@ -55,7 +55,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             });
 
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
-                psg.GetPermutations("F", 5).ToArray();
+                psg.GetPermutations("F", 5, NoteMapType.Scale).ToArray();
 
             string[] expected = new[]
             {
@@ -91,7 +91,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             });
 
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
-                psg.GetPermutations("F", 6).ToArray();
+                psg.GetPermutations("F", 6, NoteMapType.Scale).ToArray();
 
             string?[] expected = new[]
             {

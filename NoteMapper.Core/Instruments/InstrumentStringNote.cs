@@ -4,7 +4,11 @@
     {        
         public InstrumentStringNote(int position, InstrumentString @string, InstrumentStringModifier? modifier)
         {            
-            Note = @string.NoteAt(position);
+            IReadOnlyCollection<InstrumentStringModifier> modifiers = modifier != null 
+                ? new[] { modifier } 
+                : Array.Empty<InstrumentStringModifier>();
+
+            Note = @string.NoteAt(position, modifiers);
             Modifier = modifier;
             Position = position;
             String = @string;

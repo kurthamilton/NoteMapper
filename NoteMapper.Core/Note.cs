@@ -46,6 +46,19 @@ namespace NoteMapper.Core
                 .ToArray();
         }
 
+        public static INoteCollection GetNotes(NoteMapType type, string key)
+        {
+            switch (type)
+            {
+                case NoteMapType.Chord:
+                    return Chord.Parse(key);
+                case NoteMapType.Scale:
+                    return Scale.Parse(key);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
+            }
+        }
+
         public static int GetNoteIndex(int index)
         {
             return index % _notes.Count;

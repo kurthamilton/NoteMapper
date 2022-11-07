@@ -19,5 +19,12 @@ namespace NoteMapper.Core.Extensions
 
             return array;
         }
+
+        public static int ToInt(this BitArray bitArray)
+        {            
+            int[] array = new int[1];
+            bitArray.CopyTo(array, 0);
+            return array[0];
+        }
     }
 }

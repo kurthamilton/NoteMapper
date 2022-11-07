@@ -1,26 +1,18 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace NoteMapper.Core
 {
-    public class Scale : IEnumerable<Note>
+    public class Scale : NoteCollection
     {
         private static readonly Regex KeyRegex = new Regex("^(?<note>[A-Ga-g]#?)(?<minor>m)?$", RegexOptions.Compiled);
 
         private static readonly string MajorIntervals = "221222";
-        private static readonly string MinorIntervals = "212212";
-
-        private readonly Lazy<IReadOnlyDictionary<int, Note>> _notes;
+        private static readonly string MinorIntervals = "212212";        
 
         private Scale(IEnumerable<Note> notes)
-        {
-            Notes = notes.ToArray();
-            _notes = new Lazy<IReadOnlyDictionary<int, Note>>(() => 
-                new ReadOnlyDictionary<int, Note>(Notes.ToDictionary(x => x.NoteIndex)));
+            : base(notes)
+        {            
         }
-
-        public IReadOnlyCollection<Note> Notes { get; }        
 
         public static Scale Parse(string key)
         {
@@ -34,11 +26,6 @@ namespace NoteMapper.Core
             bool minor = match.Groups["minor"].Success;
 
             return minor ? Minor(note) : Major(note);
-        }
-
-        public bool Contains(Note note)
-        {
-            return Contains(note.NoteIndex);
         }
 
         public IEnumerable<Note> NotesBetween(int start, int end)
@@ -66,16 +53,6 @@ namespace NoteMapper.Core
             }
         }        
 
-        public IEnumerator<Note> GetEnumerator()
-        {
-            return Notes.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
         private static Scale Major(Note key)
         {
             IEnumerable<Note> notes = ParseIntervals(key, MajorIntervals);
@@ -97,11 +74,6 @@ namespace NoteMapper.Core
                 byte interval = byte.Parse(c.ToString());
                 yield return startingNote = startingNote.Next(interval);
             }
-        }
-
-        private bool Contains(int noteIndex)
-        {
-            return _notes.Value.ContainsKey(noteIndex);
-        }
+        }        
     }
 }

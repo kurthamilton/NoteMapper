@@ -55,5 +55,20 @@ namespace NoteMapper.Core.Tests.Extensions
                 true, false, true, true, false
             }, array);
         }
+
+        [TestCase("10000", ExpectedResult = 1)]
+        [TestCase("01000", ExpectedResult = 2)]
+        [TestCase("11000", ExpectedResult = 3)]
+        [TestCase("11110", ExpectedResult = 15)]
+        public static int ToInt(string bits)
+        {
+            BitArray bitArray = new BitArray(bits.Length);
+            for (int i = 0; i < bits.Length; i++)
+            {
+                bitArray.Set(i, bits[i] == '1');
+            }
+
+            return bitArray.ToInt();
+        }
     }
 }

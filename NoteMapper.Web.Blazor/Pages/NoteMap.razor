@@ -2,6 +2,7 @@
 
 <PageTitle>Note Map</PageTitle>
 
+@using NoteMapper.Core
 @using NoteMapper.Core.Instruments
 @using NoteMapper.Services
 @using NoteMapper.Services.Web
@@ -20,7 +21,7 @@
 else
 {    
     <div class="card mb-3">
-        <div class="card-body">
+        <div class="card-body form-inline">
             <div class=form-group>
                 <label for="instrument">Instrument</label>
                 <select class="form-control" id="instrument"
@@ -43,6 +44,16 @@ else
                     }
                 </select>
             </div>
+
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select class="form-control" id="type" @onchange="OnTypeChange">
+                    @foreach (NoteMapType type in Model.Types)
+                    {
+                        <option>@type.ToString()</option>
+                    }                    
+                </select>
+            </div>
         </div>
     </div>     
 
@@ -52,7 +63,7 @@ else
             <tbody class="fretboard">
                 <tr class="fretboard__heading">
                     <th class="string__name"></th>
-                    @for (int i = 0; i <= Instrument.Strings.ElementAt(0).Positions; i++)
+                    @for (int i = 0; i <= positions; i++)
                     {
                         <td class="string__fret">@i</td>
                     }
@@ -65,7 +76,7 @@ else
                             @(@string.OpenNote.Name)
                         </th>
 
-                        @for (int i = 0; i <= @string.Positions; i++)
+                        @for (int i = 0; i <= positions; i++)
                         {
                             <td class="string__fret">
                             </td>
@@ -88,9 +99,14 @@ else
                             @modifier.Name
                         </th>
 
-                        @for (int i = 0; i <= Instrument.Strings.ElementAt(0).Positions; i++)
+                        @for (int i = 0; i <= positions; i++)
                         {
-                            <td class="modifier__fret"></td>
+                            bool available = positionModifiers.Length > i && 
+                                             positionModifiers[i].Contains(modifier.Name);
+
+                            <td class="modifier__fret @(!available ? "disabled" : "")">
+
+                            </td>
                         }
                     </tr>
                 }
@@ -104,7 +120,11 @@ else
     NoteMapCriteriaViewModel? Model;
     StringedInstrumentBase? Instrument;
     NoteMapPermutationsViewModel? Permutations;
+    private int? positions;
     private string? selectedKey;
+    private NoteMapType selectedType = NoteMapType.Chord;
+    string[][] positionModifiers = new string[0][];
+    int[][] positionStrings = new int[0][];
 
     protected override void OnInitialized()
     {
@@ -114,6 +134,7 @@ else
     void OnInstrumentChange(ChangeEventArgs e)
     {
         Instrument = InstrumentFactory.GetInstrument((string?)e.Value) as StringedInstrumentBase;
+        positions = Instrument?.Strings.Max(x => x.Positions);
         SetPermutations();
     }
 
@@ -123,8 +144,38 @@ else
         SetPermutations();
     }
 
+    void OnTypeChange(ChangeEventArgs e)
+    {
+        string value = (string?)e.Value ?? "";
+        NoteMapType type = (NoteMapType)Enum.Parse(typeof(NoteMapType), value, true);
+        selectedType = type;
+        SetPermutations();
+    }
+
     void SetPermutations()
     {
-        Permutations = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument, selectedKey ?? "");
+        positionModifiers = new string[0][];
+        if (Instrument == null || selectedKey == null)
+        {
+            return;
+        }
+
+        // Permutations = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument, selectedKey ?? "", selectedType);
+        positionModifiers = new string[positions + 1 ?? 0][];        
+
+        INoteCollection notes = Note.GetNotes(selectedType, selectedKey ?? "");
+
+        for (int position = 0; position <= positions; position++)
+        {
+            IReadOnlyCollection<InstrumentStringModifier> availableModifiers = Instrument
+                .AvailableModifiers(notes, position)
+                .ToArray();
+            positionModifiers[position] = availableModifiers
+                .Select(x => x.Name)
+                .ToArray();
+
+
+            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = Instrument.GetPermutations(selectedKey ?? "", position, selectedType);
+        }
     }
 }

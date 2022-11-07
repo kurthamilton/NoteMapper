@@ -14,10 +14,16 @@ namespace NoteMapper.Services.Web.ViewModels
             Keys = keys
                 .Select(x => new KeyListItemViewModel(x.ShortName, x.Name))
                 .ToArray();
+
+            Types = Enum.GetValues<NoteMapType>()
+                .Where(x => x != NoteMapType.None)
+                .ToArray();
         }
 
         public IReadOnlyCollection<string> Instruments { get; }
 
         public IReadOnlyCollection<KeyListItemViewModel> Keys { get; }
+
+        public IReadOnlyCollection<NoteMapType> Types { get; }
     }
 }

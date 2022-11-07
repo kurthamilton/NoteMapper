@@ -1,4 +1,5 @@
 ﻿:root {
+    --fretboard-backgroundcolor-disabled: #ccc;
     --fretboard-bordercolor-frets: #ccc;
     --fretboard-bordercolor-strings: #000;
     --fretboard-fontsize-smaller: 0.8rem;
@@ -42,6 +43,10 @@
 .string__fret {
     border-left: 1px solid var(--fretboard-bordercolor-frets);
     text-align: center;
+}
+
+.modifier__fret.disabled {
+    background-color: var(--fretboard-backgroundcolor-disabled);
 }
 
 .modifier__fret:last-child,
