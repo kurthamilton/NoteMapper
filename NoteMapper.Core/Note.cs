@@ -31,8 +31,14 @@ namespace NoteMapper.Core
         {            
         }
 
+        /// <summary>
+        /// The index of the note including the octave
+        /// </summary>
         public int Index { get; }
 
+        /// <summary>
+        /// The index of the note within the chromatic sale
+        /// </summary>
         public int NoteIndex { get; } 
 
         public string Name { get; }

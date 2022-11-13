@@ -8,14 +8,13 @@ namespace NoteMapper.Core.Instruments
     {        
         private readonly IReadOnlyCollection<InstrumentStringModifier> _modifiers;
         private readonly IReadOnlyCollection<KeyValuePair<string, string>> _mutuallyExclusive;
-        private readonly Lazy<IReadOnlyCollection<IReadOnlyCollection<InstrumentStringModifier>>> _permutations;
+        private IReadOnlyCollection<IReadOnlyCollection<InstrumentStringModifier>>? _permutations;
 
         public InstrumentStringModifierCollection(IEnumerable<InstrumentStringModifier> modifiers,
             IEnumerable<KeyValuePair<string, string>> mutuallyExclusive)
         {
             _modifiers = modifiers.ToArray();
             _mutuallyExclusive = mutuallyExclusive.ToArray();
-            _permutations = new(() => GetPermutations());
         }
 
         public int Count => _modifiers.Count;
@@ -30,8 +29,13 @@ namespace NoteMapper.Core.Instruments
             return GetEnumerator();
         }
 
-        private IReadOnlyCollection<IReadOnlyCollection<InstrumentStringModifier>> GetPermutations()
+        public IReadOnlyCollection<IReadOnlyCollection<InstrumentStringModifier>> GetPermutations()
         {
+            if (_permutations != null)
+            {
+                return _permutations;
+            }
+
             List<IReadOnlyCollection<InstrumentStringModifier>> modifierPermutations = new();
 
             HashSet<Permutation> invalidPermutations = new();
@@ -70,7 +74,9 @@ namespace NoteMapper.Core.Instruments
                 modifierPermutations.Add(permutationModifiers);
             }
 
-            return modifierPermutations;
+            _permutations = modifierPermutations;
+
+            return _permutations;
         }
     }
 }

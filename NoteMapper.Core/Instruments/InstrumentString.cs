@@ -80,5 +80,10 @@ namespace NoteMapper.Core.Instruments
             return Notes.ElementAt(position)
                 .Next(modifierOffset);
         }
+
+        public override string ToString()
+        {
+            return OpenNote.ToString();
+        }
     }
 }

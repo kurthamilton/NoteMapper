@@ -1,13 +1,13 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace NoteMapper.Core
 {
     public class Scale : NoteCollection
     {
-        private static readonly Regex KeyRegex = new Regex("^(?<note>[A-Ga-g]#?)(?<minor>m)?$", RegexOptions.Compiled);
+        private static readonly Regex KeyRegex = new Regex(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
 
-        private static readonly string MajorIntervals = "221222";
-        private static readonly string MinorIntervals = "212212";        
+        private static readonly IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> KeyIntervals = GetKeyIntervals();
 
         private Scale(IEnumerable<Note> notes)
             : base(notes)
@@ -23,9 +23,10 @@ namespace NoteMapper.Core
             }
 
             Note note = Note.Parse(match.Groups["note"].Value);
-            bool minor = match.Groups["minor"].Success;
-
-            return minor ? Minor(note) : Major(note);
+            Group typeGroup = match.Groups["type"];
+            KeyType type = ParseKeyType(typeGroup.Success ? typeGroup.Value : "");
+            IEnumerable<Note> notes = ParseIntervals(note, KeyIntervals[type]);
+            return new(notes);
         }
 
         public IEnumerable<Note> NotesBetween(int start, int end)
@@ -53,27 +54,32 @@ namespace NoteMapper.Core
             }
         }        
 
-        private static Scale Major(Note key)
+        private static IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> GetKeyIntervals()
         {
-            IEnumerable<Note> notes = ParseIntervals(key, MajorIntervals);
-            return new Scale(notes);
+            IDictionary<KeyType, IReadOnlyCollection<byte>> intervals = new Dictionary<KeyType, IReadOnlyCollection<byte>>
+            {
+                { KeyType.Major, new byte[] { 2, 2, 1, 2, 2, 2 } },
+                { KeyType.Minor, new byte[] { 2, 1, 2, 2, 1, 2 } }
+            };
+
+            return new ReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>>(intervals);
         }
 
-        private static Scale Minor(Note key)
-        {
-            IEnumerable<Note> notes = ParseIntervals(key, MinorIntervals);
-            return new Scale(notes);
-        }
-
-        private static IEnumerable<Note> ParseIntervals(Note startingNote, string intervals)
+        private static IEnumerable<Note> ParseIntervals(Note startingNote, IReadOnlyCollection<byte> intervals)
         {
             yield return startingNote;
 
-            foreach (char c in intervals)
+            foreach (byte interval in intervals)
             {
-                byte interval = byte.Parse(c.ToString());
                 yield return startingNote = startingNote.Next(interval);
             }
-        }        
+        }  
+        
+        private static KeyType ParseKeyType(string type)
+        {
+            return Enum.TryParse(type, out KeyType parsed)
+                ? parsed
+                : default;
+        }
     }
 }

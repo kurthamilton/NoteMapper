@@ -7,6 +7,8 @@
 @using NoteMapper.Services
 @using NoteMapper.Services.Web
 @using NoteMapper.Services.Web.ViewModels
+@using NoteMapper.Services.Web.ViewModels.Instruments
+@using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Data
 @inject IInstrumentFactory InstrumentFactory;
 @inject IMusicTheoryService MusicTheoryService;
@@ -14,7 +16,7 @@
 
 <h1>Note Map</h1>
 
-@if (Model == null)
+@if (Criteria == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,7 +29,7 @@ else
                 <select class="form-control" id="instrument"
                     @onchange="OnInstrumentChange">
                     <option></option>
-                    @foreach (string instrument in Model.Instruments)
+                    @foreach (string instrument in Criteria.Instruments)
                     {
                         <option>@instrument</option>
                     }
@@ -36,19 +38,27 @@ else
 
             <div class=form-group>
                 <label for="key">Key</label>
-                <select class="form-control" id="key" @onchange="OnKeyChange">
-                    <option></option>
-                    @foreach (KeyListItemViewModel key in Model.Keys)
-                    {
-                        <option value="@key.ShortName">@key.Name</option>
-                    }
-                </select>
+                <div class="d-flex">
+                    <select class="form-control" id="key" @onchange="OnKeyNameChange">
+                        <option></option>
+                        @foreach (string name in Criteria.KeyNames)
+                        {
+                            <option>@name</option>
+                        }
+                    </select>
+                    <select class="form-control" id="key" @onchange="OnKeyTypeChange">                       
+                        @foreach (string type in Criteria.KeyTypes)
+                        {
+                            <option>@type</option>
+                        }
+                    </select>
+                </div>                
             </div>
 
             <div class="form-group">
                 <label for="type">Type</label>
                 <select class="form-control" id="type" @onchange="OnTypeChange">
-                    @foreach (NoteMapType type in Model.Types)
+                    @foreach (NoteMapType type in Criteria.Types)
                     {
                         <option>@type.ToString()</option>
                     }                    
@@ -69,20 +79,36 @@ else
                     }
                 </tr>
 
-                @foreach (InstrumentString @string in Instrument.Strings)
+                @for(int i = 0; i < Instrument.Strings.Count; i++)
                 {
+                    InstrumentString @string = Instrument.Strings.ElementAt(i);
                     <tr class="fretboard__string">
                         <th class="string__name">
                             @(@string.OpenNote.Name)
                         </th>
 
-                        @for (int i = 0; i <= positions; i++)
+                        @for (int j = 0; j <= positions; j++)
                         {
-                            <td class="string__fret">
+                            NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(j);
+                            NoteMapNotesViewModel? selectedPermutation = positionViewModel?.SelectedPermutation;
+                            InstrumentStringNote? note = selectedPermutation?.Notes.ElementAt(i);
+
+                            <td class="string__fret @(note != null ? "enabled" : "disabled")">                                
+                                <div class="clearfix">
+                                    @if (note != null)
+                                    {
+                                        <span class="float-start">@note.Note.Name</span>
+                                    }
+
+                                    @if (note?.Modifier != null)
+                                    {
+                                        <span class="float-end badge bg-light text-dark">@note.Modifier.Name</span>
+                                    }
+                                </div>                                
                             </td>
                         }
                     </tr>
-                }
+               }                
             </tbody>
 
             <tbody class="separator">
@@ -93,7 +119,7 @@ else
 
             <tbody class="modifiers">
                 @foreach (InstrumentStringModifier modifier in Instrument.Modifiers)
-                {
+                {                    
                     <tr class="modifiers__modifier">
                         <th class="modifier__name">
                             @modifier.Name
@@ -101,34 +127,54 @@ else
 
                         @for (int i = 0; i <= positions; i++)
                         {
-                            bool available = positionModifiers.Length > i && 
-                                             positionModifiers[i].Contains(modifier.Name);
+                            NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
+                            
+                            bool available = positionViewModel != null && 
+                                             positionViewModel.AvailableModifiers.Contains(modifier.Name);
 
-                            <td class="modifier__fret @(!available ? "disabled" : "")">
+                            <td class="modifier__fret @(available ? "enabled" : "disabled")">
+                                @if (positionViewModel != null)
+                                {
+                                    <div class="modifier__permutations">
+                                        @foreach (NoteMapNotesViewModel permutation in positionViewModel.Permutations)
+                                        {
+                                            bool enabled = permutation.HasModifier(modifier.Name);
+                                            bool selected = positionViewModel.SelectedPermutation == permutation;
+                                            string[] cssClasses = new[]
+                                            {
+                                                enabled ? "enabled" : "disabled",
+                                                selected ? "active" : ""
+                                            };
 
+                                            <div class="modifier__permutation @string.Join(" ", cssClasses)"
+                                                 @onclick="e => positionViewModel.SetSelectedPermutation(permutation)">
+                                                &nbsp;
+                                            </div>
+                                        }
+                                    </div>                                    
+                                }                                
                             </td>
                         }
                     </tr>
                 }
             </tbody>
         </table>
-
     }    
 }
 
 @code {
-    NoteMapCriteriaViewModel? Model;
+    NoteMapCriteriaViewModel? Criteria;
     StringedInstrumentBase? Instrument;
-    NoteMapPermutationsViewModel? Permutations;
+    NoteMapViewModel? ViewModel;
+    private int? maximumStringDistance;
     private int? positions;
-    private string? selectedKey;
-    private NoteMapType selectedType = NoteMapType.Chord;
-    string[][] positionModifiers = new string[0][];
-    int[][] positionStrings = new int[0][];
+    private string? selectedKeyName;
+    private string selectedKeyType = "Major";
+    private NoteMapType selectedType = NoteMapType.Chord;    
 
     protected override void OnInitialized()
     {
-        Model = NoteMapViewModelService.GetNoteMapCriteriaViewModel();
+        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel();
     }
 
     void OnInstrumentChange(ChangeEventArgs e)
@@ -138,9 +184,15 @@ else
         SetPermutations();
     }
 
-    void OnKeyChange(ChangeEventArgs e)
+    void OnKeyNameChange(ChangeEventArgs e)
     {        
-        selectedKey = (string?)e.Value;
+        selectedKeyName = (string?)e.Value;
+        SetPermutations();
+    }
+
+    void OnKeyTypeChange(ChangeEventArgs e)
+    {
+        selectedKeyType = (string?)e.Value ?? "";
         SetPermutations();
     }
 
@@ -154,28 +206,13 @@ else
 
     void SetPermutations()
     {
-        positionModifiers = new string[0][];
-        if (Instrument == null || selectedKey == null)
+        if (Instrument == null || string.IsNullOrEmpty(selectedKeyName))
         {
             return;
         }
 
-        // Permutations = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument, selectedKey ?? "", selectedType);
-        positionModifiers = new string[positions + 1 ?? 0][];        
-
-        INoteCollection notes = Note.GetNotes(selectedType, selectedKey ?? "");
-
-        for (int position = 0; position <= positions; position++)
-        {
-            IReadOnlyCollection<InstrumentStringModifier> availableModifiers = Instrument
-                .AvailableModifiers(notes, position)
-                .ToArray();
-            positionModifiers[position] = availableModifiers
-                .Select(x => x.Name)
-                .ToArray();
-
-
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = Instrument.GetPermutations(selectedKey ?? "", position, selectedType);
-        }
+        string key = (selectedKeyName + " " + selectedKeyType).Trim();
+        ViewModel = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument,
+            key, selectedType);
     }
 }

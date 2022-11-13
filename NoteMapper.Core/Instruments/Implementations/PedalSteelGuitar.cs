@@ -87,9 +87,9 @@ namespace NoteMapper.Core.Instruments.Implementations
             {
                 Modifiers = new[]
                 {
-                    PedalSteelGuitarConfig.GetModifierConfig("A", 9 - 0, 2, 9 - 5, 2),
-                    PedalSteelGuitarConfig.GetModifierConfig("B", 9 - 4, 1, 9 - 7, 1),
-                    PedalSteelGuitarConfig.GetModifierConfig("C", 9 - 5, 2, 9 - 6, 2),
+                    PedalSteelGuitarConfig.GetModifierConfig("A", 4, 2, 9, 2),
+                    PedalSteelGuitarConfig.GetModifierConfig("B", 2, 1, 5, 1),
+                    PedalSteelGuitarConfig.GetModifierConfig("C", 3, 2, 4, 2),
                     PedalSteelGuitarConfig.GetModifierConfig("LKL", 9 - 2, -1, 9 - 7, -1),
                     PedalSteelGuitarConfig.GetModifierConfig("LKR", 9 - 2, 1, 9 - 7, 1),
                     PedalSteelGuitarConfig.GetModifierConfig("RKL", 9 - 1, -1, 9 - 8, -1),
@@ -115,134 +115,6 @@ namespace NoteMapper.Core.Instruments.Implementations
                     PedalSteelGuitarConfig.GetStringConfig("B2", frets)
                 }
             });
-        }
-
-        public bool Enable(params string[] modifierNames)
-        {
-            IReadOnlyCollection<InstrumentStringModifier?> modifiers = modifierNames
-                .Select(x => Modifiers.FirstOrDefault(m => string.Equals(m.Name, x, StringComparison.InvariantCultureIgnoreCase)))
-                .ToArray();
-
-            List<InstrumentStringModifier> enabledModifiers = new List<InstrumentStringModifier>();
-
-            foreach (InstrumentStringModifier? modifier in modifiers)
-            {
-                if (modifier == null)
-                {
-                    return false;
-                }
-
-                if (modifier.Enabled)
-                {
-                    continue;
-                }
-
-                if (!modifier.Enable())
-                {
-                    foreach (InstrumentStringModifier enabledModifier in enabledModifiers)
-                    {
-                        enabledModifier.Disable();
-                    }
-
-                    return false;
-                }
-
-                enabledModifiers.Add(modifier);
-            }
-
-            return true;
-        }
-
-        public override IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> GetPermutations(string key, int position, 
-            NoteMapType type)
-        {
-            INoteCollection? notes = Note.GetNotes(type, key);
-            if (notes == null)
-            {
-                return Array.Empty<InstrumentStringNote[]>();
-            }
-
-            // create set of note permutations without any modifiers applied
-            IReadOnlyCollection<List<InstrumentStringNote>> notePermutations = Strings
-                .Select(x => new List<InstrumentStringNote>())
-                .ToList();
-            for (int i = 0; i < Strings.Count; i++)
-            {
-                InstrumentString @string = Strings.ElementAt(i);
-                Note note = @string.NoteAt(position, Array.Empty<InstrumentStringModifier>());
-                if (!notes.Contains(note))
-                {
-                    continue;
-                }
-
-                notePermutations.ElementAt(i).Add(new InstrumentStringNote(position, @string, null));
-            }
-
-            IReadOnlyCollection<Permutation> permutations = Permutation.GetPermutations(Modifiers.Count);
-            foreach (Permutation permutation in permutations)
-            {                
-                if (!EnableModifiers(permutation))
-                {
-                    continue;
-                }
-
-                foreach (InstrumentString @string in Strings)
-                {                    
-                    Note note = @string.NoteAt(position, Array.Empty<InstrumentStringModifier>());
-                    if (!notes.Contains(note))
-                    {
-                        continue;
-                    }
-
-                    List<InstrumentStringNote> modifiedNotes = notePermutations.ElementAt(@string.Index);
-                    IReadOnlyCollection<InstrumentStringModifier> modifiers = @string.Modifiers
-                        .Where(x => x.Enabled)
-                        .ToArray();
-
-                    foreach (InstrumentStringModifier modifier in modifiers)
-                    {
-                        // add the modified note if it is the first time we have seen this note for this modifier
-                        if (modifiedNotes.Any(x => x.Note.Index == note.Index && 
-                                                   x.Modifier != null && x.Modifier.Name == modifier.Name))
-                        {                            
-                            continue;
-                        }
-
-                        InstrumentStringNote modifiedNote = new InstrumentStringNote(position, @string, modifier);
-                        modifiedNotes.Add(modifiedNote);
-                    }
-                }
-            }
-
-            return notePermutations;
-        }
-
-        private void DisableModifiers()
-        {
-            foreach (InstrumentStringModifier modifier in Modifiers)
-            {
-                modifier.Disable();
-            }
-        }
-
-        private bool EnableModifiers(Permutation permutation)
-        {
-            for (int i = 0; i < permutation.Count; i++)
-            {
-                bool value = permutation.Get(i);
-                if (!value)
-                {
-                    continue;
-                }
-
-                InstrumentStringModifier modifier = Modifiers.ElementAt(i);
-                if (!modifier.Enable())
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }        
+        }   
     }
 }

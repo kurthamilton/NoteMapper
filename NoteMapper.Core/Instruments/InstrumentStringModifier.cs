@@ -15,8 +15,6 @@ namespace NoteMapper.Core.Instruments
             Offsets = new ReadOnlyDictionary<int, int>(offsets);
         }
 
-        public bool Enabled { get; private set; }
-
         public string Name { get; }
 
         private IReadOnlyDictionary<int, int> Offsets { get; }
@@ -72,28 +70,6 @@ namespace NoteMapper.Core.Instruments
             return new InstrumentStringModifier(name, offsets);
         }
 
-        public bool CanEnable()
-        {
-            return MutuallyExclusiveModifiers.All(x => !x.Enabled);
-        }
-
-        public bool Disable()
-        {
-            Enabled = false;
-            return true;
-        }
-
-        public bool Enable()
-        {
-            if (!CanEnable())
-            {
-                return false;
-            }
-
-            Enabled = true;
-            return true;
-        }
-
         public int GetOffset(InstrumentString @string)
         {
             return Offsets.ContainsKey(@string.Index)
@@ -121,6 +97,11 @@ namespace NoteMapper.Core.Instruments
             MutuallyExclusiveModifiers.Add(other);
             other.IsMutuallyExclusiveWith(this);
             return this;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

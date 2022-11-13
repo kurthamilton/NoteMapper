@@ -1,6 +1,7 @@
 ﻿using NoteMapper.Core;
 using NoteMapper.Core.Instruments;
-using NoteMapper.Services.Web.ViewModels;
+using NoteMapper.Services.Web.ViewModels.Instruments;
+using NoteMapper.Services.Web.ViewModels.NoteMap;
 
 namespace NoteMapper.Services.Web
 {
@@ -18,37 +19,50 @@ namespace NoteMapper.Services.Web
         public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel()
         {
             IReadOnlyCollection<InstrumentBase> instruments = _instrumentFactory.GetInstruments();
-            IReadOnlyCollection<Key> keys = _musicTheoryService.GetKeys();
-            return new NoteMapCriteriaViewModel(instruments, keys);
+            IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames();
+            IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetKeyTypes();
+            return new NoteMapCriteriaViewModel(instruments, keyNames, keyTypes);
         }
 
-        public NoteMapInstrumentViewModel? GetNoteMapInstrumentViewModel(string instrumentName)
+        public InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrumentName)
         {
             InstrumentBase? instrument = _instrumentFactory.GetInstrument(instrumentName);
             StringedInstrumentBase? stringedInstrument = instrument as StringedInstrumentBase;
             return stringedInstrument != null
-                ? new NoteMapInstrumentViewModel(stringedInstrument)
+                ? new InstrumentViewModel(stringedInstrument)
                 : null;
         }
 
-        public NoteMapPermutationsViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string keyName,
+        public NoteMapViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string key,
             NoteMapType type)
         {
             if (instrument == null)
             {
-                return null;
+                return default;
             }
 
-            Key? key = _musicTheoryService.GetKey(keyName);
-            if (key == null)
+            INoteCollection notes = Note.GetNotes(type, key);
+
+            int positions = instrument.Strings.Max(x => x.Positions);
+
+            NoteMapViewModel viewModel = new();
+
+            for (int position = 0; position <= positions; position++)
             {
-                return null;
+                NoteMapPositionViewModel positionViewModel = new(position);
+
+                StringPermutationOptions options = new(notes, position);
+
+                foreach (IReadOnlyCollection<InstrumentStringNote?> permutation in instrument.GetPermutations(options))
+                {
+                    NoteMapNotesViewModel permutationViewModel = new(permutation);
+                    positionViewModel.AddPermutation(permutationViewModel);
+                }
+                
+                viewModel.AddPosition(positionViewModel);
             }
 
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = 
-                instrument.GetPermutations(key.ShortName, 1, type);
-
-            return new NoteMapPermutationsViewModel(permutations);
+            return viewModel;
         }
     }
 }

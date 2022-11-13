@@ -21,5 +21,10 @@
         public int Position { get; }
 
         public InstrumentString String { get; }
+
+        public override string ToString()
+        {
+            return $"S: {String} | N: {Note} | M: {Modifier} | P: {Position}";
+        }
     }
 }
