@@ -69,23 +69,23 @@ else
 
     @if (Instrument != null)    
     {
-        <div class="container-fluid">
-            <div class="fretboard">
-                <div class="row g-0 fretboard__heading">
-                    <div class="string__name col"></div>
+        <table class="table-fixed" cellpadding="0">
+            <tbody class="fretboard">
+                <tr class="fretboard__heading">
+                    <th class="string__name"></th>
                     @for (int i = 0; i <= positions; i++)
                     {
-                        <div class="col string__fret">@i</div>
+                        <td class="string__fret">@i</td>
                     }
-                </div>
+                </tr>
 
-                @for (int i = 0; i < Instrument.Strings.Count; i++)
+                @for(int i = 0; i < Instrument.Strings.Count; i++)
                 {
                     InstrumentString @string = Instrument.Strings.ElementAt(i);
-                    <div class="row g-0 fretboard__string">
-                        <div class="col string__name">
-                            <span class="me-1">@(@string.OpenNote.Name)</span>
-                        </div>
+                    <tr class="fretboard__string">
+                        <th class="string__name">
+                            @(@string.OpenNote.Name)
+                        </th>
 
                         @for (int j = 0; j <= positions; j++)
                         {
@@ -93,33 +93,39 @@ else
                             NoteMapNotesViewModel? selectedPermutation = positionViewModel?.SelectedPermutation;
                             InstrumentStringNote? note = selectedPermutation?.Notes.ElementAt(i);
 
-                            <div class="col string__fret @(note != null ? "enabled" : "disabled")">
+                            <td class="string__fret @(note != null ? "enabled" : "disabled")">                                
                                 <div class="d-flex align-items-center">
                                     @if (note != null)
                                     {
-                                        <span class="ms-1 me-auto">@note.Note.Name</span>
+                                        <span class="me-auto">@note.Note.Name</span>
 
                                         if (note.Modifier != null)
                                         {
-                                            <span class="me-1 badge bg-light text-dark">@note.Modifier.Name</span>
+                                            <span class="badge bg-light text-dark">@note.Modifier.Name</span>
                                         }
-                                    }
-                                </div>
-                            </div>
+                                    }                                    
+                                </div>                                
+                            </td>
                         }
-                    </div>
-                }
-            </div>      
-            
-            <div class="modifiers">
-                <div class="row g-0">
-                    <div class="col"></div>
+                    </tr>
+               }                
+            </tbody>
+
+            <tbody class="separator">
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+            </tbody>
+
+            <tbody class="modifiers">
+                <tr>
+                    <th></th>
 
                     @for (int i = 0; i <= positions; i++)
                     {
                         NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
-
-                        <div class="col modifier__fret">
+                        
+                        <td class="modifier__fret">
                             @if (positionViewModel != null)
                             {
                                 <div class="modifier__permutations">
@@ -133,34 +139,33 @@ else
                                         };
 
                                         <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                                             data-hover="modifier-f-@i-p-@p">
+                                                data-hover="modifier-f-@i-p-@p">
                                             @if (selected)
                                             {
                                                 @:*
                                             }
                                         </div>
                                     }
-                                </div>
-                            }
-                        </div>
+                                </div>                                    
+                            }   
+                        </td>
                     }
-                </div>
-
+                </tr>
                 @foreach (InstrumentStringModifier modifier in Instrument.Modifiers)
-                {
-                    <div class="row g-0 modifiers__modifier">
-                        <div class="col modifier__name">
-                            <span class="me-1">@modifier.Name</span>
-                        </div>
+                {                    
+                    <tr class="modifiers__modifier">
+                        <th class="modifier__name">
+                            @modifier.Name
+                        </th>
 
                         @for (int i = 0; i <= positions; i++)
                         {
                             NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
+                            
+                            bool available = positionViewModel != null && 
+                                             positionViewModel.AvailableModifiers.Contains(modifier.Name);
 
-                            bool available = positionViewModel != null &&
-                            positionViewModel.AvailableModifiers.Contains(modifier.Name);
-
-                            <div class="col modifier__fret @(available ? "enabled" : "unavailable")">
+                            <td class="modifier__fret @(available ? "enabled" : "unavailable")">
                                 @if (positionViewModel != null)
                                 {
                                     <div class="modifier__permutations">
@@ -181,14 +186,14 @@ else
                                                 &nbsp;
                                             </div>
                                         }
-                                    </div>
-                                }
-                            </div>
+                                    </div>                                    
+                                }                                
+                            </td>
                         }
-                    </div>
+                    </tr>
                 }
-            </div>
-        </div>
+            </tbody>
+        </table>
     }    
 }
 
