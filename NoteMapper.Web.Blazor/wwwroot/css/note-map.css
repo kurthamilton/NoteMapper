@@ -12,8 +12,8 @@
     --fretboard-width-frets: 5%;
 }
 
-.separator {
-    height: 1rem;
+.fretboard {
+    margin-bottom: 1rem;
 }
 
 .fretboard__heading {
@@ -33,22 +33,14 @@
 .modifier__name,
 .string__name {
     font-size: var(--fretboard-fontsize-smaller);
-    padding-right: var(--fretboard-padding);
     text-align: right;
-    width: var(--fretboard-width-frets);
 }
 
 .modifier__fret,
 .string__fret {
     border-left: 1px solid var(--fretboard-bordercolor-frets);
     font-size: var(--fretboard-fontsize-smaller);
-    padding: 0;
     text-align: center;
-}
-
-.string__fret {
-    padding-left: 0.2rem;
-    padding-right: 0.2rem;
 }
 
 .modifier__permutations {
