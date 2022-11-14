@@ -1,5 +1,7 @@
-﻿using NoteMapper.Core.Instruments;
-using NoteMapper.Services.Web.ViewModels;
+﻿using NoteMapper.Core;
+using NoteMapper.Core.Instruments;
+using NoteMapper.Services.Web.ViewModels.Instruments;
+using NoteMapper.Services.Web.ViewModels.NoteMap;
 
 namespace NoteMapper.Services.Web
 {
@@ -7,8 +9,9 @@ namespace NoteMapper.Services.Web
     {
         NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel();
 
-        NoteMapInstrumentViewModel? GetNoteMapInstrumentViewModel(string instrument);
+        InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrument);
 
-        NoteMapPermutationsViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string key);
+        NoteMapViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string key, 
+            NoteMapType type);
     }
 }

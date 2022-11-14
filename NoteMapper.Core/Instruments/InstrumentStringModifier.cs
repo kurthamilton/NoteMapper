@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using NoteMapper.Core.Permutations;
 
 namespace NoteMapper.Core.Instruments
 {
     public class InstrumentStringModifier
     {
         private static Regex _parseRegex = new Regex(@"^(?<name>\w+)\|(?<modifiers>.+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static Regex _parseModifierRegex = new Regex(@"^(?<string>\d+)(?<offset>(\+|\-)\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex _parseModifierRegex = new Regex(@"^(?<string>\d+)(?<offset>(\+|\-)\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);        
 
         private InstrumentStringModifier(string name, IDictionary<int, int> offsets)
         {
@@ -14,13 +15,29 @@ namespace NoteMapper.Core.Instruments
             Offsets = new ReadOnlyDictionary<int, int>(offsets);
         }
 
-        public bool Enabled { get; private set; }
-
         public string Name { get; }
 
         private IReadOnlyDictionary<int, int> Offsets { get; }
 
         private ICollection<InstrumentStringModifier> MutuallyExclusiveModifiers { get; } = new List<InstrumentStringModifier>();
+
+        public static IDictionary<int, IReadOnlyCollection<InstrumentStringModifier>> GetPermutations(
+            IReadOnlyCollection<InstrumentStringModifier> modifiers)
+        {
+            IDictionary<int, IReadOnlyCollection<InstrumentStringModifier>> modifierPermutations =
+                    new Dictionary<int, IReadOnlyCollection<InstrumentStringModifier>>();
+
+            foreach (Permutation permutation in Permutation.GetPermutations(modifiers.Count))
+            {
+                IReadOnlyCollection<InstrumentStringModifier> permutationModifiers = modifiers
+                    .Where((modifier, i) => permutation.Get(i))
+                    .ToArray();
+
+
+            }
+
+            return modifierPermutations;
+        }
 
         public static InstrumentStringModifier Parse(string s)
         {
@@ -53,28 +70,6 @@ namespace NoteMapper.Core.Instruments
             return new InstrumentStringModifier(name, offsets);
         }
 
-        public bool CanEnable()
-        {
-            return MutuallyExclusiveModifiers.All(x => !x.Enabled);
-        }
-
-        public bool Disable()
-        {
-            Enabled = false;
-            return true;
-        }
-
-        public bool Enable()
-        {
-            if (!CanEnable())
-            {
-                return false;
-            }
-
-            Enabled = true;
-            return true;
-        }
-
         public int GetOffset(InstrumentString @string)
         {
             return Offsets.ContainsKey(@string.Index)
@@ -102,6 +97,11 @@ namespace NoteMapper.Core.Instruments
             MutuallyExclusiveModifiers.Add(other);
             other.IsMutuallyExclusiveWith(this);
             return this;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

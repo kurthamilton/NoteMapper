@@ -1,5 +1,10 @@
 ﻿:root {
-    --fretboard-bordercolor-frets: #ccc;
+    --fretboard-backgroundcolor-disabled: #ddd;
+    --fretboard-backgroundcolor-enabled: #74A474;
+    --fretboard-border-active: 1px solid #f00;
+    --fretboard-bordercolor-hover: #BD9494;
+    --fretboard-border-permutation: 1px solid #ccc;
+    --fretboard-bordercolor-frets: #bbb;
     --fretboard-bordercolor-strings: #000;
     --fretboard-fontsize-smaller: 0.8rem;
     --fretboard-padding: 0.4rem;
@@ -41,7 +46,39 @@
 .modifier__fret,
 .string__fret {
     border-left: 1px solid var(--fretboard-bordercolor-frets);
+    font-size: var(--fretboard-fontsize-smaller);
+    padding: 0;
     text-align: center;
+}
+
+.modifier__permutations {
+    display: flex;
+}
+
+.modifier__permutation {
+    border: var(--fretboard-border-permutation);
+}
+
+.modifier__permutation.enabled {
+    background-color: var(--fretboard-backgroundcolor-enabled);
+}
+
+.modifier__permutation.disabled {
+    background-color: var(--fretboard-backgroundcolor-disabled);
+}
+
+.modifier__permutation.hover {    
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.string__fret.enabled {
+    background-color: var(--fretboard-backgroundcolor-enabled);
+}
+
+.string__fret.disabled,
+.modifier__fret.disabled {
+    background-color: var(--fretboard-backgroundcolor-disabled);
 }
 
 .modifier__fret:last-child,

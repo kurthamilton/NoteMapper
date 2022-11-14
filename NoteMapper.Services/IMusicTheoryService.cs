@@ -6,6 +6,10 @@ namespace NoteMapper.Services
     {
         Key? GetKey(string shortName);
 
+        IReadOnlyCollection<string> GetKeyNames();        
+
         IReadOnlyCollection<Key> GetKeys();
+
+        IReadOnlyCollection<string> GetKeyTypes();
     }
 }

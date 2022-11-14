@@ -31,8 +31,14 @@ namespace NoteMapper.Core
         {            
         }
 
+        /// <summary>
+        /// The index of the note including the octave
+        /// </summary>
         public int Index { get; }
 
+        /// <summary>
+        /// The index of the note within the chromatic sale
+        /// </summary>
         public int NoteIndex { get; } 
 
         public string Name { get; }
@@ -44,6 +50,19 @@ namespace NoteMapper.Core
             return _notes
                 .OrderBy(x => x)
                 .ToArray();
+        }
+
+        public static INoteCollection GetNotes(NoteMapType type, string key)
+        {
+            switch (type)
+            {
+                case NoteMapType.Chord:
+                    return Chord.Parse(key);
+                case NoteMapType.Scale:
+                    return Scale.Parse(key);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
+            }
         }
 
         public static int GetNoteIndex(int index)

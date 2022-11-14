@@ -1,35 +1,21 @@
-﻿using System.Collections;
-
-namespace NoteMapper.Core
+﻿namespace NoteMapper.Core
 {
-    public class Chord : IEnumerable<Note>
+    public class Chord : NoteCollection
     {
         private Chord(IEnumerable<Note> notes)
+            : base(notes)
         {
-            Notes = notes.ToArray();
-        }        
-
-        public IReadOnlyCollection<Note> Notes { get; }
+        }
 
         public static Chord Parse(string key)
         {
             Scale scale = Scale.Parse(key);
             return new Chord(new[]
             {
-                scale.Notes.ElementAt(0),
-                scale.Notes.ElementAt(2),
-                scale.Notes.ElementAt(4)
+                scale.ElementAt(0),
+                scale.ElementAt(2),
+                scale.ElementAt(4)
             });
-        }
-
-        public IEnumerator<Note> GetEnumerator()
-        {
-            return Notes.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

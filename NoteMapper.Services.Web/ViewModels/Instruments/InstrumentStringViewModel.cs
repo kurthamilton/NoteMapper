@@ -1,10 +1,10 @@
 ﻿using NoteMapper.Core.Instruments;
 
-namespace NoteMapper.Services.Web.ViewModels
+namespace NoteMapper.Services.Web.ViewModels.Instruments
 {
-    public class NoteMapStringViewModel
+    public class InstrumentStringViewModel
     {
-        public NoteMapStringViewModel(InstrumentString @string)
+        public InstrumentStringViewModel(InstrumentString @string)
         {
             Note = @string.OpenNote.Name;
             Positions = @string.Positions;

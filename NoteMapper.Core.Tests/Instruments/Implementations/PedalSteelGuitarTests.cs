@@ -1,5 +1,6 @@
 ﻿using NoteMapper.Core.Instruments;
 using NoteMapper.Core.Instruments.Implementations;
+using NUnit.Framework;
 
 namespace NoteMapper.Core.Tests.Instruments.Implementations
 {
@@ -18,8 +19,10 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }                
             });
 
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations = 
-                psg.GetPermutations("F", 5).ToArray();
+            INoteCollection notes = Note.GetNotes(NoteMapType.Scale, "F");
+            StringPermutationOptions options = new StringPermutationOptions(notes, 5);
+            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations = 
+                psg.GetPermutations(options).ToArray();
 
             string[] expected = new[]
             {
@@ -29,7 +32,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             };
 
             string[] actual = permutations
-                .Select(x => string.Join(",", x.Select(p => $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}")))
+                .Select(x => string.Join(",", x.Select(p => p != null ? $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}" : "")))
                 .ToArray();
 
             CollectionAssert.AreEqual(expected, actual);
@@ -54,8 +57,10 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
-                psg.GetPermutations("F", 5).ToArray();
+            INoteCollection notes = Note.GetNotes(NoteMapType.Scale, "F");
+            StringPermutationOptions options = new StringPermutationOptions(notes, 5);
+            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations =
+                psg.GetPermutations(options).ToArray();
 
             string[] expected = new[]
             {
@@ -65,7 +70,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             };
 
             string[] actual = permutations
-                .Select(x => string.Join(",", x.Select(p => $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}")))
+                .Select(x => string.Join(",", x.Select(p => p != null ? $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}" : "")))
                 .ToArray();
 
             CollectionAssert.AreEqual(expected, actual);
@@ -90,8 +95,10 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote>> permutations =
-                psg.GetPermutations("F", 6).ToArray();
+            INoteCollection notes = Note.GetNotes(NoteMapType.Scale, "F");
+            StringPermutationOptions options = new StringPermutationOptions(notes, 6);
+            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations =
+                psg.GetPermutations(options).ToArray();
 
             string?[] expected = new[]
             {
@@ -101,7 +108,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             };
 
             string[] actual = permutations
-                .Select(x => string.Join(",", x.Select(p => $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}")))
+                .Select(x => string.Join(",", x.Select(p => p != null ? $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}" : "")))
                 .ToArray();
 
             CollectionAssert.AreEqual(expected, actual);

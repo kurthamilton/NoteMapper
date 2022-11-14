@@ -1,26 +1,18 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
 namespace NoteMapper.Core
 {
-    public class Scale : IEnumerable<Note>
+    public class Scale : NoteCollection
     {
-        private static readonly Regex KeyRegex = new Regex("^(?<note>[A-Ga-g]#?)(?<minor>m)?$", RegexOptions.Compiled);
+        private static readonly Regex KeyRegex = new Regex(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
 
-        private static readonly string MajorIntervals = "221222";
-        private static readonly string MinorIntervals = "212212";
-
-        private readonly Lazy<IReadOnlyDictionary<int, Note>> _notes;
+        private static readonly IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> KeyIntervals = GetKeyIntervals();
 
         private Scale(IEnumerable<Note> notes)
-        {
-            Notes = notes.ToArray();
-            _notes = new Lazy<IReadOnlyDictionary<int, Note>>(() => 
-                new ReadOnlyDictionary<int, Note>(Notes.ToDictionary(x => x.NoteIndex)));
+            : base(notes)
+        {            
         }
-
-        public IReadOnlyCollection<Note> Notes { get; }        
 
         public static Scale Parse(string key)
         {
@@ -31,14 +23,10 @@ namespace NoteMapper.Core
             }
 
             Note note = Note.Parse(match.Groups["note"].Value);
-            bool minor = match.Groups["minor"].Success;
-
-            return minor ? Minor(note) : Major(note);
-        }
-
-        public bool Contains(Note note)
-        {
-            return Contains(note.NoteIndex);
+            Group typeGroup = match.Groups["type"];
+            KeyType type = ParseKeyType(typeGroup.Success ? typeGroup.Value : "");
+            IEnumerable<Note> notes = ParseIntervals(note, KeyIntervals[type]);
+            return new(notes);
         }
 
         public IEnumerable<Note> NotesBetween(int start, int end)
@@ -66,42 +54,32 @@ namespace NoteMapper.Core
             }
         }        
 
-        public IEnumerator<Note> GetEnumerator()
+        private static IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> GetKeyIntervals()
         {
-            return Notes.GetEnumerator();
+            IDictionary<KeyType, IReadOnlyCollection<byte>> intervals = new Dictionary<KeyType, IReadOnlyCollection<byte>>
+            {
+                { KeyType.Major, new byte[] { 2, 2, 1, 2, 2, 2 } },
+                { KeyType.Minor, new byte[] { 2, 1, 2, 2, 1, 2 } }
+            };
+
+            return new ReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>>(intervals);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        private static Scale Major(Note key)
-        {
-            IEnumerable<Note> notes = ParseIntervals(key, MajorIntervals);
-            return new Scale(notes);
-        }
-
-        private static Scale Minor(Note key)
-        {
-            IEnumerable<Note> notes = ParseIntervals(key, MinorIntervals);
-            return new Scale(notes);
-        }
-
-        private static IEnumerable<Note> ParseIntervals(Note startingNote, string intervals)
+        private static IEnumerable<Note> ParseIntervals(Note startingNote, IReadOnlyCollection<byte> intervals)
         {
             yield return startingNote;
 
-            foreach (char c in intervals)
+            foreach (byte interval in intervals)
             {
-                byte interval = byte.Parse(c.ToString());
                 yield return startingNote = startingNote.Next(interval);
             }
-        }
-
-        private bool Contains(int noteIndex)
+        }  
+        
+        private static KeyType ParseKeyType(string type)
         {
-            return _notes.Value.ContainsKey(noteIndex);
+            return Enum.TryParse(type, out KeyType parsed)
+                ? parsed
+                : default;
         }
     }
 }

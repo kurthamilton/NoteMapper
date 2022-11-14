@@ -59,7 +59,12 @@ namespace NoteMapper.Core.Instruments
             return new InstrumentString(index, note, endFret, modifiers.Where(x => x.IsFor(index)));
         }
 
-        public Note NoteAt(int position)
+        public bool HasModifier(InstrumentStringModifier modifier)
+        {
+            return Modifiers.Contains(modifier);
+        }
+
+        public Note NoteAt(int position, IReadOnlyCollection<InstrumentStringModifier> enabledModifiers)
         {
             if (position < 0 || 
                 position > Positions)
@@ -67,14 +72,18 @@ namespace NoteMapper.Core.Instruments
                 throw new ArgumentOutOfRangeException(nameof(position));
             }
 
-            IReadOnlyCollection<InstrumentStringModifier> enabledModifiers = Modifiers
-                .Where(x => x.Enabled)
-                .ToArray();
+            enabledModifiers = enabledModifiers
+                .Where(x => HasModifier(x)).ToArray();
 
             int modifierOffset = enabledModifiers.Count > 0 ? enabledModifiers.Sum(x => x.GetOffset(this)) : 0;
 
             return Notes.ElementAt(position)
                 .Next(modifierOffset);
+        }
+
+        public override string ToString()
+        {
+            return OpenNote.ToString();
         }
     }
 }
