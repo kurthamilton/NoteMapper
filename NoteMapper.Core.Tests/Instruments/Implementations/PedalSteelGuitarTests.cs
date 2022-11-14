@@ -19,16 +19,14 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }                
             });
 
-            INoteCollection notes = Note.GetNotes(NoteMapType.Scale, "F");
-            StringPermutationOptions options = new StringPermutationOptions(notes, 5);
+            INoteCollection notes = Note.GetNotes(NoteMapType.Chord, "C");
+            StringPermutationOptions options = new StringPermutationOptions(notes, 0);
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations = 
                 psg.GetPermutations(options).ToArray();
 
             string[] expected = new[]
             {
-                "F3",
-                "A3",
-                "C4"
+                "C3,E3,G3"
             };
 
             string[] actual = permutations
@@ -47,26 +45,27 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 {
                     "A|0+2",
                     "B|1+2",
-                    "C|2+2"
+                    "C|2+2",
+                    "D|3+1"
                 },
                 Strings = new[]
                 {
                     "C3|f=0-12",
                     "E3|f=0-12",
-                    "G3|f=0-12"
+                    "G3|f=0-12",
+                    "B3|f=0-12"
                 }
             });
 
-            INoteCollection notes = Note.GetNotes(NoteMapType.Scale, "F");
-            StringPermutationOptions options = new StringPermutationOptions(notes, 5);
+            INoteCollection notes = Note.GetNotes(NoteMapType.Chord, "C");
+            StringPermutationOptions options = new StringPermutationOptions(notes, 0);
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations =
                 psg.GetPermutations(options).ToArray();
 
             string[] expected = new[]
             {
-                "F3,G3(A)",
-                "A3",
-                "C4,D4(C)"
+                "C3,E3,G3,",
+                "C3,E3,G3,C4(D)"
             };
 
             string[] actual = permutations
@@ -95,23 +94,16 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            INoteCollection notes = Note.GetNotes(NoteMapType.Scale, "F");
-            StringPermutationOptions options = new StringPermutationOptions(notes, 6);
+            INoteCollection notes = Note.GetNotes(NoteMapType.Chord, "C");
+            StringPermutationOptions options = new StringPermutationOptions(notes, 1);
             IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations =
                 psg.GetPermutations(options).ToArray();
-
-            string?[] expected = new[]
-            {
-                "",
-                "A#3,C4(B)",
-                ""
-            };
 
             string[] actual = permutations
                 .Select(x => string.Join(",", x.Select(p => p != null ? $"{p.Note}{(p.Modifier != null ? "(" + p.Modifier.Name + ")" : "")}" : "")))
                 .ToArray();
 
-            CollectionAssert.AreEqual(expected, actual);
+            CollectionAssert.IsEmpty(actual);
         }
     }
 }

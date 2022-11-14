@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core
 {
@@ -7,12 +8,17 @@ namespace NoteMapper.Core
     {
         private static readonly Regex KeyRegex = new Regex(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
 
-        private static readonly IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> KeyIntervals = GetKeyIntervals();
+        private static readonly IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> KeyIntervals = CreateKeyIntervals();
 
-        private Scale(IEnumerable<Note> notes)
+        private static readonly IReadOnlyDictionary<KeyType, string> KeyShortNames = CreateKeyShortNames();
+
+        private Scale(IEnumerable<Note> notes, KeyType type)
             : base(notes)
-        {            
+        {
+            Type = type;
         }
+
+        public KeyType Type { get; }
 
         public static Scale Parse(string key)
         {
@@ -25,8 +31,9 @@ namespace NoteMapper.Core
             Note note = Note.Parse(match.Groups["note"].Value);
             Group typeGroup = match.Groups["type"];
             KeyType type = ParseKeyType(typeGroup.Success ? typeGroup.Value : "");
-            IEnumerable<Note> notes = ParseIntervals(note, KeyIntervals[type]);
-            return new(notes);
+            IReadOnlyCollection<byte> intervals = GetIntervals(type);
+            IEnumerable<Note> notes = GetNotes(note, intervals);
+            return new(notes, type);
         }
 
         public IEnumerable<Note> NotesBetween(int start, int end)
@@ -54,10 +61,11 @@ namespace NoteMapper.Core
             }
         }        
 
-        private static IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> GetKeyIntervals()
+        private static IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> CreateKeyIntervals()
         {
             IDictionary<KeyType, IReadOnlyCollection<byte>> intervals = new Dictionary<KeyType, IReadOnlyCollection<byte>>
             {
+                { KeyType.DominantSeven, new byte[] { 2, 2, 1, 2, 2, 1 } },
                 { KeyType.Major, new byte[] { 2, 2, 1, 2, 2, 2 } },
                 { KeyType.Minor, new byte[] { 2, 1, 2, 2, 1, 2 } }
             };
@@ -65,7 +73,35 @@ namespace NoteMapper.Core
             return new ReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>>(intervals);
         }
 
-        private static IEnumerable<Note> ParseIntervals(Note startingNote, IReadOnlyCollection<byte> intervals)
+        private static IReadOnlyDictionary<KeyType, string> CreateKeyShortNames()
+        {
+            IDictionary<KeyType, string> keyShortNames = Enum.GetValues<KeyType>()
+                .ToDictionary(x => x, x => x.ShortName());
+
+            return new ReadOnlyDictionary<KeyType, string>(keyShortNames);
+        }
+
+        private static IReadOnlyCollection<byte> GetIntervals(KeyType type)
+        {
+            if (KeyIntervals.ContainsKey(type))
+            {
+                return KeyIntervals[type];
+            }
+
+            if (type.ToString().StartsWith(KeyType.Major.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                return KeyIntervals[KeyType.Major];
+            }
+
+            if (type.ToString().StartsWith(KeyType.Minor.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                return KeyIntervals[KeyType.Minor];
+            }
+
+            return Array.Empty<byte>();
+        }
+
+        private static IEnumerable<Note> GetNotes(Note startingNote, IReadOnlyCollection<byte> intervals)
         {
             yield return startingNote;
 
@@ -77,9 +113,19 @@ namespace NoteMapper.Core
         
         private static KeyType ParseKeyType(string type)
         {
-            return Enum.TryParse(type, out KeyType parsed)
-                ? parsed
-                : default;
+            if (Enum.TryParse(type, out KeyType parsed) && Enum.IsDefined<KeyType>(parsed))
+            {
+                return parsed;
+            }
+
+            if (KeyShortNames.Any(x => string.Equals(type, x.Value, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                return KeyShortNames
+                    .First(x => string.Equals(type, x.Value, StringComparison.InvariantCultureIgnoreCase))
+                    .Key;
+            }
+
+            return default;
         }
     }
 }

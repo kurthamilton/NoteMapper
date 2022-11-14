@@ -1,7 +1,8 @@
 ﻿:root {
     --fretboard-backgroundcolor-disabled: #ddd;
     --fretboard-backgroundcolor-enabled: #74A474;
-    --fretboard-border-active: 1px solid #f00;
+    --fretboard-backgroundcolor-unavailable: #bbb;
+    --fretboard-border-hover: 1px solid #f00;
     --fretboard-bordercolor-hover: #BD9494;
     --fretboard-border-permutation: 1px solid #ccc;
     --fretboard-bordercolor-frets: #bbb;
@@ -9,12 +10,6 @@
     --fretboard-fontsize-smaller: 0.8rem;
     --fretboard-padding: 0.4rem;
     --fretboard-width-frets: 5%;
-}
-
-.fretboard {
-}
-
-.modifiers {
 }
 
 .separator {
@@ -51,12 +46,21 @@
     text-align: center;
 }
 
+.string__fret {
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+}
+
 .modifier__permutations {
     display: flex;
 }
 
 .modifier__permutation {
-    border: var(--fretboard-border-permutation);
+    border-right: var(--fretboard-border-permutation);
+}
+
+.modifier__permutation:last-child {
+    border-right: 1px solid transparent;
 }
 
 .modifier__permutation.enabled {
@@ -67,9 +71,15 @@
     background-color: var(--fretboard-backgroundcolor-disabled);
 }
 
+.modifier__permutation {
+    border-left: 1px solid transparent;
+}
+
 .modifier__permutation.hover {    
     cursor: pointer;
     opacity: 0.8;
+    border-left: var(--fretboard-border-hover);
+    border-right: var(--fretboard-border-hover);
 }
 
 .string__fret.enabled {
@@ -84,4 +94,8 @@
 .modifier__fret:last-child,
 .string__fret:last-child {
     border-right: 1px solid var(--fretboard-bordercolor-frets);
+}
+
+.modifier__fret.unavailable {
+    background-color: var(--fretboard-backgroundcolor-unavailable);
 }

@@ -1,14 +1,13 @@
 ﻿using NoteMapper.Core;
+using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Services
 {
     public class MusicTheoryService : IMusicTheoryService
     {
-        private static readonly IReadOnlyCollection<string> _keyTypes = new[]
-        {
-            "Major",
-            "Minor"
-        };
+        private static readonly IReadOnlyCollection<string> _keyTypes = Enum.GetValues<KeyType>()
+            .Select(x => x.ShortName())
+            .ToArray();
 
         public Key? GetKey(string key)
         {

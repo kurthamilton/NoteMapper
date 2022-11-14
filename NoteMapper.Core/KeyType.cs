@@ -3,6 +3,9 @@
     public enum KeyType
     {
         Major,
-        Minor
+        Minor,
+        DominantSeven,
+        MajorSeven,
+        MinorSeven
     }
 }

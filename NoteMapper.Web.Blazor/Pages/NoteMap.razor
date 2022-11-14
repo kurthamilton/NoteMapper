@@ -69,7 +69,7 @@ else
 
     @if (Instrument != null)    
     {
-        <table class="table-fixed">
+        <table class="table-fixed" cellpadding="0">
             <tbody class="fretboard">
                 <tr class="fretboard__heading">
                     <th class="string__name"></th>
@@ -94,16 +94,16 @@ else
                             InstrumentStringNote? note = selectedPermutation?.Notes.ElementAt(i);
 
                             <td class="string__fret @(note != null ? "enabled" : "disabled")">                                
-                                <div class="clearfix">
+                                <div class="d-flex align-items-center">
                                     @if (note != null)
                                     {
-                                        <span class="float-start">@note.Note.Name</span>
-                                    }
+                                        <span class="me-auto">@note.Note.Name</span>
 
-                                    @if (note?.Modifier != null)
-                                    {
-                                        <span class="float-end badge bg-light text-dark">@note.Modifier.Name</span>
-                                    }
+                                        if (note.Modifier != null)
+                                        {
+                                            <span class="badge bg-light text-dark">@note.Modifier.Name</span>
+                                        }
+                                    }                                    
                                 </div>                                
                             </td>
                         }
@@ -113,7 +113,7 @@ else
 
             <tbody class="separator">
                 <tr>
-                    <td></td>
+                    <td>&nbsp;</td>
                 </tr>
             </tbody>
 
@@ -127,27 +127,27 @@ else
                         
                         <td class="modifier__fret">
                             @if (positionViewModel != null)
-                                {
-                                    <div class="modifier__permutations">
-                                        @for (int p = 0; p < positionViewModel.Permutations.Count; p++)
+                            {
+                                <div class="modifier__permutations">
+                                    @for (int p = 0; p < positionViewModel.Permutations.Count; p++)
+                                    {
+                                        NoteMapNotesViewModel permutation = positionViewModel.Permutations.ElementAt(p);
+                                        bool selected = positionViewModel.SelectedPermutation == permutation;
+                                        string[] cssClasses = new[]
                                         {
-                                            NoteMapNotesViewModel permutation = positionViewModel.Permutations.ElementAt(p);
-                                            bool selected = positionViewModel.SelectedPermutation == permutation;
-                                            string[] cssClasses = new[]
-                                            {
-                                                selected ? "active" : ""
-                                            };
+                                            selected ? "active" : ""
+                                        };
 
-                                            <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                                                 data-hover="modifier-f-@i-p-@p">
-                                                @if (selected)
-                                                {
-                                                    @:*
-                                                }
-                                            </div>
-                                        }
-                                    </div>                                    
-                                }   
+                                        <div class="modifier__permutation @string.Join(" ", cssClasses) col"
+                                                data-hover="modifier-f-@i-p-@p">
+                                            @if (selected)
+                                            {
+                                                @:*
+                                            }
+                                        </div>
+                                    }
+                                </div>                                    
+                            }   
                         </td>
                     }
                 </tr>
@@ -165,7 +165,7 @@ else
                             bool available = positionViewModel != null && 
                                              positionViewModel.AvailableModifiers.Contains(modifier.Name);
 
-                            <td class="modifier__fret @(available ? "enabled" : "disabled")">
+                            <td class="modifier__fret @(available ? "enabled" : "unavailable")">
                                 @if (positionViewModel != null)
                                 {
                                     <div class="modifier__permutations">
@@ -246,7 +246,7 @@ else
             return;
         }
 
-        string key = (selectedKeyName + " " + selectedKeyType).Trim();
+        string key = (selectedKeyName + selectedKeyType).Trim();
         ViewModel = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument,
             key, selectedType);
     }

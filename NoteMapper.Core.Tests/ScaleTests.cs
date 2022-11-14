@@ -12,7 +12,7 @@ namespace NoteMapper.Core.Tests
             return string.Join(",", scale.Select(x => x.ToString()));
         }
 
-        [TestCase("Cm", ExpectedResult = "C0,D0,D#0,F0,G0,G#0,A#0")]        
+        [TestCase("C Minor", ExpectedResult = "C0,D0,D#0,F0,G0,G#0,A#0")]        
         public static string Minor(string key)
         {
             Scale scale = Scale.Parse(key);
