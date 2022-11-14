@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\site.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\site.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\site.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NoteMapper.Core\NoteMapper.Core.csproj" />
     <ProjectReference Include="..\NoteMapper.Infrastructure\NoteMapper.Infrastructure.csproj" />
     <ProjectReference Include="..\NoteMapper.Services.Web\NoteMapper.Services.Web.csproj" />

@@ -2,6 +2,7 @@
     --fretboard-backgroundcolor-disabled: #ddd;
     --fretboard-backgroundcolor-enabled: #74A474;
     --fretboard-border-active: 1px solid #f00;
+    --fretboard-bordercolor-hover: #BD9494;
     --fretboard-border-permutation: 1px solid #ccc;
     --fretboard-bordercolor-frets: #bbb;
     --fretboard-bordercolor-strings: #000;
@@ -55,7 +56,6 @@
 }
 
 .modifier__permutation {
-    flex-grow: 1;
     border: var(--fretboard-border-permutation);
 }
 
@@ -67,10 +67,9 @@
     background-color: var(--fretboard-backgroundcolor-disabled);
 }
 
-.modifier__permutation.active {
-    border: var(--fretboard-border-active);
-    border-top: none;
-    border-bottom: none;
+.modifier__permutation.hover {    
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 .string__fret.enabled {

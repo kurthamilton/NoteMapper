@@ -118,6 +118,39 @@ else
             </tbody>
 
             <tbody class="modifiers">
+                <tr>
+                    <th></th>
+
+                    @for (int i = 0; i <= positions; i++)
+                    {
+                        NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
+                        
+                        <td class="modifier__fret">
+                            @if (positionViewModel != null)
+                                {
+                                    <div class="modifier__permutations">
+                                        @for (int p = 0; p < positionViewModel.Permutations.Count; p++)
+                                        {
+                                            NoteMapNotesViewModel permutation = positionViewModel.Permutations.ElementAt(p);
+                                            bool selected = positionViewModel.SelectedPermutation == permutation;
+                                            string[] cssClasses = new[]
+                                            {
+                                                selected ? "active" : ""
+                                            };
+
+                                            <div class="modifier__permutation @string.Join(" ", cssClasses) col"
+                                                 data-hover="modifier-f-@i-p-@p">
+                                                @if (selected)
+                                                {
+                                                    @:*
+                                                }
+                                            </div>
+                                        }
+                                    </div>                                    
+                                }   
+                        </td>
+                    }
+                </tr>
                 @foreach (InstrumentStringModifier modifier in Instrument.Modifiers)
                 {                    
                     <tr class="modifiers__modifier">
@@ -136,8 +169,9 @@ else
                                 @if (positionViewModel != null)
                                 {
                                     <div class="modifier__permutations">
-                                        @foreach (NoteMapNotesViewModel permutation in positionViewModel.Permutations)
+                                        @for (int p = 0; p < positionViewModel.Permutations.Count; p++)
                                         {
+                                            NoteMapNotesViewModel permutation = positionViewModel.Permutations.ElementAt(p);
                                             bool enabled = permutation.HasModifier(modifier.Name);
                                             bool selected = positionViewModel.SelectedPermutation == permutation;
                                             string[] cssClasses = new[]
@@ -146,8 +180,9 @@ else
                                                 selected ? "active" : ""
                                             };
 
-                                            <div class="modifier__permutation @string.Join(" ", cssClasses)"
-                                                 @onclick="e => positionViewModel.SetSelectedPermutation(permutation)">
+                                            <div class="modifier__permutation @string.Join(" ", cssClasses) col"
+                                                 @onclick="e => positionViewModel.SetSelectedPermutation(permutation)"
+                                                 data-hover="modifier-f-@i-p-@p">
                                                 &nbsp;
                                             </div>
                                         }
