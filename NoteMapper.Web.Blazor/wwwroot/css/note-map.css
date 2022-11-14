@@ -35,7 +35,7 @@
     font-size: var(--fretboard-fontsize-smaller);
     padding-right: var(--fretboard-padding);
     text-align: right;
-    width: var(--fretboard-width-frets);
+    /*width: var(--fretboard-width-frets);*/
 }
 
 .modifier__fret,
@@ -49,6 +49,10 @@
 .string__fret {
     padding-left: 0.2rem;
     padding-right: 0.2rem;
+}
+
+.string__fret.unused {
+    width: 2%;
 }
 
 .modifier__permutations {
