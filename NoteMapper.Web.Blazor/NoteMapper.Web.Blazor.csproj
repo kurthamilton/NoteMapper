@@ -7,14 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="compilerconfig.json" />
     <Content Remove="wwwroot\site.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="compilerconfig.json" />
     <_ContentIncludedByDefault Remove="wwwroot\site.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="compilerconfig.json" />
     <None Include="wwwroot\js\site.js" />
   </ItemGroup>
 
@@ -23,6 +26,10 @@
     <ProjectReference Include="..\NoteMapper.Infrastructure\NoteMapper.Infrastructure.csproj" />
     <ProjectReference Include="..\NoteMapper.Services.Web\NoteMapper.Services.Web.csproj" />
     <ProjectReference Include="..\NoteMapper.Services\NoteMapper.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Shared\Components\" />
   </ItemGroup>
 
 </Project>

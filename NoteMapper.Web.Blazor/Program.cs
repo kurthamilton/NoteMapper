@@ -1,13 +1,11 @@
 using NoteMapper.Infrastructure;
 using NoteMapper.Web.Blazor;
-using NoteMapper.Web.Blazor.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 DependencyConfig.RegisterDependencies(new DependencyContainer(builder.Services));
 
 var app = builder.Build();
