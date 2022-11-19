@@ -7,7 +7,7 @@ namespace NoteMapper.Services.Web
 {
     public interface INoteMapViewModelService
     {
-        NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel();
+        NoteMapCriteriaOptionsViewModel GetNoteMapCriteriaViewModel();
 
         InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrument);
 

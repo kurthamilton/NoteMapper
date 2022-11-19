@@ -5,12 +5,18 @@ namespace NoteMapper.Core.Instruments
 {
     public abstract class StringedInstrumentBase : InstrumentBase
     {
+        private readonly Lazy<int> _positions;
+
         protected StringedInstrumentBase(InstrumentStringModifierCollection modifiers)
         {
             Modifiers = modifiers;
+
+            _positions = new Lazy<int>(() => Strings.Max(x => x.Positions));
         }
 
         public InstrumentStringModifierCollection Modifiers { get; }
+
+        public int Positions => _positions.Value;
 
         public abstract IReadOnlyCollection<InstrumentString> Strings { get; }
 

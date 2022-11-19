@@ -16,12 +16,12 @@ namespace NoteMapper.Services.Web
             _musicTheoryService = musicTheoryService;
         }
 
-        public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel()
+        public NoteMapCriteriaOptionsViewModel GetNoteMapCriteriaViewModel()
         {
             IReadOnlyCollection<InstrumentBase> instruments = _instrumentFactory.GetInstruments();
             IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames();
             IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetKeyTypes();
-            return new NoteMapCriteriaViewModel(instruments, keyNames, keyTypes);
+            return new NoteMapCriteriaOptionsViewModel(instruments, keyNames, keyTypes);
         }
 
         public InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrumentName)

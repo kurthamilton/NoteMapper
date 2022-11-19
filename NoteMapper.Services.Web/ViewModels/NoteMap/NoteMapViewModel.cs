@@ -1,6 +1,4 @@
-﻿using NoteMapper.Core.Instruments;
-
-namespace NoteMapper.Services.Web.ViewModels.NoteMap
+﻿namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapViewModel
     {
@@ -10,7 +8,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public void AddPosition(NoteMapPositionViewModel position)
         {
-            _positions.Add(position);
+            _positions.Add(position);            
         }
     }
 }
