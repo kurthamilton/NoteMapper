@@ -15,9 +15,10 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             KeyNames = keyNames;
             KeyTypes = keyTypes;
 
-            Types = Enum.GetValues<NoteMapType>()
-                .Where(x => x != NoteMapType.None)
-                .ToArray();
+            Types = new[]
+            {
+                NoteMapType.Chord
+            };
         }
 
         public IReadOnlyCollection<string> Instruments { get; }        

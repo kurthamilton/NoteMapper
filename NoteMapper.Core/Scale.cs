@@ -36,6 +36,20 @@ namespace NoteMapper.Core
             return new(notes, type);
         }
 
+        public static bool TryParse(string key, out Scale? scale)
+        {
+            try
+            {
+                scale = Parse(key);
+                return true;
+            }
+            catch
+            {
+                scale = null;
+                return false;
+            }
+        }
+
         public IEnumerable<Note> NotesBetween(int start, int end)
         {
             while (start <= end)

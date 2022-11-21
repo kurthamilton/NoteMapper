@@ -11869,11 +11869,10 @@ a, .btn-link {
 :root {
   --fretboard-backgroundcolor-disabled: #ddd;
   --fretboard-backgroundcolor-enabled: #74A474;
-  --fretboard-backgroundcolor-unavailable: #bbb;
   --fretboard-border-hover: 1px solid #f00;
+  --fretboard-border-permutation: 1px solid #bbb;
+  --fretboard-border-fret: 3px double #999;
   --fretboard-bordercolor-hover: #BD9494;
-  --fretboard-border-permutation: 1px solid #ccc;
-  --fretboard-bordercolor-frets: #bbb;
   --fretboard-bordercolor-strings: #000;
   --fretboard-fontsize-smaller: 0.8rem;
   --fretboard-padding: 0.4rem;
@@ -11892,7 +11891,6 @@ a, .btn-link {
 .fretboard__string {
   border-top: 1px solid var(--fretboard-bordercolor-strings);
 }
-
 .modifiers__modifier:last-child,
 .fretboard__string:last-child {
   border-bottom: 1px solid var(--fretboard-bordercolor-strings);
@@ -11903,20 +11901,30 @@ a, .btn-link {
   font-size: var(--fretboard-fontsize-smaller);
   padding-right: var(--fretboard-padding);
   text-align: right;
-  /*width: var(--fretboard-width-frets);*/
 }
 
 .modifier__fret,
 .string__fret {
-  border-left: 1px solid var(--fretboard-bordercolor-frets);
+  border-left: var(--fretboard-border-fret);
   font-size: var(--fretboard-fontsize-smaller);
   padding: 0;
   text-align: center;
 }
+.modifier__fret:last-child,
+.string__fret:last-child {
+  border-right: var(--fretboard-border-fret);
+}
+.modifier__fret .inner.disabled,
+.string__fret .inner.disabled {
+  background-color: var(--fretboard-backgroundcolor-disabled);
+}
 
-.string__fret {
-  padding-left: 0.2rem;
-  padding-right: 0.2rem;
+.string__fret .inner {
+  padding-left: calc(var(--fretboard-padding) / 2);
+  padding-right: calc(var(--fretboard-padding) / 2);
+}
+.string__fret .inner.enabled {
+  background-color: var(--fretboard-backgroundcolor-enabled);
 }
 
 .modifier__permutations {
@@ -11925,47 +11933,22 @@ a, .btn-link {
 
 .modifier__permutation {
   border-right: var(--fretboard-border-permutation);
+  border-left: 1px solid transparent;
 }
-
 .modifier__permutation:last-child {
   border-right: 1px solid transparent;
 }
-
 .modifier__permutation.enabled {
   background-color: var(--fretboard-backgroundcolor-enabled);
 }
-
 .modifier__permutation.disabled {
   background-color: var(--fretboard-backgroundcolor-disabled);
 }
-
-.modifier__permutation {
-  border-left: 1px solid transparent;
-}
-
 .modifier__permutation.hover {
   cursor: pointer;
   opacity: 0.8;
   border-left: var(--fretboard-border-hover);
   border-right: var(--fretboard-border-hover);
-}
-
-.string__fret.enabled {
-  background-color: var(--fretboard-backgroundcolor-enabled);
-}
-
-.string__fret.disabled,
-.modifier__fret.disabled {
-  background-color: var(--fretboard-backgroundcolor-disabled);
-}
-
-.modifier__fret:last-child,
-.string__fret:last-child {
-  border-right: 1px solid var(--fretboard-bordercolor-frets);
-}
-
-.modifier__fret.unavailable {
-  background-color: var(--fretboard-backgroundcolor-unavailable);
 }
 
 .table-fixed {

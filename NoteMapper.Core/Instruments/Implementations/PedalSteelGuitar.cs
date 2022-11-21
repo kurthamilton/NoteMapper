@@ -67,7 +67,7 @@ namespace NoteMapper.Core.Instruments.Implementations
                 },
                 Strings = new[]
                 {
-                    PedalSteelGuitarConfig.GetStringConfig("G3", frets),
+                    PedalSteelGuitarConfig.GetStringConfig("D3", frets),
                     PedalSteelGuitarConfig.GetStringConfig("E3", frets),
                     PedalSteelGuitarConfig.GetStringConfig("C3", frets),
                     PedalSteelGuitarConfig.GetStringConfig("A2", frets),

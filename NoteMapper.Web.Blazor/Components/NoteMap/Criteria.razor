@@ -9,8 +9,7 @@
 <div class="form-inline">
     <div class=form-group>
         <label for="instrument">Instrument</label>
-        <select class="form-control" id="instrument"
-                @onchange="OnInstrumentChange">
+        <select class="form-control" id="instrument" value="@Model.Instrument" @onchange="OnInstrumentChange">
             <option></option>
             @foreach (string instrument in Options.Instruments)
             {
@@ -22,14 +21,14 @@
     <div class=form-group>
         <label for="key">Key</label>
         <div class="d-flex">
-            <select class="form-control" id="key" @onchange="OnKeyNameChange">
+            <select class="form-control" id="key" value="@Model.KeyName" @onchange="OnKeyNameChange">
                 <option></option>
                 @foreach (string name in Options.KeyNames)
                 {
                     <option>@name</option>
                 }
             </select>
-            <select class="form-control" id="key" @onchange="OnKeyTypeChange">
+            <select class="form-control" id="key" value="@Model.KeyType" @onchange="OnKeyTypeChange">
                 @foreach (string type in Options.KeyTypes)
                 {
                     <option>@type</option>
@@ -40,7 +39,7 @@
 
     <div class="form-group">
         <label for="type">Type</label>
-        <select class="form-control" id="type" @onchange="OnTypeChange">
+        <select class="form-control" id="type" value="@Model.Type.ToString()" @onchange="OnTypeChange">
             @foreach (NoteMapType type in Options.Types)
             {
                 <option>@type.ToString()</option>
@@ -56,7 +55,13 @@
     [Parameter]
     public Action<NoteMapCriteriaViewModel>? OnChange { get; set; }
 
-    private NoteMapCriteriaViewModel Model { get; } = new NoteMapCriteriaViewModel();
+    [Parameter]
+    public NoteMapCriteriaViewModel Model { get; set; } = new NoteMapCriteriaViewModel();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
 
     void OnInstrumentChange(ChangeEventArgs e)
     {
