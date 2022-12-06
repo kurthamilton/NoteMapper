@@ -1,4 +1,4 @@
-﻿using NoteMapper.Core;
+﻿using NoteMapper.Core.MusicTheory;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {

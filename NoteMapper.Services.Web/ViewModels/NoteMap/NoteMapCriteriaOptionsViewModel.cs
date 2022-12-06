@@ -1,5 +1,5 @@
-﻿using NoteMapper.Core;
-using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Instruments;
+using NoteMapper.Core.MusicTheory;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {

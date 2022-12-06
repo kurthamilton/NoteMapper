@@ -1,22 +1,17 @@
 ﻿@page "/"
-
-<PageTitle>Note Mapper</PageTitle>
-
+@attribute [Authorize]
 @using System.Linq;
 @using NoteMapper.Core
 @using NoteMapper.Core.Extensions
 @using NoteMapper.Core.Instruments
+@using NoteMapper.Core.MusicTheory
 @using NoteMapper.Services
 @using NoteMapper.Services.Web
 @using NoteMapper.Services.Web.ViewModels
 @using NoteMapper.Services.Web.ViewModels.Instruments
 @using NoteMapper.Services.Web.ViewModels.NoteMap
-@using NoteMapper.Web.Blazor.Components.NoteMap
 @using NoteMapper.Web.Blazor.Extensions
-@inject IInstrumentFactory InstrumentFactory;
-@inject IMusicTheoryService MusicTheoryService;
-@inject NavigationManager NavigationManager;
-@inject INoteMapViewModelService NoteMapViewModelService;
+@using NoteMapper.Web.Blazor.Shared.NoteMap
 
 @if (CriteriaOptions == null)
 {
@@ -177,6 +172,10 @@ else
     }    
 }
 
+@inject IInstrumentFactory InstrumentFactory;
+@inject IMusicTheoryService MusicTheoryService;
+@inject NavigationManager NavigationManager;
+@inject INoteMapViewModelService NoteMapViewModelService;
 @code {
     NoteMapCriteriaViewModel? Criteria;
     NoteMapCriteriaOptionsViewModel? CriteriaOptions;

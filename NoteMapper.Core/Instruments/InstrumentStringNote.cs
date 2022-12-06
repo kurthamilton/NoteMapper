@@ -1,4 +1,6 @@
-﻿namespace NoteMapper.Core.Instruments
+﻿using NoteMapper.Core.MusicTheory;
+
+namespace NoteMapper.Core.Instruments
 {
     public class InstrumentStringNote
     {        

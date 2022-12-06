@@ -1,4 +1,6 @@
-﻿namespace NoteMapper.Core.Extensions
+﻿using NoteMapper.Core.MusicTheory;
+
+namespace NoteMapper.Core.Extensions
 {
     public static class KeyTypeExtensions
     {

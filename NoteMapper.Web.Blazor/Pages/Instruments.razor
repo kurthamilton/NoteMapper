@@ -1,10 +1,10 @@
 ﻿@page "/instruments"
+@attribute [Authorize]
 
 <PageTitle>Instruments</PageTitle>
 
 @using NoteMapper.Core.Instruments
 @using NoteMapper.Services
-@inject IInstrumentFactory InstrumentFactory
 
 <h1>Instruments</h1>
 
@@ -31,6 +31,7 @@ else
     </table>
 }
 
+@inject IInstrumentFactory InstrumentFactory
 @code {
     private IReadOnlyCollection<InstrumentBase>? instruments;
 

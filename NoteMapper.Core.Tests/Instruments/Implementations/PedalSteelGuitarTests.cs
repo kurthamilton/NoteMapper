@@ -1,5 +1,6 @@
 ﻿using NoteMapper.Core.Instruments;
 using NoteMapper.Core.Instruments.Implementations;
+using NoteMapper.Core.MusicTheory;
 using NUnit.Framework;
 
 namespace NoteMapper.Core.Tests.Instruments.Implementations

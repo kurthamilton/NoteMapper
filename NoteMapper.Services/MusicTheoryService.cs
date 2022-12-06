@@ -1,5 +1,5 @@
-﻿using NoteMapper.Core;
-using NoteMapper.Core.Extensions;
+﻿using NoteMapper.Core.Extensions;
+using NoteMapper.Core.MusicTheory;
 
 namespace NoteMapper.Services
 {

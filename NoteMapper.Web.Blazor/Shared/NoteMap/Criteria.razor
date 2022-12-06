@@ -1,0 +1,97 @@
+﻿@using NoteMapper.Core
+@using NoteMapper.Core.MusicTheory
+@using NoteMapper.Services.Web.ViewModels.NoteMap
+
+@if (Options == null)
+{
+    return;
+}
+
+<div class="form-inline">
+    <div class=form-group>
+        <label for="instrument">Instrument</label>
+        <select class="form-control" id="instrument" value="@Model.Instrument" @onchange="OnInstrumentChange">
+            <option></option>
+            @foreach (string instrument in Options.Instruments)
+            {
+                <option>@instrument</option>
+            }
+        </select>
+    </div>
+
+    <div class=form-group>
+        <label for="key">Key</label>
+        <div class="d-flex">
+            <select class="form-control" id="key" value="@Model.KeyName" @onchange="OnKeyNameChange">
+                <option></option>
+                @foreach (string name in Options.KeyNames)
+                {
+                    <option>@name</option>
+                }
+            </select>
+            <select class="form-control" id="key" value="@Model.KeyType" @onchange="OnKeyTypeChange">
+                @foreach (string type in Options.KeyTypes)
+                {
+                    <option>@type</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="type">Type</label>
+        <select class="form-control" id="type" value="@Model.Type.ToString()" @onchange="OnTypeChange">
+            @foreach (NoteMapType type in Options.Types)
+            {
+                <option>@type.ToString()</option>
+            }
+        </select>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public NoteMapCriteriaOptionsViewModel? Options { get; set; }
+
+    [Parameter]
+    public Action<NoteMapCriteriaViewModel>? OnChange { get; set; }
+
+    [Parameter]
+    public NoteMapCriteriaViewModel Model { get; set; } = new NoteMapCriteriaViewModel();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    void OnInstrumentChange(ChangeEventArgs e)
+    {
+        Model.Instrument = (string?)e.Value;
+        EmitChange();
+    }
+
+    void OnKeyNameChange(ChangeEventArgs e)
+    {
+        Model.KeyName = (string?)e.Value;
+        EmitChange();
+    }
+
+    void OnKeyTypeChange(ChangeEventArgs e)
+    {
+        Model.KeyType = (string?)e.Value;
+        EmitChange();
+    }
+
+    void OnTypeChange(ChangeEventArgs e)
+    {
+        string value = (string?)e.Value ?? "";
+        NoteMapType type = Enum.Parse<NoteMapType>(value, true);
+        Model.Type = Enum.IsDefined<NoteMapType>(type) ? type : default;
+        EmitChange();
+    }
+
+    void EmitChange()
+    {
+        OnChange?.Invoke(Model);
+    }
+}

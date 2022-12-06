@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using NoteMapper.Core.MusicTheory;
 
 namespace NoteMapper.Core.Instruments
 {

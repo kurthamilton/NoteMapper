@@ -1,12 +1,25 @@
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using NoteMapper.Core.IO;
 using NoteMapper.Infrastructure;
+using NoteMapper.Services.Web;
 using NoteMapper.Web.Blazor;
+using NoteMapper.Web.Blazor.Services;
+using NoteMapper.Web.Blazor.Services.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-DependencyConfig.RegisterDependencies(new DependencyContainer(builder.Services));
+IServiceCollection services = builder.Services;
+services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true);
+services.AddRazorPages();
+services.AddServerSideBlazor();
+
+IDependencyContainer container = new DependencyContainer(services)
+    .AddScoped<IFilePathResolver, FilePathResolver>()
+    .AddScoped<IUrlEncoder, UrlEncoder>()
+    .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+DependencyConfig.RegisterDependencies(container, builder.Configuration);
 
 var app = builder.Build();
 
@@ -24,7 +37,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 app.MapBlazorHub();
+app.MapRazorPages();
 app.MapFallbackToPage("/_Host");
 
 app.Run();

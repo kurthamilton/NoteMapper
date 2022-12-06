@@ -1,4 +1,6 @@
-﻿namespace NoteMapper.Core.Tests
+﻿using NoteMapper.Core.MusicTheory;
+
+namespace NoteMapper.Core.Tests
 {
     public static class ChordTests
     {

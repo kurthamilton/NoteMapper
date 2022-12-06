@@ -1,4 +1,5 @@
 ﻿using NoteMapper.Core.Extensions;
+using NoteMapper.Core.MusicTheory;
 using NoteMapper.Core.Permutations;
 
 namespace NoteMapper.Core.Instruments

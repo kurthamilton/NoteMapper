@@ -1,15 +1,21 @@
 ﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid px-4">
-        <a class="navbar-brand" href="#">Note Mapper</a>
+    <div class="@(Fluid ? "container-fluid px-4" : "container") @Class">
+        <a class="navbar-brand me-auto" href="#">Note Mapper</a>
         @*<button class="navbar-toggler" type="button" 
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
         </div>*@
+
+        <AccountNav />
     </div>
 </nav>
 
-@code {
+@code{
+    [Parameter]
+    public bool Fluid { get; set; } = true;
 
+    [Parameter]
+    public string? Class { get; set; }
 }
