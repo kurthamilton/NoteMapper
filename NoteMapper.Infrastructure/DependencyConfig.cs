@@ -39,15 +39,17 @@ namespace NoteMapper.Infrastructure
 
         private static void RegisterIdentity(IDependencyContainer container, IConfiguration config)
         {
+            string baseUrl = config.GetValue("BaseUrl");
+
             container
                 .AddScoped<IIdentityService, MicrosoftIdentityService>()
                 .AddSingleton(new MicrosoftIdentityServiceSettings
                 {
                     ActivationCodeExpiresAfterMinutes = config.GetInt("Account.ActivationCodeExpiresAfterMinutes"),
-                    ActivationUrl = config.GetValue("Account.ActivationUrl"),
+                    ActivationUrl = baseUrl + config.GetValue("Account.ActivationUrl"),
                     LoginTokenExpiresAfterSeconds = config.GetInt("Account.LoginTokenExpiresAfterSeconds"),
                     PasswordResetCodeExpiresAfterHours = config.GetInt("Account.PasswordResetCodeExpiresAfterHours"),
-                    PasswordResetUrl = config.GetValue("Account.PasswordResetUrl")
+                    PasswordResetUrl = baseUrl + config.GetValue("Account.PasswordResetUrl")
                 })
                 // .AddScoped<IPasswordHasher<IdentityUser>, CustomPasswordHasher>()
                 .AddScoped<IPasswordHasher, CustomPasswordHasher>()
