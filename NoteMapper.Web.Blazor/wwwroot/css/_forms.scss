@@ -1,12 +1,22 @@
 ﻿.form-inline {
     display: flex;
+
+    .form-group {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .form-control {
+        width: auto;
+    }
 }
 
-.form-inline .form-group {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+.loading-indicator {
+    display: none;
 }
 
-.form-inline .form-control {
-    width: auto;
+.loading {
+    .loading-indicator {
+        display: inline-block;
+    }
 }

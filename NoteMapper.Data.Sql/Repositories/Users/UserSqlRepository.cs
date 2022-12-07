@@ -1,4 +1,5 @@
-﻿using NoteMapper.Data.Core.Users;
+﻿using NoteMapper.Core;
+using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
@@ -9,7 +10,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
         }
 
-        public Task DeleteAsync(Guid userId)
+        public Task<ServiceResult> DeleteAsync(Guid userId)
         {
             return DeleteWhereAsync(x => x.UserId == userId);
         }

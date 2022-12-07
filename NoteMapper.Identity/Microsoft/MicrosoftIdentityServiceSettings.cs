@@ -1,4 +1,6 @@
-﻿namespace NoteMapper.Identity.Microsoft
+﻿using NoteMapper.Core.Users;
+
+namespace NoteMapper.Identity.Microsoft
 {
     public class MicrosoftIdentityServiceSettings
     {
@@ -11,5 +13,7 @@
         public int PasswordResetCodeExpiresAfterHours { get; set; }
 
         public string PasswordResetUrl { get; set; } = "";
+
+        public RegistrationType RegistrationType { get; set; }
     }
 }

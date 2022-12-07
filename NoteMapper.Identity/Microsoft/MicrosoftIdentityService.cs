@@ -1,4 +1,5 @@
 ﻿using NoteMapper.Core;
+using NoteMapper.Core.Users;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Services.Emails;
 using NoteMapper.Services.Users;
@@ -13,7 +14,7 @@ namespace NoteMapper.Identity.Microsoft
         private readonly MicrosoftIdentityServiceSettings _settings;
         private readonly IUrlEncoder _urlEncoder;
         private readonly IUserActivationRepository _userActivationRepository;
-        private readonly IUserLoginTokenRepository _userLoginTokenRepository;
+        private readonly IUserLoginTokenRepository _userLoginTokenRepository;        
         private readonly IUserPasswordRepository _userPasswordRepository;
         private readonly IUserRepository _userRepository;
 
@@ -64,16 +65,11 @@ namespace NoteMapper.Identity.Microsoft
             return ServiceResult.Successful("Your account has been activated");
         }
 
-        public async Task<ServiceResult> CanUserSignIn(User? user, string password)
+        public async Task<ServiceResult> CanUserSignIn(Guid userId, string password)
         {
             ServiceResult defaultResult = ServiceResult.Failure("Invalid email or password");
 
-            if (user == null)
-            {
-                return defaultResult;
-            }
-
-            UserPassword? userPassword = await _userPasswordRepository.FindAsync(user.UserId);
+            UserPassword? userPassword = await FindUserPasswordAsync(userId);
             if (userPassword == null)
             {
                 return defaultResult;
@@ -108,6 +104,14 @@ namespace NoteMapper.Identity.Microsoft
                 : null;
         }
 
+        public async Task<ServiceResult> DeleteAccountAsync(Guid userId)
+        {
+            ServiceResult result = await _userRepository.DeleteAsync(userId);
+            return result.Success
+                ? ServiceResult.Successful("Your account has been deleted")
+                : ServiceResult.Failure("An error occurred while deleting your account");
+        }
+
         public Task<User?> FindUserAsync(Guid userId)
         {
             return _userRepository.FindAsync(userId);
@@ -118,12 +122,21 @@ namespace NoteMapper.Identity.Microsoft
             return _userRepository.FindByEmailAsync(email);
         }
 
+        public RegistrationType GetRegistrationType()
+        {
+            return _settings.RegistrationType;
+        }
+
         public async Task<ServiceResult> RegisterUserAsync(string email)
         {
+            ServiceResult defaultResult = ServiceResult.Successful($"An activation email has been sent to {email}. " +
+                "If you have already registered then login or reset your password.");
+            ServiceResult defaultErrorResult = ServiceResult.Failure("An error has occurred while creating your account");
+
             User? existing = await FindUserAsync(email);
             if (existing != null)
             {
-                return ServiceResult.Failure("There is already an account associated with that email");
+                return defaultResult;
             }
 
             DateTime createdUtc = DateTime.UtcNow;                        
@@ -137,7 +150,7 @@ namespace NoteMapper.Identity.Microsoft
             ServiceResult userResult = await _userRepository.CreateAsync(user);
             if (!userResult.Success)
             {
-                return userResult;
+                return defaultErrorResult;
             }
 
             string activationCode = Guid.NewGuid().ToString();
@@ -153,32 +166,33 @@ namespace NoteMapper.Identity.Microsoft
             ServiceResult activationResult = await _userActivationRepository.CreateAsync(userActivation);
             if (!activationResult.Success)
             {
-                return activationResult;
+                return defaultErrorResult;
             }
 
             ServiceResult activationEmailResult = await SendActivationEmailAsync(user, userActivation);
             if (!activationEmailResult.Success)
             {
-                return activationEmailResult;
+                return defaultErrorResult;
             }
 
-            return ServiceResult.Successful("An activation email has been sent to your email");
+            return defaultResult;
         }
 
         public async Task<ServiceResult> RequestPasswordResetAsync(string email)
         {
-            ServiceResult result = ServiceResult.Successful($"A password reset link has been sent to {email} if it is registered");
+            ServiceResult defaultResult = ServiceResult.Successful($"A password reset link has been sent to {email} if it is registered");
+            ServiceResult defaultErrorResult = ServiceResult.Failure("An error occurred while resetting your password");
 
             User? user = await FindUserAsync(email);
             if (user == null)
             {
-                return result;
+                return defaultResult;
             }
 
             UserPassword? userPassword = await _userPasswordRepository.FindAsync(user.UserId);
             if (userPassword == null)
             {
-                return result;
+                return defaultResult;
             }
 
             string resetCode = Guid.NewGuid().ToString();
@@ -188,26 +202,26 @@ namespace NoteMapper.Identity.Microsoft
             ServiceResult updateResult = await _userPasswordRepository.UpdateAsync(userPassword);
             if (!updateResult.Success)
             {
-                return ServiceResult.Failure("An error occurred while resetting your password");
+                return defaultErrorResult;
             }
 
             ServiceResult emailResult = await SendPasswordResetEmailAsync(user, userPassword);
             if (!emailResult.Success)
             {
-                return emailResult;
+                return defaultErrorResult;
             }
 
-            return result;
+            return defaultResult;
         }
 
         public async Task<ServiceResult> ResetPasswordAsync(string email, string code, string newPassword)
         {
-            ServiceResult result = ServiceResult.Failure("Link is invalid or has expired");
+            ServiceResult defaultResult = ServiceResult.Failure("The link you followed is invalid or has expired");
 
             User? user = await FindUserAsync(email);
             if (user == null)
             {
-                return result;
+                return defaultResult;
             }
 
             UserPassword? password = await _userPasswordRepository.FindAsync(user.UserId);
@@ -216,13 +230,41 @@ namespace NoteMapper.Identity.Microsoft
                 password.ResetCode != code || 
                 password.ResetCodeExpiresUtc < DateTime.UtcNow)
             {
-                return result;
+                return defaultResult;
             }
 
             ServiceResult passwordResult = await SetUserPasswordAsync(password, newPassword);
             return passwordResult.Success
                 ? ServiceResult.Successful("Your password has been reset")
-                : passwordResult;
+                : defaultResult;
+        }
+
+        public async Task<ServiceResult> UpdatePasswordAsync(Guid userId, string oldPassword, string newPassword)
+        {
+            ServiceResult defaultResult = ServiceResult.Failure("An error while updating your password");
+
+            UserPassword? userPassword = await FindUserPasswordAsync(userId);
+            if (userPassword == null)
+            {
+                return defaultResult;
+            }
+
+            string hashedOldPassword = _passwordHasher.HashPassword(oldPassword, userPassword.Salt);
+            if (hashedOldPassword != userPassword.Hash)
+            {
+                return ServiceResult.Failure("Old password mismatch");
+            }
+
+            string newSalt = _passwordHasher.GenerateSalt();
+            string newHash = _passwordHasher.HashPassword(newPassword, newSalt);
+
+            userPassword.Hash = newHash;
+            userPassword.Salt = newSalt;
+
+            ServiceResult result = await _userPasswordRepository.UpdateAsync(userPassword);
+            return result.Success
+                ? ServiceResult.Successful("Password updated")
+                : defaultResult;
         }
 
         public async Task<User?> UseLoginTokenAsync(string email, string token)
@@ -244,6 +286,18 @@ namespace NoteMapper.Identity.Microsoft
             return loginToken.ExpiresUtc < DateTime.UtcNow
                 ? null
                 : user;
+        }
+
+        private async Task<UserPassword?> FindUserPasswordAsync(Guid userId)
+        {
+            User? user = await FindUserAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            UserPassword? userPassword = await _userPasswordRepository.FindAsync(user.UserId);
+            return userPassword;
         }
 
         private Task<ServiceResult> SendActivationEmailAsync(User user, UserActivation activation)
@@ -290,9 +344,8 @@ namespace NoteMapper.Identity.Microsoft
 
         private async Task<ServiceResult> SetUserPasswordAsync(UserPassword userPassword, string plainText)
         {
-            byte[] saltBytes = _passwordHasher.GenerateSalt();
-            string hash = _passwordHasher.HashPassword(plainText, saltBytes);
-            string salt = _passwordHasher.EncodeSalt(saltBytes);
+            string salt = _passwordHasher.GenerateSalt();
+            string hash = _passwordHasher.HashPassword(plainText, salt);
 
             bool firstTime = userPassword.UserPasswordId == Guid.Empty;
             userPassword.Hash = hash;            

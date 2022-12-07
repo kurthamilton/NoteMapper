@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using NoteMapper.Core.IO;
 using NoteMapper.Infrastructure;
+using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
-using NoteMapper.Web.Blazor;
 using NoteMapper.Web.Blazor.Services;
 using NoteMapper.Web.Blazor.Services.Identity;
 
@@ -18,7 +18,8 @@ services.AddServerSideBlazor();
 IDependencyContainer container = new DependencyContainer(services)
     .AddScoped<IFilePathResolver, FilePathResolver>()
     .AddScoped<IUrlEncoder, UrlEncoder>()
-    .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+    .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>()
+    .AddScoped<IUserLocator, UserLocator>();
 DependencyConfig.RegisterDependencies(container, builder.Configuration);
 
 var app = builder.Build();

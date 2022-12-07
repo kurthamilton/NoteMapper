@@ -6,7 +6,7 @@ namespace NoteMapper.Data.Core.Users
     {
         Task<ServiceResult> CreateAsync(User user);  
         
-        Task DeleteAsync(Guid userId);
+        Task<ServiceResult> DeleteAsync(Guid userId);
 
         Task<User?> FindAsync(Guid userId);
 

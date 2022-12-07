@@ -1,0 +1,69 @@
+﻿@page "/account"
+@layout ContentLayout
+@inherits NoteMapperComponentBase
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Identity;
+@using NoteMapper.Core;
+@using NoteMapper.Data.Core.Users;
+@using NoteMapper.Services.Users;
+@using NoteMapper.Web.Blazor.Models.Account;
+@using NoteMapper.Web.Blazor.Models;
+@using NoteMapper.Web.Blazor.Shared.Layouts;
+@using System.Security.Claims;
+
+<h1>Your account</h1>
+
+<h4>@Email</h4>
+
+<h4>Update password</h4>
+
+<EditForm Model="@UpdatePasswordModel" OnValidSubmit="OnPasswordUpdateAsync">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="old-password" class="form-label">Old Password</label>
+        <InputText id="old-password" type="password" @bind-Value="UpdatePasswordModel.OldPassword" class="form-control" />
+        <ValidationMessage For="() => UpdatePasswordModel.OldPassword" />
+    </div>
+
+    <div class="mb-3">
+        <label for="new-password" class="form-label">New Password</label>
+        <InputText id="new-password" type="password" @bind-Value="UpdatePasswordModel.NewPassword" class="form-control" />
+        <ValidationMessage For="() => UpdatePasswordModel.NewPassword" />
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+</EditForm>
+
+@inject NavigationManager NavigationManager
+@code {
+    string? Email { get; set; }
+
+    UpdatePasswordViewModel UpdatePasswordModel { get; set; } = new();
+
+    Guid UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        User? user = await GetCurrentUserAsync();
+        if (user == null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        Email = user.Email;
+        UserId = user.UserId;
+    }
+
+    private async Task OnPasswordUpdateAsync()
+    {
+        SetLoading();
+
+        ServiceResult result = await IdentityService.UpdatePasswordAsync(UserId, 
+            UpdatePasswordModel.OldPassword, UpdatePasswordModel.NewPassword);
+        SetFeedback(result);
+    }
+}

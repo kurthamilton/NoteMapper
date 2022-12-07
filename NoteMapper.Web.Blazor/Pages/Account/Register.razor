@@ -1,7 +1,8 @@
 ﻿@page "/account/register"
-@layout AccountLayout
+@layout ContentLayout
 @attribute [AllowAnonymous]
 @using NoteMapper.Core
+@using NoteMapper.Core.Users;
 @using NoteMapper.Services.Users
 @using NoteMapper.Web.Blazor.Models
 @using NoteMapper.Web.Blazor.Models.Account
@@ -36,6 +37,21 @@ else
     FeedbackViewModel? Feedback { get; set; }
 
     RegisterViewModel Model { get; set; } = new();
+
+    RegistrationType RegistrationType { get; set; }
+
+    protected override void OnInitialized()
+    {
+        RegistrationType = IdentityService.GetRegistrationType();
+        if (RegistrationType == RegistrationType.Closed)
+        {
+            Feedback = new FeedbackViewModel
+            {
+                Message = "Registration is currently closed",
+                Type = FeedbackType.Danger
+            };
+        }
+    }
 
     private async Task HandleValidSubmitAsync()
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using NoteMapper.Core.Users;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Sql;
 using NoteMapper.Data.Sql.Repositories.Users;
@@ -49,9 +50,9 @@ namespace NoteMapper.Infrastructure
                     ActivationUrl = baseUrl + config.GetValue("Account.ActivationUrl"),
                     LoginTokenExpiresAfterSeconds = config.GetInt("Account.LoginTokenExpiresAfterSeconds"),
                     PasswordResetCodeExpiresAfterHours = config.GetInt("Account.PasswordResetCodeExpiresAfterHours"),
-                    PasswordResetUrl = baseUrl + config.GetValue("Account.PasswordResetUrl")
+                    PasswordResetUrl = baseUrl + config.GetValue("Account.PasswordResetUrl"),
+                    RegistrationType = config.GetEnum<RegistrationType>("Account.RegistrationType")
                 })
-                // .AddScoped<IPasswordHasher<IdentityUser>, CustomPasswordHasher>()
                 .AddScoped<IPasswordHasher, CustomPasswordHasher>()
                 .AddSingleton(new CustomPasswordHasherSettings
                 {
@@ -59,7 +60,6 @@ namespace NoteMapper.Infrastructure
                     HashIterations = config.GetInt("Security.Passwords.HashIterations"),
                     SaltByteSize = config.GetInt("Security.Passwords.SaltByteSize")
                 })
-                // .AddScoped<IUserPasswordStore<IdentityUser>, CustomUserStore>()
                 .AddScoped<IUserStore<IdentityUser>, CustomUserStore>();
         }
 

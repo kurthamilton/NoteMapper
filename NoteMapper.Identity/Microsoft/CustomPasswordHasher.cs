@@ -1,9 +1,8 @@
 ﻿using System.Security.Cryptography;
-using Microsoft.AspNetCore.Identity;
 
 namespace NoteMapper.Identity.Microsoft
 {
-    public class CustomPasswordHasher : IPasswordHasher<IdentityUser>, IPasswordHasher
+    public class CustomPasswordHasher : IPasswordHasher
     {
         private readonly CustomPasswordHasherSettings _settings;
 
@@ -12,46 +11,22 @@ namespace NoteMapper.Identity.Microsoft
             _settings = settings;
         }
 
-        public string EncodeSalt(byte[] salt)
-        {
-            return Convert.ToBase64String(salt);
-        }
-
-        public byte[] GenerateSalt()
+        public string GenerateSalt()
         {
             using (RandomNumberGenerator saltGenerator = RandomNumberGenerator.Create())
             {
-                byte[] salt = new byte[_settings.SaltByteSize];
-                saltGenerator.GetBytes(salt);
+                byte[] saltBytes = new byte[_settings.SaltByteSize];
+                saltGenerator.GetBytes(saltBytes);
+                string salt = EncodeBytes(saltBytes);
                 return salt;
             }
         }
 
         public string HashPassword(string plainText, string salt)
         {
-            byte[] saltBytes = Convert.FromBase64String(salt);
+            byte[] saltBytes = DecodeBytes(salt);
             return HashPassword(plainText, saltBytes);
-        }
-
-        public string HashPassword(string plainText, byte[] salt)
-        {
-            byte[] hashBytes = ComputeHash(plainText, salt);
-
-            string hash = Convert.ToBase64String(hashBytes);
-            return hash;
-        }
-
-        public string HashPassword(IdentityUser user, string password)
-        {
-            return password;
-        }
-
-        public PasswordVerificationResult VerifyHashedPassword(IdentityUser user, string hashedPassword, string providedPassword)
-        {
-            return hashedPassword == providedPassword
-                ? PasswordVerificationResult.Success
-                : PasswordVerificationResult.Failed;
-        }
+        }        
 
         private byte[] ComputeHash(string plainText, byte[] salt)
         {
@@ -61,9 +36,27 @@ namespace NoteMapper.Identity.Microsoft
             }
         }
 
+        private byte[] DecodeBytes(string s)
+        {
+            return Convert.FromBase64String(s);
+        }
+
+        private string EncodeBytes(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes);
+        }
+
         private DeriveBytes GetHashGenerator(string plainText, byte[] salt)
         {
             return new Rfc2898DeriveBytes(plainText, salt, _settings.HashIterations, HashAlgorithmName.SHA256);
+        }
+
+        private string HashPassword(string plainText, byte[] salt)
+        {
+            byte[] hashBytes = ComputeHash(plainText, salt);
+
+            string hash = EncodeBytes(hashBytes);
+            return hash;
         }
     }
 }

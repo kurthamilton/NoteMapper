@@ -1,5 +1,6 @@
 ﻿@page "/account/login"
-@layout AccountLayout
+@inherits NoteMapperComponentBase
+@layout ContentLayout
 @attribute [AllowAnonymous]
 @using NoteMapper.Core
 @using NoteMapper.Data.Core.Users
@@ -12,59 +13,61 @@
 
 <h1>Login</h1>
 
-<Feedback Model="@Feedback" />
-
-<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
+<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync" class="@(Loading ? "loading" : null)">
     <DataAnnotationsValidator />
     
-    <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <InputText id="email" @bind-Value="Model.Email" class="form-control" />
-        <ValidationMessage For="() => Model.Email" />
-    </div>
-
-    <div class="mb-3">
-        <div class="d-flex">
-            <label for="password" class="form-label me-auto">Password</label>
-            <a href="/account/password/forgotten">
-                Forgotten password?
-            </a>
+    <fieldset disabled="@Loading">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <InputText id="email" @bind-Value="Model.Email" class="form-control" tabindex="1" />
+            <ValidationMessage For="() => Model.Email" />
         </div>
-        <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" />
-        <ValidationMessage For="() => Model.Password" />
-    </div>
 
-    <div>
-        <button type="submit" class="btn btn-primary">Login</button>        
-    </div>
+        <div class="mb-3">
+            <div class="d-flex">
+                <label for="password" class="form-label me-auto">Password</label>
+                <a href="/account/password/forgotten" tabindex="4">
+                    Forgotten password?
+                </a>
+            </div>
+            <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" tabindex="2" />
+            <ValidationMessage For="() => Model.Password" />
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary" tabindex="3">
+                Login
+                <ButtonSpinner Loading="@Loading" />
+            </button>
+        </div>
+    </fieldset>
 </EditForm>
 
-@inject IIdentityService IdentityService
+<Feedback Model="@Feedback" />
+
 @inject NavigationManager NavigationManager
 @inject IUrlEncoder UrlEncoder
 @code {
-    FeedbackViewModel? Feedback { get; set; }
 
     LoginViewModel Model { get; set; } = new();    
 
     private async Task HandleValidSubmitAsync()
     {
-        User? user = await IdentityService.FindUserAsync(Model.Email);
-        ServiceResult result = await IdentityService.CanUserSignIn(user, Model.Password);
+        Console.WriteLine("HandleValidSubmitAsync");
+        SetLoading();
+
+        User? user = await IdentityService.FindUserAsync(Model.Email);        
+        ServiceResult result = await IdentityService.CanUserSignIn(user?.UserId ?? Guid.Empty, Model.Password);
         if (user == null || !result.Success)
-        {
-            Feedback = FeedbackViewModel.FromServiceResult(result);
+        {            
+            SetFeedback(result);
             return;
         }
 
         UserLoginToken? token = await IdentityService.CreateLoginTokenAsync(user.UserId);
         if (token == null)
         {
-            Feedback = new FeedbackViewModel
-            {
-                Message = "An error occurred during login",
-                Type = FeedbackType.Danger
-            };
+            SetError("An error occurred during login");
             return;
         }
 

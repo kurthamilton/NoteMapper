@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inherits NoteMapperComponentBase
 @attribute [Authorize]
 @using System.Linq;
 @using NoteMapper.Core
@@ -21,7 +22,7 @@ else
 {
     <div class="card mb-3">
         <div class="card-body">
-            <Criteria Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
+            <NoteMapCriteria Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
         </div>
     </div>
 
@@ -112,6 +113,7 @@ else
                                         };
 
                                         <div class="modifier__permutation @string.Join(" ", cssClasses) col"
+                                             @onclick="e => positionViewModel.SetSelectedPermutation(permutation)"
                                              data-hover="modifier-f-@i-p-@p">
                                             @if (selected)
                                             {
