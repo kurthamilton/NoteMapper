@@ -10,23 +10,23 @@
     <div class="btn-group me-3">
         <button class="btn btn-outline-secondary @(CanZoom(1) ? "" : "disabled")"
                 @onclick="e => Zoom(1)">
-            <span class="oi oi-zoom-out" aria-hidden="true"></span>
+            <span class="bi bi-zoom-out" aria-hidden="true"></span>
         </button>
 
         <button class="btn btn-outline-secondary @(CanZoom(-1) ? "" : "disabled")"
                 @onclick="e => Zoom(-1)">
-            <span class="oi oi-zoom-in" aria-hidden="true"></span>
+            <span class="bi bi-zoom-in" aria-hidden="true"></span>
         </button>
     </div>
     <div class="btn-group">
         <button class="btn btn-outline-secondary @(CanMove(-1) ? "" : "disabled")"
                 @onclick="e => Move(-1)">
-            <span class="oi oi-caret-left" aria-hidden="true"></span>
+            <span class="bi bi-caret-left" aria-hidden="true"></span>
         </button>
 
         <button class="btn btn-outline-secondary @(CanMove(1) ? "" : "disabled")"
                 @onclick="e => Move(+1)">
-            <span class="oi oi-caret-right" aria-hidden="true"></span>
+            <span class="bi bi-caret-right" aria-hidden="true"></span>
         </button>
     </div>
 </div>
