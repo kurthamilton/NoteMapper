@@ -10771,6 +10771,10 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+:root {
+  --color-danger: var(--bs-danger);
+}
+
 .valid.modified:not([type=checkbox]) {
   outline: 1px solid #26b050;
 }
@@ -10821,6 +10825,11 @@ textarea.form-control-lg {
 }
 .form-inline .form-control {
   width: auto;
+}
+
+label.required:after {
+  color: var(--color-danger);
+  content: " *";
 }
 
 .loading-indicator {

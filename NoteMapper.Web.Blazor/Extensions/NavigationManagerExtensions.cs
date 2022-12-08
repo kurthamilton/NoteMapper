@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Net;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 
@@ -13,7 +14,7 @@ namespace NoteMapper.Web.Blazor.Extensions
             IDictionary<string, StringValues> queryString = QueryHelpers.ParseQuery(uri.Query);
             foreach (string key in values.Keys)
             {
-                queryString[key] = values[key];
+                queryString[key] = WebUtility.UrlEncode(values[key]);
             }
 
             string path = uri.GetLeftPart(UriPartial.Path);            
@@ -28,7 +29,7 @@ namespace NoteMapper.Web.Blazor.Extensions
 
             if (QueryHelpers.ParseQuery(uri.Query).TryGetValue(key, out StringValues queryValue))
             {
-                value = queryValue.ToString();
+                value = WebUtility.UrlDecode(queryValue.ToString());
                 return true;
             }
 

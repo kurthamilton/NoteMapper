@@ -12,7 +12,9 @@
 @using NoteMapper.Services.Web.ViewModels.Instruments
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Extensions
+@using NoteMapper.Web.Blazor.Models.NoteMap;
 @using NoteMapper.Web.Blazor.Shared.NoteMap
+@using NoteMapper.Web.Blazor.Shared.Shared
 
 @if (CriteriaOptions == null)
 {
@@ -29,17 +31,21 @@ else
     @if (Instrument != null)
     {
         int totalWidth = 1;
-        for (int i = 0; i <= Instrument.Positions; i++)
+        for (int i = StartPosition; i <= EndPosition; i++)
         {
             NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
             totalWidth += positionViewModel?.Permutations.Count > 0 ? positionViewModel.Permutations.Count : 1;
         }
 
+        <div class="d-flex justify-content-end my-3">
+            <NoteMapToolbar Instrument="@Instrument" OnChange="OnZoomChange" />
+        </div>
+
         <table class="w-100" cellpadding="0">
             <tbody class="fretboard">
                 <tr class="fretboard__heading">
-                    <th class="string__name" style="width: @(1.0 / totalWidth)%;"></th>
-                    @for (int i = 0; i <= Instrument.Positions; i++)
+                    <th class="string__name" style="width: 0.001%;"></th>
+                    @for (int i = StartPosition; i <= EndPosition; i++)
                     {
                         NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
                         float width = positionViewModel?.Permutations.Count > 0 ? positionViewModel.Permutations.Count : 1;
@@ -59,7 +65,7 @@ else
                             @(@string.OpenNote.Name)
                         </th>
 
-                        @for (int j = 0; j <= Instrument.Positions; j++)
+                        @for (int j = StartPosition; j <= EndPosition; j++)
                         {
                             NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(j);
                             NoteMapNotesViewModel? selectedPermutation = positionViewModel?.SelectedPermutation;
@@ -95,12 +101,12 @@ else
                 <tr>
                     <th></th>
 
-                    @for (int i = 0; i <= Instrument.Positions; i++)
+                    @for (int i = StartPosition; i <= EndPosition; i++)
                     {
                         NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
 
                         <td class="modifier__fret">
-                            @if (positionViewModel != null)
+                            @if (positionViewModel != null && positionViewModel.Permutations.Count > 0)
                             {
                                 <div class="modifier__permutations">
                                     @for (int p = 0; p < positionViewModel.Permutations.Count; p++)
@@ -123,6 +129,10 @@ else
                                     }
                                 </div>
                             }
+                            else
+                            {
+                                @:&nbsp;
+                            }
                         </td>
                     }
                 </tr>
@@ -133,7 +143,7 @@ else
                             @modifier.Name
                         </th>
 
-                        @for (int i = 0; i <= Instrument.Positions; i++)
+                        @for (int i = StartPosition; i <= EndPosition; i++)
                         {
                             NoteMapPositionViewModel? positionViewModel = ViewModel?.Positions.ElementAt(i);
 
@@ -170,8 +180,8 @@ else
                     </tr>
                 }
             </tbody>
-        </table>
-    }    
+        </table>        
+    }
 }
 
 @inject IInstrumentFactory InstrumentFactory;
@@ -179,10 +189,12 @@ else
 @inject NavigationManager NavigationManager;
 @inject INoteMapViewModelService NoteMapViewModelService;
 @code {
-    NoteMapCriteriaViewModel? Criteria;
-    NoteMapCriteriaOptionsViewModel? CriteriaOptions;
-    StringedInstrumentBase? Instrument;
-    NoteMapViewModel? ViewModel;
+    NoteMapCriteriaViewModel? Criteria { get; set; }
+    NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }    
+    int EndPosition { get; set; }
+    StringedInstrumentBase? Instrument { get; set; }
+    int StartPosition { get; set; }
+    NoteMapViewModel? ViewModel { get; set; }
 
     protected override void OnInitialized()
     {
@@ -199,7 +211,7 @@ else
         if (Criteria?.Instrument != Instrument?.Name)
         {
             Instrument = InstrumentFactory.GetInstrument(Criteria?.Instrument) as StringedInstrumentBase;
-        }
+        }        
     }
 
     void OnCriteriaChange(NoteMapCriteriaViewModel criteria)
@@ -214,6 +226,12 @@ else
             { "instrument", Criteria.Instrument },
             { "key", Criteria.KeyName + Criteria.KeyType }
         });        
+    }
+
+    void OnZoomChange(NoteMapZoomViewModel? zoom)
+    {
+        EndPosition = zoom != null ? zoom.EndPosition : 0;
+        StartPosition = zoom != null ? zoom.StartPosition : 0;                
     }
 
     void SetCriteriaFromQueryString()

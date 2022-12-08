@@ -11,6 +11,7 @@ namespace NoteMapper.Identity.Microsoft
     {
         private readonly IEmailSenderService _emailSenderService;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IRegistrationCodeRepository _registrationCodeRepository;
         private readonly MicrosoftIdentityServiceSettings _settings;
         private readonly IUrlEncoder _urlEncoder;
         private readonly IUserActivationRepository _userActivationRepository;
@@ -21,10 +22,11 @@ namespace NoteMapper.Identity.Microsoft
         public MicrosoftIdentityService(IUserRepository userRepository, IUserActivationRepository userActivationRepository,
             MicrosoftIdentityServiceSettings settings, IPasswordHasher passwordHasher, IUserPasswordRepository userPasswordRepository,
             IUserLoginTokenRepository userLoginTokenRepository, IEmailSenderService emailSenderService,
-            IUrlEncoder urlEncoder)
+            IUrlEncoder urlEncoder, IRegistrationCodeRepository registrationCodeRepository)
         {
             _emailSenderService = emailSenderService;
             _passwordHasher = passwordHasher;
+            _registrationCodeRepository = registrationCodeRepository;
             _settings = settings;
             _urlEncoder = urlEncoder;
             _userActivationRepository = userActivationRepository;
@@ -127,8 +129,26 @@ namespace NoteMapper.Identity.Microsoft
             return _settings.RegistrationType;
         }
 
-        public async Task<ServiceResult> RegisterUserAsync(string email)
+        public async Task<ServiceResult> RegisterUserAsync(string email, string? code)
         {
+            RegistrationType registrationType = GetRegistrationType();
+            if (registrationType == RegistrationType.Closed)
+            {
+                return ServiceResult.Failure("Registration is currently closed");
+            }
+
+            if (registrationType == RegistrationType.InviteOnly)
+            {
+                RegistrationCode? registrationCode = !string.IsNullOrEmpty(code) 
+                    ? await _registrationCodeRepository.FindAsync(code)
+                    : null;
+
+                if (registrationCode == null || registrationCode.ExpiresUtc < DateTime.UtcNow)
+                {
+                    return ServiceResult.Failure("Invalid registration code");
+                }
+            }
+
             ServiceResult defaultResult = ServiceResult.Successful($"An activation email has been sent to {email}. " +
                 "If you have already registered then login or reset your password.");
             ServiceResult defaultErrorResult = ServiceResult.Failure("An error has occurred while creating your account");

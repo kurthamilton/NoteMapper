@@ -32,6 +32,7 @@ namespace NoteMapper.Infrastructure
                     ConnectionString = config.GetConnectionString("note-mapper") ?? ""
                 })
                 .AddScoped<NoteMapperContext>()
+                .AddScoped<IRegistrationCodeRepository, RegistrationCodeRepository>()
                 .AddScoped<IUserActivationRepository, UserActivationSqlRepository>()
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
                 .AddScoped<IUserPasswordRepository, UserPasswordSqlRepository>()

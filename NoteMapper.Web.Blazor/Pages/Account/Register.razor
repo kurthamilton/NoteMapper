@@ -11,25 +11,36 @@
 
 <h1>Register</h1>
 
-@if (Feedback == null)
+<Feedback Model="@Feedback" />
+
+@if (Feedback == null || Feedback.Type != FeedbackType.Success)
 {
     <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
         <DataAnnotationsValidator />
 
+        @if (RegistrationType == RegistrationType.InviteOnly)
+        {
+            <div class="alert alert-warning">
+                Registration is currently invite only
+            </div>
+
+            <div class="mb-3">                
+                <label for="code" class="form-label required">Invite code</label>
+                <InputText id="code" @bind-Value="Model.Code" class="form-control" />
+                <ValidationMessage For="() => Model.Code" />
+            </div>
+        }        
+
         <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label required">Email</label>
             <InputText id="email" @bind-Value="Model.Email" class="form-control" />
             <ValidationMessage For="() => Model.Email" />
         </div>
 
         <div>
-            <button type="submit" class="btn btn-primary">Send link</button>            
+            <button type="submit" class="btn btn-primary">Send activation link</button>            
         </div>
     </EditForm>
-}
-else
-{
-    <Feedback Model="@Feedback" />
 }
 
 @inject IIdentityService IdentityService
@@ -55,7 +66,7 @@ else
 
     private async Task HandleValidSubmitAsync()
     {
-        ServiceResult result = await IdentityService.RegisterUserAsync(Model.Email);
+        ServiceResult result = await IdentityService.RegisterUserAsync(Model.Email, Model.Code);
         Feedback = FeedbackViewModel.FromServiceResult(result);
     }
 }

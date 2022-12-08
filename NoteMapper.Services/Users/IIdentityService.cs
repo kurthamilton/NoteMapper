@@ -20,7 +20,7 @@ namespace NoteMapper.Services.Users
 
         RegistrationType GetRegistrationType();
 
-        Task<ServiceResult> RegisterUserAsync(string email);
+        Task<ServiceResult> RegisterUserAsync(string email, string? code);
 
         Task<ServiceResult> RequestPasswordResetAsync(string email);
 

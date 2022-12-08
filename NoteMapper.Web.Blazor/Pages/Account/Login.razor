@@ -18,14 +18,14 @@
     
     <fieldset disabled="@Loading">
         <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label required">Email</label>
             <InputText id="email" @bind-Value="Model.Email" class="form-control" tabindex="1" />
             <ValidationMessage For="() => Model.Email" />
         </div>
 
         <div class="mb-3">
             <div class="d-flex">
-                <label for="password" class="form-label me-auto">Password</label>
+                <label for="password" class="form-label required me-auto">Password</label>
                 <a href="/account/password/forgotten" tabindex="4">
                     Forgotten password?
                 </a>

@@ -11,6 +11,11 @@
     }
 }
 
+label.required:after {
+    color: var(--color-danger);
+    content: ' *'
+}
+
 .loading-indicator {
     display: none;
 }
