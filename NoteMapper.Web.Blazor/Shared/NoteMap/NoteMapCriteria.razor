@@ -1,4 +1,5 @@
 ﻿@using NoteMapper.Core
+@using NoteMapper.Core.Instruments;
 @using NoteMapper.Core.MusicTheory
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 
@@ -12,9 +13,19 @@
         <label for="instrument">Instrument</label>
         <select class="form-control" id="instrument" value="@Model.Instrument" @onchange="OnInstrumentChange">
             <option></option>
-            @foreach (string instrument in Options.Instruments)
+            @foreach (InstrumentBase instrument in Options.DefaultInstruments)
             {
-                <option>@instrument</option>
+                <option>@instrument.Name</option>
+            }
+
+            @if (Options.UserInstruments.Count > 0)
+            {
+                <option disabled>----------</option>
+
+                @foreach (InstrumentBase instrument in Options.UserInstruments)
+                {
+                    <option>@instrument.Name</option>
+                }
             }
         </select>
     </div>

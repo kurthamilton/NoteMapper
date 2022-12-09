@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using NoteMapper.Core.Users;
+using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Data.Core.Users;
+using NoteMapper.Data.Cosmos;
+using NoteMapper.Data.Cosmos.Repositories;
 using NoteMapper.Data.Sql;
+using NoteMapper.Data.Sql.Repositories;
 using NoteMapper.Data.Sql.Repositories.Users;
 using NoteMapper.Emails;
 using NoteMapper.Identity;
@@ -10,6 +14,7 @@ using NoteMapper.Identity.Microsoft;
 using NoteMapper.Infrastructure.Extensions;
 using NoteMapper.Services;
 using NoteMapper.Services.Emails;
+using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
 
@@ -27,16 +32,26 @@ namespace NoteMapper.Infrastructure
         private static void RegisterData(IDependencyContainer container, IConfiguration config)
         {            
             container
-                .AddSingleton(new NoteMapperContextSettings
+                .AddSingleton(new SqlRepositorySettings
                 {
-                    ConnectionString = config.GetConnectionString("note-mapper") ?? ""
+                    ConnectionString = config.GetConnectionString("note-mapper-sql") ?? ""
                 })
-                .AddScoped<NoteMapperContext>()
                 .AddScoped<IRegistrationCodeRepository, RegistrationCodeRepository>()
                 .AddScoped<IUserActivationRepository, UserActivationSqlRepository>()
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
                 .AddScoped<IUserPasswordRepository, UserPasswordSqlRepository>()
+                .AddScoped<IUserPasswordResetCodeRepository, UserPasswordResetCodeSqlRepository>()
                 .AddScoped<IUserRepository, UserSqlRepository>();
+
+            container
+                .AddSingleton(new AzureCosmosRepositorySettings
+                {
+                    ApplicationName = config.GetValue("Application.Name"),
+                    ConnectionString = config.GetConnectionString("note-mapper-cosmos") ?? "",
+                    DatabaseId = config.GetValue("Data.Azure.CosmosDB.DatabaseId"),
+                    DefaultUserId = config.GetValue("Data.Azure.CosmosDB.DefaultUserId")
+                })
+                .AddScoped<IUserInstrumentRepository, UserInstrumentAzureCosmosRepository>();
         }
 
         private static void RegisterIdentity(IDependencyContainer container, IConfiguration config)
@@ -78,7 +93,8 @@ namespace NoteMapper.Infrastructure
 
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
-                .AddScoped<IMusicTheoryService, MusicTheoryService>();
+                .AddScoped<IMusicTheoryService, MusicTheoryService>()
+                .AddScoped<IUserInstrumentService, UserInstrumentService>();
 
             container
                 .AddScoped<INoteMapViewModelService, NoteMapViewModelService>();

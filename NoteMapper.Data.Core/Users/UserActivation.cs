@@ -2,14 +2,20 @@
 {
     public class UserActivation
     {
-        public string Code { get; set; } = "";
+        public UserActivation(Guid userId, DateTime createdUtc, DateTime expiresUtc, string code) 
+        {
+            Code = code;
+            CreatedUtc = createdUtc;
+            ExpiresUtc = expiresUtc;
+            UserId = userId;
+        }
 
-        public DateTime CreatedUtc { get; set; }
+        public string Code { get; }
 
-        public DateTime ExpiresUtc { get; set; }
+        public DateTime CreatedUtc { get; }
 
-        public Guid UserActivationId { get; set; }
+        public DateTime ExpiresUtc { get; }
 
-        public Guid UserId { get; set; }
+        public Guid UserId { get; }
     }
 }

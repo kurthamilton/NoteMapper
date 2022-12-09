@@ -5,12 +5,13 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapCriteriaOptionsViewModel
     {
-        public NoteMapCriteriaOptionsViewModel(IEnumerable<InstrumentBase> instruments, IReadOnlyCollection<string> keyNames,
+        public NoteMapCriteriaOptionsViewModel(IEnumerable<InstrumentBase> defaultInstruments, 
+            IEnumerable<InstrumentBase> userInstruments,
+            IReadOnlyCollection<string> keyNames,
             IReadOnlyCollection<string> keyTypes)
         {
-            Instruments = instruments
-                .Select(x => x.Name)
-                .ToArray();
+            DefaultInstruments = defaultInstruments.ToArray();
+            UserInstruments = userInstruments.ToArray();
 
             KeyNames = keyNames;
             KeyTypes = keyTypes;
@@ -21,12 +22,14 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             };
         }
 
-        public IReadOnlyCollection<string> Instruments { get; }        
+        public IReadOnlyCollection<InstrumentBase> DefaultInstruments { get; }
 
         public IReadOnlyCollection<string> KeyNames { get; }
 
         public IReadOnlyCollection<string> KeyTypes { get; }
 
         public IReadOnlyCollection<NoteMapType> Types { get; }
+
+        public IReadOnlyCollection<InstrumentBase> UserInstruments { get; }
     }
 }

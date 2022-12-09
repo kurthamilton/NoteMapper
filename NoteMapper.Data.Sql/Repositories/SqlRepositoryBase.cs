@@ -1,78 +1,122 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using System.Data.SqlClient;
 using NoteMapper.Core;
+using NoteMapper.Data.Sql.Repositories;
 
 namespace NoteMapper.Data.Sql
 {
     public abstract class SqlRepositoryBase<T> where T : class
     {
-        private readonly NoteMapperContext _context;
+        private readonly SqlRepositorySettings _settings;
 
-        protected SqlRepositoryBase(NoteMapperContext context)
+        protected SqlRepositoryBase(SqlRepositorySettings settings)
         {
-            _context = context;
+            _settings = settings;
         }
 
-        public Task<ServiceResult> CreateAsync(T entity)
-        {
-            Set().Add(entity);
-            return SaveChangesAsync();
-        }
+        protected abstract string TableName { get; }
 
-        public Task<ServiceResult> UpdateAsync(T entity)
+        protected async Task<ServiceResult> ExecuteQueryAsync(string sql, IEnumerable<SqlParameter> parameters)
         {
-            return SaveChangesAsync();
-        }
-
-        protected Task<ServiceResult> DeleteRangeAsync(IReadOnlyCollection<T> entities)
-        {
-            if (entities.Count == 0)
+            using (SqlConnection conn = GetConnection())
             {
-                return Task.FromResult(ServiceResult.Successful());
+                using (SqlCommand cmd = GetCommand(conn, sql, parameters))
+                {
+                    await conn.OpenAsync();
+
+                    try
+                    {
+                        await cmd.ExecuteNonQueryAsync();
+                        return ServiceResult.Successful();
+                    }
+                    catch
+                    {
+                        return ServiceResult.Failure("");
+                    }
+                }
             }
-            
-            Set().RemoveRange(entities);
-            return SaveChangesAsync();
-        }
+        }        
 
-        protected async Task<ServiceResult> DeleteWhereAsync(Expression<Func<T, bool>> predicate)
+        protected SqlParameter GetParameter(string name, object? value, SqlDbType type)
         {
-            IReadOnlyCollection<T> entities = await Set()
-                .Where(predicate)
-                .ToArrayAsync();
+            SqlParameter parameter = new();
+            parameter.ParameterName = name;
 
-            return await DeleteRangeAsync(entities);
-        }
-
-        protected Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            return Set()
-                .FirstOrDefaultAsync(predicate);
-        }
-
-        protected async Task<IReadOnlyCollection<T>> Select(Expression<Func<T, bool>> predicate)
-        {
-            return await Set()
-                .Where(predicate)
-                .ToArrayAsync();
-        }                
-
-        private async Task<ServiceResult> SaveChangesAsync()
-        {
-            try
+            if (value != null)
             {
-                await _context.SaveChangesAsync(true);
-                return ServiceResult.Successful();
-            }
-            catch
+                parameter.Value = value;
+            }            
+            else
             {
-                return ServiceResult.Failure("");
+                parameter.Value = DBNull.Value;
+            }
+            return parameter;
+        }
+
+        protected abstract T Map(SqlDataReader reader);
+
+        protected async Task<IReadOnlyCollection<T>> ReadAsync(string sql, IEnumerable<SqlParameter> parameters)
+        {
+            using (SqlConnection conn = GetConnection())
+            {
+                using (SqlCommand cmd = GetCommand(conn, sql, parameters))
+                {
+                    await conn.OpenAsync();
+
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    if (!await reader.ReadAsync())
+                    {
+                        return Array.Empty<T>();
+                    }
+
+                    List<T> entities = new();
+                    do
+                    {
+                        T entity = Map(reader);
+                        entities.Add(entity);
+                    } while (await reader.ReadAsync());
+
+                    return entities;
+                }
             }
         }
 
-        private DbSet<T> Set()
+        protected async Task<T?> ReadSingleAsync(string sql, IEnumerable<SqlParameter> parameters)
         {
-            return _context.Set<T>();
+            using (SqlConnection conn = GetConnection())
+            {
+                using (SqlCommand cmd = GetCommand(conn, sql, parameters))
+                {
+                    await conn.OpenAsync();
+
+                    try
+                    {
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                        if (!await reader.ReadAsync())
+                        {
+                            return default;
+                        }
+
+                        return Map(reader);
+                    }
+                    catch (Exception ex)
+                    {
+                        return default;
+                    }                    
+                }
+            }
+        }        
+
+        private SqlCommand GetCommand(SqlConnection conn, string sql, IEnumerable<SqlParameter> parameters)
+        {
+            SqlCommand cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddRange(parameters.ToArray());
+            return cmd;
+        }
+
+        private SqlConnection GetConnection()
+        {
+            return new SqlConnection(_settings.ConnectionString);
         }
     }
 }

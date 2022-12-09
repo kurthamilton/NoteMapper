@@ -6,6 +6,7 @@
 @using NoteMapper.Core.Extensions
 @using NoteMapper.Core.Instruments
 @using NoteMapper.Core.MusicTheory
+@using NoteMapper.Data.Core.Users;
 @using NoteMapper.Services
 @using NoteMapper.Services.Web
 @using NoteMapper.Services.Web.ViewModels
@@ -196,9 +197,10 @@ else
     int StartPosition { get; set; }
     NoteMapViewModel? ViewModel { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        CriteriaOptions = NoteMapViewModelService.GetNoteMapCriteriaViewModel();
+        User? user = await base.GetCurrentUserAsync();        
+        CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaViewModelAsync(user?.UserId);
 
         SetCriteriaFromQueryString();
 

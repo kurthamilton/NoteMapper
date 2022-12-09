@@ -2,10 +2,17 @@
 {
     public class User
     {
-        public DateTime CreatedUtc { get; set; }
+        public User(Guid userId, DateTime createdUtc, string email)
+        {
+            CreatedUtc = createdUtc;
+            Email = email;
+            UserId = userId;
+        }
 
-        public string Email { get; set; } = "";
+        public DateTime CreatedUtc { get; }
 
-        public Guid UserId { get; set; }
+        public string Email { get; }
+
+        public Guid UserId { get; }
     }
 }

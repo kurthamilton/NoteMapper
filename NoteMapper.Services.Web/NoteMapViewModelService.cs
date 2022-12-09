@@ -1,5 +1,6 @@
 ﻿using NoteMapper.Core.Instruments;
 using NoteMapper.Core.MusicTheory;
+using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Services.Web.ViewModels.Instruments;
 using NoteMapper.Services.Web.ViewModels.NoteMap;
 
@@ -9,19 +10,30 @@ namespace NoteMapper.Services.Web
     {
         private readonly IInstrumentFactory _instrumentFactory;
         private readonly IMusicTheoryService _musicTheoryService;
+        private readonly IUserInstrumentRepository _userInstrumentRepository;
 
-        public NoteMapViewModelService(IInstrumentFactory instrumentFactory, IMusicTheoryService musicTheoryService)
+        public NoteMapViewModelService(IInstrumentFactory instrumentFactory, IMusicTheoryService musicTheoryService,
+            IUserInstrumentRepository userInstrumentRepository)
         {
             _instrumentFactory = instrumentFactory;
             _musicTheoryService = musicTheoryService;
+            _userInstrumentRepository = userInstrumentRepository;
         }
 
-        public NoteMapCriteriaOptionsViewModel GetNoteMapCriteriaViewModel()
+        public async Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId)
         {
-            IReadOnlyCollection<InstrumentBase> instruments = _instrumentFactory.GetInstruments();
+            IReadOnlyCollection<UserInstrument> defaultInstruments = await _userInstrumentRepository.GetDefaultInstrumentsAsync();
+            IReadOnlyCollection<UserInstrument> userInstruments = userId != null ?
+                await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
+                : Array.Empty<UserInstrument>();
+
             IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames();
             IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetKeyTypes();
-            return new NoteMapCriteriaOptionsViewModel(instruments, keyNames, keyTypes);
+            return new NoteMapCriteriaOptionsViewModel(
+                defaultInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
+                userInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
+                keyNames, 
+                keyTypes);
         }
 
         public InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrumentName)

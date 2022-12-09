@@ -2,14 +2,14 @@
 {
     public class RegistrationCode
     {
-        public string Code { get; set; } = "";
+        public RegistrationCode(string code, DateTime? expiresUtc) 
+        {
+            Code = code;
+            ExpiresUtc = expiresUtc;
+        }   
 
-        public DateTime CreatedUtc { get; set; }
+        public string Code { get; }
 
-        public DateTime? ExpiresUtc { get; set; }
-
-        public string? Note { get; set; }
-
-        public Guid RegistrationCodeId { get; set; }
+        public DateTime? ExpiresUtc { get; }
     }
 }

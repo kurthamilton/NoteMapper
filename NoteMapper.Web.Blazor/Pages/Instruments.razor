@@ -4,7 +4,9 @@
 <PageTitle>Instruments</PageTitle>
 
 @using NoteMapper.Core.Instruments
+@using NoteMapper.Data.Core.Instruments;
 @using NoteMapper.Services
+@using NoteMapper.Services.Instruments;
 
 <h1>Instruments</h1>
 
@@ -31,12 +33,12 @@ else
     </table>
 }
 
-@inject IInstrumentFactory InstrumentFactory
+@inject IUserInstrumentService UserInstrumentService
 @code {
     private IReadOnlyCollection<InstrumentBase>? instruments;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        instruments = InstrumentFactory.GetInstruments();
+        instruments = await UserInstrumentService.GetDefaultInstrumentsAsync();
     }
 }

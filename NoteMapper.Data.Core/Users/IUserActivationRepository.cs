@@ -4,7 +4,7 @@ namespace NoteMapper.Data.Core.Users
 {
     public interface IUserActivationRepository
     {
-        Task<ServiceResult> CreateAsync(UserActivation activation);
+        Task<UserActivation?> CreateAsync(UserActivation activation);
 
         Task<ServiceResult> DeleteAllAsync(Guid userId);
 

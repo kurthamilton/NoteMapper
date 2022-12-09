@@ -17,12 +17,14 @@ namespace NoteMapper.Identity.Microsoft
         private readonly IUserActivationRepository _userActivationRepository;
         private readonly IUserLoginTokenRepository _userLoginTokenRepository;        
         private readonly IUserPasswordRepository _userPasswordRepository;
+        private readonly IUserPasswordResetCodeRepository _userPasswordResetCodeRepository;
         private readonly IUserRepository _userRepository;
 
         public MicrosoftIdentityService(IUserRepository userRepository, IUserActivationRepository userActivationRepository,
             MicrosoftIdentityServiceSettings settings, IPasswordHasher passwordHasher, IUserPasswordRepository userPasswordRepository,
             IUserLoginTokenRepository userLoginTokenRepository, IEmailSenderService emailSenderService,
-            IUrlEncoder urlEncoder, IRegistrationCodeRepository registrationCodeRepository)
+            IUrlEncoder urlEncoder, IRegistrationCodeRepository registrationCodeRepository, 
+            IUserPasswordResetCodeRepository userPasswordResetCodeRepository)
         {
             _emailSenderService = emailSenderService;
             _passwordHasher = passwordHasher;
@@ -33,6 +35,7 @@ namespace NoteMapper.Identity.Microsoft
             _userLoginTokenRepository = userLoginTokenRepository;
             _userPasswordRepository = userPasswordRepository;
             _userRepository = userRepository;
+            _userPasswordResetCodeRepository = userPasswordResetCodeRepository;
         }
 
         public async Task<ServiceResult> ActivateUserAsync(string email, string code, string password)
@@ -86,24 +89,15 @@ namespace NoteMapper.Identity.Microsoft
             return ServiceResult.Successful();
         }
 
-        public async Task<UserLoginToken?> CreateLoginTokenAsync(Guid userId)
+        public Task<UserLoginToken?> CreateLoginTokenAsync(Guid userId)
         {
             DateTime createdUtc = DateTime.UtcNow;
             DateTime expiresUtc = createdUtc.AddSeconds(_settings.LoginTokenExpiresAfterSeconds);
             string token = Guid.NewGuid().ToString();
 
-            UserLoginToken loginToken = new UserLoginToken
-            {
-                CreatedUtc = createdUtc,
-                ExpiresUtc = expiresUtc,
-                Token = token,
-                UserId = userId
-            };
-            
-            ServiceResult result = await _userLoginTokenRepository.CreateAsync(loginToken);
-            return result.Success
-                ? loginToken
-                : null;
+            UserLoginToken loginToken = new UserLoginToken(userId, createdUtc, expiresUtc, token);
+
+            return _userLoginTokenRepository.CreateAsync(loginToken);
         }
 
         public async Task<ServiceResult> DeleteAccountAsync(Guid userId)
@@ -159,16 +153,11 @@ namespace NoteMapper.Identity.Microsoft
                 return defaultResult;
             }
 
-            DateTime createdUtc = DateTime.UtcNow;                        
+            DateTime createdUtc = DateTime.UtcNow;
 
-            User user = new User
-            {
-                CreatedUtc = createdUtc,
-                Email = email,
-            };
-            
-            ServiceResult userResult = await _userRepository.CreateAsync(user);
-            if (!userResult.Success)
+            User user = new User(Guid.Empty, createdUtc, email);            
+            User? userResult = await _userRepository.CreateAsync(user);
+            if (userResult == null)
             {
                 return defaultErrorResult;
             }
@@ -176,20 +165,14 @@ namespace NoteMapper.Identity.Microsoft
             string activationCode = Guid.NewGuid().ToString();
             DateTime activationCodeExpiresUtc = createdUtc.AddMinutes(_settings.ActivationCodeExpiresAfterMinutes);
 
-            UserActivation userActivation = new UserActivation
-            {
-                Code = activationCode,
-                CreatedUtc = createdUtc,
-                ExpiresUtc = activationCodeExpiresUtc,
-                UserId = user.UserId
-            };
-            ServiceResult activationResult = await _userActivationRepository.CreateAsync(userActivation);
-            if (!activationResult.Success)
+            UserActivation userActivation = new UserActivation(userResult.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
+            UserActivation? activationResult = await _userActivationRepository.CreateAsync(userActivation);
+            if (activationResult == null)
             {
                 return defaultErrorResult;
             }
 
-            ServiceResult activationEmailResult = await SendActivationEmailAsync(user, userActivation);
+            ServiceResult activationEmailResult = await SendActivationEmailAsync(userResult, activationResult);
             if (!activationEmailResult.Success)
             {
                 return defaultErrorResult;
@@ -209,23 +192,26 @@ namespace NoteMapper.Identity.Microsoft
                 return defaultResult;
             }
 
-            UserPassword? userPassword = await _userPasswordRepository.FindAsync(user.UserId);
-            if (userPassword == null)
+            IReadOnlyCollection<UserActivation> activations = await _userActivationRepository.GetAllAsync(user.UserId);
+            if (activations.Count > 0)
             {
+                // Do not allow password reset if the user has a pending activation
+                // Activations are cleared out after the user is activated.
                 return defaultResult;
             }
 
-            string resetCode = Guid.NewGuid().ToString();
-            DateTime resetCodeExpiresUtc = DateTime.UtcNow.AddHours(_settings.PasswordResetCodeExpiresAfterHours);
-            userPassword.SetResetCode(resetCode, resetCodeExpiresUtc);
+            DateTime createdUtc = DateTime.UtcNow;
+            string code = Guid.NewGuid().ToString();
+            DateTime expiresUtc = createdUtc.AddHours(_settings.PasswordResetCodeExpiresAfterHours);
+            UserPasswordResetCode userPasswordResetCode = new(user.UserId, createdUtc, expiresUtc, code);            
 
-            ServiceResult updateResult = await _userPasswordRepository.UpdateAsync(userPassword);
-            if (!updateResult.Success)
+            UserPasswordResetCode? createResult = await _userPasswordResetCodeRepository.CreateAsync(userPasswordResetCode);
+            if (createResult == null)
             {
                 return defaultErrorResult;
             }
 
-            ServiceResult emailResult = await SendPasswordResetEmailAsync(user, userPassword);
+            ServiceResult emailResult = await SendPasswordResetEmailAsync(user, createResult);
             if (!emailResult.Success)
             {
                 return defaultErrorResult;
@@ -244,16 +230,20 @@ namespace NoteMapper.Identity.Microsoft
                 return defaultResult;
             }
 
-            UserPassword? password = await _userPasswordRepository.FindAsync(user.UserId);
-            if (password == null || 
-                string.IsNullOrEmpty(password.ResetCode) || 
-                password.ResetCode != code || 
-                password.ResetCodeExpiresUtc < DateTime.UtcNow)
+            UserPasswordResetCode? userPasswordResetCode = await _userPasswordResetCodeRepository.FindAsync(user.UserId, code);            
+            if (userPasswordResetCode == null ||
+                userPasswordResetCode.Code != code ||
+                userPasswordResetCode.ExpiresUtc < DateTime.UtcNow)
             {
                 return defaultResult;
             }
 
-            ServiceResult passwordResult = await SetUserPasswordAsync(password, newPassword);
+            ServiceResult passwordResult = await SetUserPasswordAsync(user.UserId, newPassword);
+            if (passwordResult.Success)
+            {
+                await _userPasswordResetCodeRepository.DeleteAllAsync(user.UserId);
+            }
+
             return passwordResult.Success
                 ? ServiceResult.Successful("Your password has been reset")
                 : defaultResult;
@@ -278,9 +268,8 @@ namespace NoteMapper.Identity.Microsoft
             string newSalt = _passwordHasher.GenerateSalt();
             string newHash = _passwordHasher.HashPassword(newPassword, newSalt);
 
-            userPassword.Hash = newHash;
-            userPassword.Salt = newSalt;
-
+            userPassword = new(userId, newHash, newSalt);
+            
             ServiceResult result = await _userPasswordRepository.UpdateAsync(userPassword);
             return result.Success
                 ? ServiceResult.Successful("Password updated")
@@ -334,10 +323,10 @@ namespace NoteMapper.Identity.Microsoft
             return _emailSenderService.SendEmailAsync(email);
         }
 
-        private Task<ServiceResult> SendPasswordResetEmailAsync(User user, UserPassword password)
+        private Task<ServiceResult> SendPasswordResetEmailAsync(User user, UserPasswordResetCode userPasswordResetCode)
         {
             string url = _settings.PasswordResetUrl
-                .Replace("{code}", _urlEncoder.UrlEncode(password.ResetCode ?? ""))
+                .Replace("{code}", _urlEncoder.UrlEncode(userPasswordResetCode.Code))
                 .Replace("{email}", _urlEncoder.UrlEncode(user.Email));
 
             string body =
@@ -348,33 +337,13 @@ namespace NoteMapper.Identity.Microsoft
             return _emailSenderService.SendEmailAsync(email);
         }
 
-        private async Task<ServiceResult> SetUserPasswordAsync(Guid userId, string plainText)
-        {
-            UserPassword? userPassword = await _userPasswordRepository.FindAsync(userId);
-            if (userPassword == null)
-            {
-                userPassword = new()
-                {
-                    UserId = userId
-                };
-            }
-
-            return await SetUserPasswordAsync(userPassword, plainText);
-        }
-
-        private async Task<ServiceResult> SetUserPasswordAsync(UserPassword userPassword, string plainText)
+        private Task<ServiceResult> SetUserPasswordAsync(Guid userId, string plainText)
         {
             string salt = _passwordHasher.GenerateSalt();
             string hash = _passwordHasher.HashPassword(plainText, salt);
 
-            bool firstTime = userPassword.UserPasswordId == Guid.Empty;
-            userPassword.Hash = hash;            
-            userPassword.Salt = salt;
-            userPassword.RemoveResetCode();
-
-            return firstTime
-                ? await _userPasswordRepository.CreateAsync(userPassword)
-                : await _userPasswordRepository.UpdateAsync(userPassword);
+            UserPassword userPassword = new(userId, hash, salt);
+            return _userPasswordRepository.UpdateAsync(userPassword);
         }
     }
 }
