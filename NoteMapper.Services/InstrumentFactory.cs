@@ -8,9 +8,11 @@ namespace NoteMapper.Services
     {
         public InstrumentBase FromUserInstrument(UserInstrument userInstrument)
         {
-            switch (userInstrument.Type.ToLowerInvariant())
+            InstrumentType type = Enum.Parse<InstrumentType>(userInstrument.Type, true);
+            
+            switch (type)
             {
-                case "pedalsteelguitar":
+                case InstrumentType.PedalSteelGuitar:
                     List<string> modifiers = new();
                     List<KeyValuePair<string, string>> mutuallyExclusiveModifiers = new();
                     List<string> strings = new();
@@ -38,7 +40,7 @@ namespace NoteMapper.Services
 
                     foreach (UserInstrumentString @string in userInstrument.Strings)
                     {
-                        strings.Add(PedalSteelGuitarConfig.GetStringConfig(@string.Note, userInstrument.Frets ?? 12));
+                        strings.Add(PedalSteelGuitarConfig.GetStringConfig(@string.Note, userInstrument.Frets));
                     }
 
                     PedalSteelGuitarConfig config = new PedalSteelGuitarConfig
@@ -47,24 +49,40 @@ namespace NoteMapper.Services
                         MutuallyExclusiveModifiers = mutuallyExclusiveModifiers,
                         Strings = strings
                     };
-                    return PedalSteelGuitar.Custom(userInstrument.Name, config);
+                    return PedalSteelGuitar.Custom(userInstrument.UserInstrumentId, userInstrument.Name, config);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public InstrumentBase? GetInstrument(string? name)
+        public UserInstrument ToUserInstrument(StringedInstrumentBase instrument)
         {
-            return GetInstruments()
-                .FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public IReadOnlyCollection<InstrumentBase> GetInstruments()
-        {
-            return new InstrumentBase[]
+            return new UserInstrument
             {
-                PedalSteelGuitar.C6(),
-                PedalSteelGuitar.E9()
+                Frets = 12,
+                Modifiers = instrument.Modifiers.Select(x =>
+                {
+                    IEnumerable<ModifierOffset> offsets = instrument.Modifiers
+                        .SelectMany((modifier) =>
+                        {
+                            return instrument.Strings
+                                .Where((s, i) => modifier.IsFor(i))
+                                .Select((s, i) => new ModifierOffset
+                                {
+                                    Offset = modifier.GetOffset(i),
+                                    String = i
+                                });
+
+                        });
+                    return new UserInstrumentModifier
+                    {
+                        Name = x.Name,
+                        Offsets = offsets.ToArray()                        
+                    };
+                }).ToArray(),
+                Name = instrument.Name, 
+                Type = instrument.Type.ToString(),
+                UserInstrumentId = Guid.NewGuid().ToString()
             };
         }
     }

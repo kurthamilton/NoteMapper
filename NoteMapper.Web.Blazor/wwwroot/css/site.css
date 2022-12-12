@@ -10816,6 +10816,10 @@ textarea.form-control-lg {
   content: "An error has occurred.";
 }
 
+.btn-icon {
+  padding: 0;
+}
+
 .form-inline {
   display: flex;
 }

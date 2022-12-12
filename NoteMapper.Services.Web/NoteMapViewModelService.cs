@@ -1,7 +1,6 @@
 ﻿using NoteMapper.Core.Instruments;
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Data.Core.Instruments;
-using NoteMapper.Services.Web.ViewModels.Instruments;
 using NoteMapper.Services.Web.ViewModels.NoteMap;
 
 namespace NoteMapper.Services.Web
@@ -23,8 +22,8 @@ namespace NoteMapper.Services.Web
         public async Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId)
         {
             IReadOnlyCollection<UserInstrument> defaultInstruments = await _userInstrumentRepository.GetDefaultInstrumentsAsync();
-            IReadOnlyCollection<UserInstrument> userInstruments = userId != null ?
-                await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
+            IReadOnlyCollection<UserInstrument> userInstruments = userId != null 
+                ? await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
                 : Array.Empty<UserInstrument>();
 
             IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames();
@@ -34,15 +33,6 @@ namespace NoteMapper.Services.Web
                 userInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
                 keyNames, 
                 keyTypes);
-        }
-
-        public InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrumentName)
-        {
-            InstrumentBase? instrument = _instrumentFactory.GetInstrument(instrumentName);
-            StringedInstrumentBase? stringedInstrument = instrument as StringedInstrumentBase;
-            return stringedInstrument != null
-                ? new InstrumentViewModel(stringedInstrument)
-                : null;
         }
 
         public NoteMapViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string key,

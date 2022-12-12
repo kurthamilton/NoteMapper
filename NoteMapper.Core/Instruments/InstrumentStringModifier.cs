@@ -72,8 +72,13 @@ namespace NoteMapper.Core.Instruments
 
         public int GetOffset(InstrumentString @string)
         {
-            return Offsets.ContainsKey(@string.Index)
-                ? Offsets[@string.Index]
+            return GetOffset(@string.Index);
+        }
+
+        public int GetOffset(int stringIndex)
+        {
+            return Offsets.ContainsKey(stringIndex)
+                ? Offsets[stringIndex]
                 : 0;
         }
 

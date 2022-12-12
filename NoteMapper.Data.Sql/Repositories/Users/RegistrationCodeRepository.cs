@@ -16,7 +16,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<RegistrationCode?> FindAsync(string code)
         {
-            string sql = "SELECT TOP 1 ExpiresUtc, Code " +
+            string sql = "SELECT TOP 1 RegistrationCodeId, ExpiresUtc, Code " +
                          $"FROM {TableName} " +
                          $"WHERE Code = @Code ";
 
@@ -28,8 +28,9 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         protected override RegistrationCode Map(SqlDataReader reader)
         {
-            return new RegistrationCode(reader.GetString(1), 
-                reader.GetDateTimeOrNull(0));
+            return new RegistrationCode(reader.GetGuid(0),
+                reader.GetString(2), 
+                reader.GetDateTimeOrNull(1));
         }
     }
 }

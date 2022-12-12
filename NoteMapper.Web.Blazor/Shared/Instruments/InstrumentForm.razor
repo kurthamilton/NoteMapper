@@ -1,0 +1,221 @@
+﻿@using NoteMapper.Core.Instruments;
+@using NoteMapper.Core.Instruments.Implementations;
+@using NoteMapper.Data.Core.Instruments;
+@using NoteMapper.Web.Blazor.Models.Instruments;
+
+@if (Model == null)
+{
+    return;
+}
+
+<div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <InputText @bind-Value="Model.Name" class="form-control" />
+</div>
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th></th>
+
+            @foreach (InstrumentModifierViewModel m in Model.Modifiers)
+            {
+                <th>
+                    <InputText @bind-Value="m.Name" class="form-control form-control-sm" />
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (InstrumentStringViewModel s in Model.Strings)
+        {
+            <tr>
+                <th>
+                    <InputText @bind-Value="s.Note" class="form-control form-control-sm" />
+                </th>
+
+                @foreach (StringOffsetViewModel o in s.ModifierOffsets)
+                {
+                    string? textClass = o.Offset < 0 ? "text-danger" : o.Offset > 0 ? "text-success" : null;
+
+                    <td>
+                        <div class="d-flex justify-content-between">
+                            <span>
+                                <button class="btn btn-icon" @onclick="(e => o.Offset--)">
+                                    <i class="bi bi-caret-left"></i>
+                                </button>
+                            </span>
+                            <span class="d-flex justify-content-center align-items-center @textClass">
+                                @for (int i = 0; i < Math.Abs(o.Offset); i++)
+                                {
+                                    <span>
+                                        @if (o.Offset < 0)
+                                        {
+                                            <i class="bi bi-dash-circle-fill"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-plus-circle-fill"></i>
+                                        }
+                                    </span>
+                                }
+                            </span>
+                            <span>
+                                <button class="btn btn-icon" @onclick="(e => o.Offset++)">
+                                    <i class="bi bi-caret-right"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>
+                <button type="button" @onclick="(e => Model.AddString())">Add string</button>
+            </td>
+            <td colspan="@(Math.Max(Model.Modifiers.Count, 1))">
+                <button type="button" @onclick="(e => Model.AddModifier())">Add modifier</button>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<button class="btn btn-primary" @onclick="HandleSubmitAsync">
+    @ButtonText
+</button>
+
+@code {
+    [Parameter]
+    public string ButtonText { get; set; } = "";
+
+    [Parameter]
+    public UserInstrument? Template { get; set; }
+
+    [Parameter]
+    public EventCallback<UserInstrument> OnChange { get; set; }
+
+    private InstrumentEditViewModel? Model { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<UserInstrument?>(nameof(Template), out UserInstrument? template))
+        {
+            Model = ToViewModel(template);
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    private static IEnumerable<UserInstrumentModifier> ToUserInstrumentModifiers(InstrumentEditViewModel viewModel)
+    {
+        for (int modifierIndex = 0; modifierIndex < viewModel.Modifiers.Count; modifierIndex++)
+        {
+            InstrumentModifierViewModel modifierViewModel = viewModel.Modifiers.ElementAt(modifierIndex);
+
+            List<ModifierOffset> offsets = new();
+
+            for (int stringIndex = 0; stringIndex < viewModel.Strings.Count; stringIndex++)
+            {
+                InstrumentStringViewModel stringViewModel = viewModel.Strings.ElementAt(stringIndex);
+                StringOffsetViewModel offsetViewModel = stringViewModel.ModifierOffsets.ElementAt(modifierIndex);
+                if (offsetViewModel.Offset == 0)
+                {
+                    continue;
+                }
+
+                offsets.Add(new ModifierOffset
+                {
+                    Offset = offsetViewModel.Offset,
+                    String = stringIndex
+                });
+            }
+
+            yield return new UserInstrumentModifier
+            {
+                Name = modifierViewModel.Name,
+                Offsets = offsets                
+            };
+        }        
+    }
+
+    private static UserInstrument ToUserInstrument(InstrumentEditViewModel viewModel)
+    {
+        return new UserInstrument
+        {
+            Modifiers = ToUserInstrumentModifiers(viewModel).ToArray(),
+            Name = viewModel.Name,
+            Strings = viewModel.Strings
+                .Select(x => new UserInstrumentString
+                {
+                    Note = x.Note                    
+                })
+                .ToArray(),
+            Type = viewModel.Type.ToString(),
+            UserInstrumentId = viewModel.Id
+        };
+    }
+
+    private static InstrumentEditViewModel? ToViewModel(UserInstrument? template)
+    {
+        if (template == null)
+        {
+            return null;
+        }
+
+        InstrumentType type = Enum.Parse<InstrumentType>(template.Type, true);
+        InstrumentEditViewModel viewModel = new InstrumentEditViewModel(template.UserInstrumentId, type)
+        {            
+            Name = template.Name
+        };
+
+        for (int modifierIndex = 0; modifierIndex < template.Modifiers.Count; modifierIndex++)
+        {
+            UserInstrumentModifier modifier = template.Modifiers.ElementAt(modifierIndex);
+            InstrumentModifierViewModel modifierViewModel = new InstrumentModifierViewModel
+            {                
+                Name = modifier.Name
+            };
+
+            viewModel.AddModifier(modifierViewModel);
+        }
+
+        for (int stringIndex = 0; stringIndex < template.Strings.Count; stringIndex++)
+        {
+            UserInstrumentString @string = template.Strings.ElementAt(stringIndex);
+            InstrumentStringViewModel stringViewModel = new InstrumentStringViewModel
+            {
+                Note = @string.Note,
+                Octave = 0
+            };
+
+            stringViewModel.SetModifierOffsetCount(template.Modifiers.Count);
+
+            for (int modifierIndex = 0; modifierIndex < template.Modifiers.Count; modifierIndex++)
+            {
+                UserInstrumentModifier modifier = template.Modifiers.ElementAt(modifierIndex);
+                ModifierOffset? offset = modifier.Offsets.FirstOrDefault(x => x.String == stringIndex);
+                stringViewModel.ModifierOffsets.ElementAt(modifierIndex).Offset = offset != null
+                    ? offset.Offset
+                    : 0;
+            }
+
+            viewModel.AddString(stringViewModel);
+        }
+
+        return viewModel;
+    }
+
+    private Task HandleSubmitAsync()
+    {
+        if (Model == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        UserInstrument userInstrument = ToUserInstrument(Model);
+        return OnChange.InvokeAsync(userInstrument);
+    }
+}

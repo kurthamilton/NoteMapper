@@ -2,14 +2,18 @@
 {
     public class RegistrationCode
     {
-        public RegistrationCode(string code, DateTime? expiresUtc) 
+        public RegistrationCode(Guid registrationCodeId, string code, 
+            DateTime? expiresUtc) 
         {
             Code = code;
             ExpiresUtc = expiresUtc;
+            RegistrationCodeId = registrationCodeId;
         }   
 
         public string Code { get; }
 
         public DateTime? ExpiresUtc { get; }
+
+        public Guid RegistrationCodeId { get; }
     }
 }

@@ -6,8 +6,10 @@
         {
         }      
         
+        public abstract string Id { get; }
+
         public abstract string Name { get; }
 
-        public abstract string Type { get; }
+        public abstract InstrumentType Type { get; }
     }
 }

@@ -19,17 +19,25 @@ namespace NoteMapper.Web.Blazor.Services
 
         public async Task<User?> GetCurrentUserAsync()
         {
-            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            ClaimsPrincipal principal = state.User;
-            Claim? userIdClaim = principal.Claims
-                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdClaim?.Value, out Guid userId))
+            Guid? userId = await GetCurrentUserIdAsync();
+            if (userId == null)
             {
                 return null;
             }
 
-            User? user = await _userRepository.FindAsync(userId);
+            User? user = await _userRepository.FindAsync(userId.Value);
             return user;
+        }
+
+        public async Task<Guid?> GetCurrentUserIdAsync()
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();            
+            ClaimsPrincipal principal = state.User;
+            Claim? userIdClaim = principal.Claims
+                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            return Guid.TryParse(userIdClaim?.Value, out Guid userId)
+                ? userId
+                : null;
         }
     }
 }

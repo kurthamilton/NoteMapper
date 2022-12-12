@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using Microsoft.Azure.Cosmos;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NoteMapper.Core;
 
 namespace NoteMapper.Data.Cosmos
@@ -18,15 +20,9 @@ namespace NoteMapper.Data.Cosmos
 
         protected string DefaultUserId { get; private set; }
 
-        protected async Task<ServiceResult> CreateAsync(Container container, string id, T entity)
+        protected Task<ServiceResult> CreateAsync(Container container, string id, T entity)
         {
-            ItemResponse<T> response = await container.CreateItemAsync(entity, new PartitionKey(id));
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                return ServiceResult.Failure("Error creating entity");
-            }
-
-            return ServiceResult.Successful();
+            return UpdateAsync(container, id, entity);
         }
 
         protected CosmosClient CreateClient()
@@ -59,13 +55,26 @@ namespace NoteMapper.Data.Cosmos
 
         protected async Task<ServiceResult> UpdateAsync(Container container, string id, T entity)
         {
-            ItemResponse<T> response = await container.UpsertItemAsync<T>(entity, new PartitionKey(id));
-            if (response.StatusCode != HttpStatusCode.OK)
+            try
+            {
+                object mapped = MapEntity(entity);
+                ItemResponse<object> response = await container.UpsertItemAsync(mapped, new PartitionKey(id));
+                return ServiceResult.Successful();
+            }
+            catch (Exception ex)
             {
                 return ServiceResult.Failure("Error updating entity");
-            }
+            }                        
+        }   
+        
+        private object MapEntity(T entity)
+        {
+            JsonSerializerSettings settings = new();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
-            return ServiceResult.Successful();
-        }                
+            string json = JsonConvert.SerializeObject(entity, settings);
+            object result = JsonConvert.DeserializeObject(json);
+            return result;
+        }
     }
 }

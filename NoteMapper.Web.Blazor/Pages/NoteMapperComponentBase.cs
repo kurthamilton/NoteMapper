@@ -25,6 +25,11 @@ namespace NoteMapper.Web.Blazor.Pages
             return UserLocator.GetCurrentUserAsync();
         }
 
+        protected Task<Guid?> GetCurrentUserIdAsync()
+        {
+            return UserLocator.GetCurrentUserIdAsync();
+        }
+
         protected void SetFeedback(ServiceResult result) 
         {
             SetData(FeedbackViewModel.FromServiceResult(result));

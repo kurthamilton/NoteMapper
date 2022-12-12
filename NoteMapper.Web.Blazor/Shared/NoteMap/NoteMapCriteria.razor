@@ -10,12 +10,12 @@
 
 <div class="form-inline d-block d-sm-flex">
     <div class=form-group>
-        <label for="instrument">Instrument</label>
-        <select class="form-control" id="instrument" value="@Model.Instrument" @onchange="OnInstrumentChange">
+        <label for="instrument"><a href="/instruments">Instrument</a></label>
+        <select class="form-control" id="instrument" value="@Model.InstrumentId" @onchange="OnInstrumentChange">
             <option></option>
             @foreach (InstrumentBase instrument in Options.DefaultInstruments)
             {
-                <option>@instrument.Name</option>
+                <option value="@instrument.Id">@instrument.Name</option>
             }
 
             @if (Options.UserInstruments.Count > 0)
@@ -24,7 +24,7 @@
 
                 @foreach (InstrumentBase instrument in Options.UserInstruments)
                 {
-                    <option>@instrument.Name</option>
+                    <option value="@instrument.Id">@instrument.Name</option>
                 }
             }
         </select>
@@ -67,7 +67,7 @@
     public NoteMapCriteriaOptionsViewModel? Options { get; set; }
 
     [Parameter]
-    public Action<NoteMapCriteriaViewModel>? OnChange { get; set; }
+    public EventCallback<NoteMapCriteriaViewModel> OnChange { get; set; }
 
     [Parameter]
     public NoteMapCriteriaViewModel Model { get; set; } = new NoteMapCriteriaViewModel();
@@ -77,34 +77,34 @@
         base.OnInitialized();
     }
 
-    void OnInstrumentChange(ChangeEventArgs e)
+    Task OnInstrumentChange(ChangeEventArgs e)
     {
-        Model.Instrument = (string?)e.Value;
-        EmitChange();
+        Model.InstrumentId = (string?)e.Value;
+        return EmitChange();
     }
 
-    void OnKeyNameChange(ChangeEventArgs e)
+    Task OnKeyNameChange(ChangeEventArgs e)
     {
         Model.KeyName = (string?)e.Value;
-        EmitChange();
+        return EmitChange();
     }
 
-    void OnKeyTypeChange(ChangeEventArgs e)
+    Task OnKeyTypeChange(ChangeEventArgs e)
     {
         Model.KeyType = (string?)e.Value;
-        EmitChange();
+        return EmitChange();
     }
 
-    void OnTypeChange(ChangeEventArgs e)
+    Task OnTypeChange(ChangeEventArgs e)
     {
         string value = (string?)e.Value ?? "";
         NoteMapType type = Enum.Parse<NoteMapType>(value, true);
         Model.Type = Enum.IsDefined<NoteMapType>(type) ? type : default;
-        EmitChange();
+        return EmitChange();
     }
 
-    void EmitChange()
+    Task EmitChange()
     {
-        OnChange?.Invoke(Model);
+        return OnChange.InvokeAsync(Model);
     }
 }

@@ -1,0 +1,125 @@
+﻿@page "/instruments"
+@inherits NoteMapperComponentBase
+@attribute [Authorize]
+
+<PageTitle>Instruments</PageTitle>
+
+@using System.Net;
+@using NoteMapper.Core.Instruments
+@using NoteMapper.Core;
+@using NoteMapper.Data.Core.Instruments;
+@using NoteMapper.Services
+@using NoteMapper.Services.Instruments;
+@using NoteMapper.Services.Web.StateManagement;
+@using NoteMapper.Web.Blazor.Models.Instruments;
+@using NoteMapper.Web.Blazor.Shared.Instruments;
+@using NoteMapper.Web.Blazor.Shared.Shared
+
+<h1>Instruments</h1>
+
+@if (DefaultInstruments == null || UserInstruments == null)
+{
+    <Loading />
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (InstrumentBase instrument in DefaultInstruments)
+            {
+                <tr>
+                    <td>@instrument.Name</td>
+                    <td>
+                        <a href="/instruments/create?template=@instrument.Id" class="btn btn-primary btn-sm">
+                            Copy
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+        @if (UserInstruments.Count > 0)
+        {
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <h4>Custom</h4>
+                    </td>
+                </tr>
+                @foreach (InstrumentBase instrument in UserInstruments)
+                {
+                    <tr>
+                        <td>
+                            <a href="/instruments/@instrument.Id/edit">@instrument.Name</a>
+                        </td>
+                        <td>
+                            <a href="/instruments/create?template=@instrument.Id" class="btn btn-primary btn-sm">
+                                Copy
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm"
+                                    @onclick="(e => DeleteInstrumentAsync(instrument.Id))">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        }
+
+        <tfoot>
+            <tr>
+                <td colspan="2">
+                    <a class="btn btn-primary" href="/instruments/create">
+                        Create new instrument
+                    </a>
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>    
+}
+
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager;
+@inject IUserInstrumentService UserInstrumentService
+@code {
+    IReadOnlyCollection<InstrumentBase>? DefaultInstruments;
+    IReadOnlyCollection<InstrumentBase>? UserInstruments;
+
+    Guid UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid? userId = await GetCurrentUserIdAsync();
+        if (userId == null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        UserId = userId.Value;
+
+        DefaultInstruments = await UserInstrumentService.GetDefaultInstrumentsAsync();
+        UserInstruments = await UserInstrumentService.GetUserInstrumentsAsync(UserId);
+    }
+
+    async Task DeleteInstrumentAsync(string userInstrumentId)
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this instrument?"))
+        {
+            return;
+        }        
+
+        ServiceResult result = await UserInstrumentService.DeleteInstrumentAsync(UserId, userInstrumentId);
+        if (result.Success)
+        {
+            UserInstruments = await UserInstrumentService.GetUserInstrumentsAsync(UserId);
+        }
+    }
+}

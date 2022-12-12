@@ -8,6 +8,7 @@
 @using NoteMapper.Core.MusicTheory
 @using NoteMapper.Data.Core.Users;
 @using NoteMapper.Services
+@using NoteMapper.Services.Instruments;
 @using NoteMapper.Services.Web
 @using NoteMapper.Services.Web.ViewModels
 @using NoteMapper.Services.Web.ViewModels.Instruments
@@ -19,7 +20,7 @@
 
 @if (CriteriaOptions == null)
 {
-    <p><em>Loading...</em></p>
+    <Loading />
 }
 else
 {
@@ -189,43 +190,57 @@ else
 @inject IMusicTheoryService MusicTheoryService;
 @inject NavigationManager NavigationManager;
 @inject INoteMapViewModelService NoteMapViewModelService;
+@inject IUserInstrumentService UserInstrumentService
 @code {
     NoteMapCriteriaViewModel? Criteria { get; set; }
     NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }    
     int EndPosition { get; set; }
     StringedInstrumentBase? Instrument { get; set; }
     int StartPosition { get; set; }
+    Guid UserId { get; set; }
     NoteMapViewModel? ViewModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        User? user = await base.GetCurrentUserAsync();        
-        CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaViewModelAsync(user?.UserId);
+        Guid? userId = await GetCurrentUserIdAsync();
+        if (userId == null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        UserId = userId.Value;
+        CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaViewModelAsync(UserId);
 
         SetCriteriaFromQueryString();
 
-        LoadInstrument();
+        await LoadInstrumentAsync();
         SetPermutations();
     }
 
-    void LoadInstrument()
+    async Task LoadInstrumentAsync()
     {
-        if (Criteria?.Instrument != Instrument?.Name)
+        if (Criteria == null || string.IsNullOrEmpty(Criteria.InstrumentId))
         {
-            Instrument = InstrumentFactory.GetInstrument(Criteria?.Instrument) as StringedInstrumentBase;
-        }        
+            Instrument = null;
+        }
+        else if (Criteria.InstrumentId != Instrument?.Id)
+        {
+            InstrumentBase? instrument = await UserInstrumentService.FindAsync(UserId, Criteria.InstrumentId);
+            Instrument = instrument as StringedInstrumentBase;
+        }
     }
 
-    void OnCriteriaChange(NoteMapCriteriaViewModel criteria)
+    async Task OnCriteriaChange(NoteMapCriteriaViewModel criteria)
     {
         Criteria = criteria;
 
-        LoadInstrument();
+        await LoadInstrumentAsync();
         SetPermutations();
 
         NavigationManager.SetQueryStringValues(new Dictionary<string, string?>
         {
-            { "instrument", Criteria.Instrument },
+            { "instrument", Criteria.InstrumentId },
             { "key", Criteria.KeyName + Criteria.KeyType }
         });        
     }
@@ -245,7 +260,7 @@ else
 
         Criteria = new NoteMapCriteriaViewModel
         {
-            Instrument = instrument,
+            InstrumentId = instrument,
             KeyName = keyScale?.ElementAt(0).Name,
             KeyType = keyScale?.Type.ShortName(),
             Type = NoteMapType.Chord

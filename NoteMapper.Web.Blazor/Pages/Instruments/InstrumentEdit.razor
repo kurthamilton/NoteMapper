@@ -1,0 +1,78 @@
+﻿@page "/instruments/{id:guid}/edit"
+@inherits NoteMapperComponentBase
+@attribute [Authorize]
+
+@using NoteMapper.Core;
+@using NoteMapper.Data.Core.Instruments;
+@using NoteMapper.Services.Instruments;
+@using NoteMapper.Web.Blazor.Shared.Instruments
+@using NoteMapper.Web.Blazor.Shared.Shared
+
+<PageTitle>Edit instrument</PageTitle>
+
+@if (UserInstrument == null)
+{
+    return;
+}
+
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/instruments">Instruments</a>
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav>
+
+@if (Loading)
+{
+    <Loading />    
+}
+else
+{
+    <Feedback Model="Feedback" />
+    <InstrumentForm Template="@UserInstrument" ButtonText="Update" OnChange="UpdateInstrumentAsync" />
+}
+
+@inject NavigationManager NavigationManager
+@inject IUserInstrumentService UserInstrumentService
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    Guid UserId { get; set; }
+    UserInstrument? UserInstrument { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid? userId = await GetCurrentUserIdAsync();
+        if (userId == null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        UserId = userId.Value;
+        UserInstrument = await UserInstrumentService.FindUserInstrumentAsync(UserId, Id.ToString());
+
+        if (UserInstrument == null)
+        {
+            NavigationManager.NavigateTo("/instruments");
+            return;
+        }
+
+        Loading = false;
+    }
+
+    async Task UpdateInstrumentAsync(UserInstrument userInstrument)
+    {
+        ServiceResult result = await UserInstrumentService.UpdateInstrumentAsync(UserId, userInstrument);
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/instruments");
+            return;
+        }
+
+        SetFeedback(result);
+    }
+}

@@ -7,8 +7,6 @@ namespace NoteMapper.Services
     {
         InstrumentBase FromUserInstrument(UserInstrument userInstrument);
 
-        InstrumentBase? GetInstrument(string? name);
-
-        IReadOnlyCollection<InstrumentBase> GetInstruments();
+        UserInstrument ToUserInstrument(StringedInstrumentBase instrument);
     }
 }

@@ -6,7 +6,11 @@ namespace NoteMapper.Data.Core.Instruments
     {
         Task<ServiceResult> CreateUserInstrumentAsync(Guid userId, UserInstrument instrument);
 
-        Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, UserInstrument instrument);
+        Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, string userInstrumentId);
+
+        Task<UserInstrument?> FindAsync(string userInstrumentId);
+
+        Task<UserInstrument?> FindAsync(Guid userId, string userInstrumentId);
 
         Task<IReadOnlyCollection<UserInstrument>> GetDefaultInstrumentsAsync();
 

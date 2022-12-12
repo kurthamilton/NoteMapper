@@ -5,7 +5,6 @@ using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Cosmos;
 using NoteMapper.Data.Cosmos.Repositories;
-using NoteMapper.Data.Sql;
 using NoteMapper.Data.Sql.Repositories;
 using NoteMapper.Data.Sql.Repositories.Users;
 using NoteMapper.Emails;
@@ -17,6 +16,7 @@ using NoteMapper.Services.Emails;
 using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
+using NoteMapper.Services.Web.StateManagement;
 
 namespace NoteMapper.Infrastructure
 {
@@ -27,6 +27,7 @@ namespace NoteMapper.Infrastructure
             RegisterData(container, config);
             RegisterIdentity(container, config);
             RegisterServices(container, config);
+            RegisterWebServices(container);
         }
 
         private static void RegisterData(IDependencyContainer container, IConfiguration config)
@@ -41,6 +42,7 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
                 .AddScoped<IUserPasswordRepository, UserPasswordSqlRepository>()
                 .AddScoped<IUserPasswordResetCodeRepository, UserPasswordResetCodeSqlRepository>()
+                .AddScoped<IUserRegistrationCodeRepository, UserRegistrationCodeSqlRepository>()
                 .AddScoped<IUserRepository, UserSqlRepository>();
 
             container
@@ -94,10 +96,15 @@ namespace NoteMapper.Infrastructure
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
                 .AddScoped<IMusicTheoryService, MusicTheoryService>()
-                .AddScoped<IUserInstrumentService, UserInstrumentService>();
+                .AddScoped<IUserInstrumentService, UserInstrumentService>();            
+        }
 
+        private static void RegisterWebServices(IDependencyContainer container)
+        {
             container
                 .AddScoped<INoteMapViewModelService, NoteMapViewModelService>();
+
+            container.AddSingleton<IStateContainer>(new StateContainer());
         }
     }
 }

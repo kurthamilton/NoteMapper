@@ -18,13 +18,15 @@ namespace NoteMapper.Identity.Microsoft
         private readonly IUserLoginTokenRepository _userLoginTokenRepository;        
         private readonly IUserPasswordRepository _userPasswordRepository;
         private readonly IUserPasswordResetCodeRepository _userPasswordResetCodeRepository;
+        private readonly IUserRegistrationCodeRepository _userRegistrationCodeRepository;
         private readonly IUserRepository _userRepository;
 
         public MicrosoftIdentityService(IUserRepository userRepository, IUserActivationRepository userActivationRepository,
             MicrosoftIdentityServiceSettings settings, IPasswordHasher passwordHasher, IUserPasswordRepository userPasswordRepository,
             IUserLoginTokenRepository userLoginTokenRepository, IEmailSenderService emailSenderService,
             IUrlEncoder urlEncoder, IRegistrationCodeRepository registrationCodeRepository, 
-            IUserPasswordResetCodeRepository userPasswordResetCodeRepository)
+            IUserPasswordResetCodeRepository userPasswordResetCodeRepository, 
+            IUserRegistrationCodeRepository userRegistrationCodeRepository)
         {
             _emailSenderService = emailSenderService;
             _passwordHasher = passwordHasher;
@@ -34,6 +36,7 @@ namespace NoteMapper.Identity.Microsoft
             _userActivationRepository = userActivationRepository;
             _userLoginTokenRepository = userLoginTokenRepository;
             _userPasswordRepository = userPasswordRepository;
+            _userRegistrationCodeRepository = userRegistrationCodeRepository;
             _userRepository = userRepository;
             _userPasswordResetCodeRepository = userPasswordResetCodeRepository;
         }
@@ -131,9 +134,10 @@ namespace NoteMapper.Identity.Microsoft
                 return ServiceResult.Failure("Registration is currently closed");
             }
 
+            RegistrationCode? registrationCode = null;
             if (registrationType == RegistrationType.InviteOnly)
             {
-                RegistrationCode? registrationCode = !string.IsNullOrEmpty(code) 
+                registrationCode = !string.IsNullOrEmpty(code) 
                     ? await _registrationCodeRepository.FindAsync(code)
                     : null;
 
@@ -155,9 +159,9 @@ namespace NoteMapper.Identity.Microsoft
 
             DateTime createdUtc = DateTime.UtcNow;
 
-            User user = new User(Guid.Empty, createdUtc, email);            
-            User? userResult = await _userRepository.CreateAsync(user);
-            if (userResult == null)
+            User? user = new User(Guid.Empty, createdUtc, email);            
+            user = await _userRepository.CreateAsync(user);
+            if (user == null)
             {
                 return defaultErrorResult;
             }
@@ -165,14 +169,21 @@ namespace NoteMapper.Identity.Microsoft
             string activationCode = Guid.NewGuid().ToString();
             DateTime activationCodeExpiresUtc = createdUtc.AddMinutes(_settings.ActivationCodeExpiresAfterMinutes);
 
-            UserActivation userActivation = new UserActivation(userResult.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
-            UserActivation? activationResult = await _userActivationRepository.CreateAsync(userActivation);
-            if (activationResult == null)
+            UserActivation? userActivation = new UserActivation(user.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
+            userActivation = await _userActivationRepository.CreateAsync(userActivation);
+            if (userActivation == null)
             {
                 return defaultErrorResult;
             }
 
-            ServiceResult activationEmailResult = await SendActivationEmailAsync(userResult, activationResult);
+            if (registrationCode != null)
+            {
+                UserRegistrationCode? userRegistrationCode = new UserRegistrationCode(user.UserId, 
+                    registrationCode.RegistrationCodeId, createdUtc);
+                await _userRegistrationCodeRepository.CreateAsync(userRegistrationCode);
+            }
+
+            ServiceResult activationEmailResult = await SendActivationEmailAsync(user, userActivation);
             if (!activationEmailResult.Success)
             {
                 return defaultErrorResult;

@@ -1,0 +1,84 @@
+﻿@page "/instruments/create"
+@inherits NoteMapperComponentBase
+@attribute [Authorize]
+
+@using NoteMapper.Core.Instruments;
+@using NoteMapper.Core;
+@using NoteMapper.Data.Core.Instruments;
+@using NoteMapper.Services.Instruments;
+@using NoteMapper.Services.Web.StateManagement;
+@using NoteMapper.Web.Blazor.Extensions;
+@using NoteMapper.Web.Blazor.Models;
+@using NoteMapper.Web.Blazor.Shared.Instruments
+@using NoteMapper.Web.Blazor.Shared.Shared
+
+<PageTitle>Create instrument</PageTitle>
+
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/instruments">Instruments</a>
+        </li>
+        <li class="breadcrumb-item active">Create</li>
+    </ol>
+</nav>
+
+@if (Loading)
+{
+    <Loading />    
+}
+else
+{
+    <Feedback Model="Feedback" />
+    <InstrumentForm Template="@Template" ButtonText="Create" OnChange="CreateInstrumentAsync" />
+}
+
+@inject NavigationManager NavigationManager
+@inject IUserInstrumentService UserInstrumentService
+@code {
+    UserInstrument? Template { get; set; }
+    Guid UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid? userId = await GetCurrentUserIdAsync();
+        if (userId == null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        UserId = userId.Value;
+
+        if (NavigationManager.TryGetQueryStringValue("template", out string template))
+        {            
+            Template = await UserInstrumentService.FindUserInstrumentAsync(UserId, template);
+        }        
+
+        if (Template == null)
+        {
+            Template = new UserInstrument
+            {
+                Type = InstrumentType.PedalSteelGuitar.ToString()
+            };            
+        }
+        else
+        {
+            Template.Name += " (Copy)";
+        }
+
+        Loading = false;
+    }
+
+    async Task CreateInstrumentAsync(UserInstrument userInstrument)
+    {
+        ServiceResult result = await UserInstrumentService.CreateInstrumentAsync(UserId, userInstrument);
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/instruments");
+            return;
+        }
+
+        SetFeedback(result);
+    }
+}

@@ -9,8 +9,6 @@ namespace NoteMapper.Services.Web
     {
         Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId);
 
-        InstrumentViewModel? GetNoteMapInstrumentViewModel(string instrument);
-
         NoteMapViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string key, 
             NoteMapType type);
     }

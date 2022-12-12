@@ -2,7 +2,7 @@
 {
     public class UserInstrument
     {
-        public int? Frets { get; set; }
+        public int Frets { get; set; } = 12;
 
         public IReadOnlyCollection<UserInstrumentModifier> Modifiers { get; set; } = Array.Empty<UserInstrumentModifier>();
 
@@ -11,5 +11,7 @@
         public IReadOnlyCollection<UserInstrumentString> Strings { get; set; } = Array.Empty<UserInstrumentString>();
 
         public string Type { get; set; } = "";
+
+        public string UserInstrumentId { get; set; } = "";
     }
 }

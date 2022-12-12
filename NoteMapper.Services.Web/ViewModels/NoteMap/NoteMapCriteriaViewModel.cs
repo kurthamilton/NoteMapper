@@ -4,7 +4,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapCriteriaViewModel
     {
-        public string? Instrument { get; set; }
+        public string? InstrumentId { get; set; }
 
         public string? KeyName { get; set; }
 
