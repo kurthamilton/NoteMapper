@@ -34,9 +34,12 @@ else
             @foreach (GuitarBase instrument in DefaultInstruments)
             {
                 <tr>
-                    <td>@instrument.Name</td>
                     <td>
-                        <a href="/instruments/create?template=@instrument.Id" class="btn btn-primary btn-sm">
+                        <a href="/instruments/@instrument.Id/view">@instrument.Name</a>
+                    </td>
+                    <td>
+                        <a href="/instruments/create?template=@instrument.Id" 
+                           class="btn btn-outline-primary btn-sm">
                             Copy
                         </a>
                     </td>
@@ -59,10 +62,11 @@ else
                             <a href="/instruments/@instrument.Id/edit">@instrument.Name</a>
                         </td>
                         <td>
-                            <a href="/instruments/create?template=@instrument.Id" class="btn btn-primary btn-sm">
+                            <a href="/instruments/create?template=@instrument.Id" 
+                               class="btn btn-outline-primary btn-sm">
                                 Copy
                             </a>
-                            <button type="button" class="btn btn-danger btn-sm"
+                            <button type="button" class="btn btn-outline-danger btn-sm"
                                     @onclick="(e => DeleteInstrumentAsync(instrument.Id))">
                                 Delete
                             </button>

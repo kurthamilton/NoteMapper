@@ -8,7 +8,7 @@
     return;
 }
 
-<fieldset disabled="@(ReadOnly ? null : "disabled")">
+<fieldset disabled="@(ReadOnly ? "disabled" : null)">
     <div class="mb-3">
         <label for="name" class="form-label">Name</label>
         <InputText @bind-Value="Model.Name" class="form-control" />
@@ -55,9 +55,12 @@
                         <td>
                             <div class="d-flex justify-content-between">
                                 <span>
-                                    <button class="btn btn-icon" @onclick="(e => o.Offset--)">
-                                        <i class="bi bi-caret-left"></i>
-                                    </button>
+                                    @if (!ReadOnly)
+                                    {
+                                        <button class="btn btn-icon" @onclick="(e => o.Offset--)">
+                                            <i class="bi bi-caret-left"></i>
+                                        </button>
+                                    }                                    
                                 </span>
                                 <span class="d-flex justify-content-center align-items-center @textClass">
                                     @for (int i = 0; i < Math.Abs(o.Offset); i++)
@@ -75,9 +78,12 @@
                                     }
                                 </span>
                                 <span>
-                                    <button class="btn btn-icon" @onclick="(e => o.Offset++)">
-                                        <i class="bi bi-caret-right"></i>
-                                    </button>
+                                    @if (!ReadOnly)
+                                    {
+                                        <button class="btn btn-icon" @onclick="(e => o.Offset++)">
+                                            <i class="bi bi-caret-right"></i>
+                                        </button>
+                                    }                                    
                                 </span>
                             </div>
                         </td>
@@ -85,21 +91,28 @@
                 </tr>
             }
         </tbody>
-        <tfoot>
-            <tr>
-                <td>
-                    <button type="button" @onclick="(e => Model.AddString())">Add string</button>
-                </td>
-                <td colspan="@(Math.Max(Model.Modifiers.Count, 1))">
-                    <button type="button" @onclick="(e => Model.AddModifier())">Add modifier</button>
-                </td>
-            </tr>
-        </tfoot>
+        
+        @if (!ReadOnly)
+        {
+            <tfoot>
+                <tr>
+                    <td>
+                        <button type="button" @onclick="(e => Model.AddString())">Add string</button>
+                    </td>
+                    <td colspan="@(Math.Max(Model.Modifiers.Count, 1))">
+                        <button type="button" @onclick="(e => Model.AddModifier())">Add modifier</button>
+                    </td>
+                </tr>
+            </tfoot>
+        }        
     </table>
 
-    <button class="btn btn-primary" @onclick="HandleSubmitAsync">
-        @ButtonText
-    </button>
+    @if (!ReadOnly)
+    {
+        <button class="btn btn-primary" @onclick="HandleSubmitAsync">
+            @ButtonText
+        </button>
+    }    
 </fieldset>
 
 @code {
