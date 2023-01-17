@@ -10,7 +10,7 @@
 
 <div class="form-inline d-block d-sm-flex">
     <div class=form-group>
-        <label for="instrument"><a href="/instruments">Instrument</a></label>
+        <label for="instrument">Instrument</label>
         <select class="form-control" id="instrument" value="@Model.InstrumentId" @onchange="OnInstrumentChange">
             @foreach (GuitarBase instrument in Options.DefaultInstruments)
             {

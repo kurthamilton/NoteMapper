@@ -43,15 +43,20 @@ namespace NoteMapper.Services.Instruments
                 : null;
         }
 
+        public Task<UserInstrument?> FindDefaultInstrumentAsync(string userInstrumentId)
+        {
+            return _userInstrumentRepository.FindDefaultInstrumentAsync(userInstrumentId);            
+        }
+
         public async Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId)
         {            
-            UserInstrument? @default = await _userInstrumentRepository.FindAsync(userInstrumentId);
+            UserInstrument? @default = await FindDefaultInstrumentAsync(userInstrumentId);
             if (@default != null)
             {
                 return @default;
             }
 
-            UserInstrument? userInstrument = await _userInstrumentRepository.FindAsync(userId, userInstrumentId);
+            UserInstrument? userInstrument = await _userInstrumentRepository.FindUserInstrumentAsync(userId, userInstrumentId);
             return userInstrument;
         }
 

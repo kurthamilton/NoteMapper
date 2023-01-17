@@ -8,101 +8,106 @@
     return;
 }
 
-<div class="mb-3">
-    <label for="name" class="form-label">Name</label>
-    <InputText @bind-Value="Model.Name" class="form-control" />
-</div>
+<fieldset disabled="@(ReadOnly ? null : "disabled")">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText @bind-Value="Model.Name" class="form-control" />
+    </div>
 
-<table class="table table-sm align-middle">
-    <thead>
-        <tr>
-            <th></th>
-
-            @foreach (InstrumentModifierViewModel m in Model.Modifiers)
-            {
-                <th>
-                    <div>
-                        <InputText @bind-Value="m.Name" class="form-control form-control-sm" />
-                    </div>
-                    @if (Model.ModifierTypes.Count > 0)
-                    {
-                        <div>
-                            <select class="form-control" @bind="@m.Type">
-                                @foreach (string modifierType in Model.ModifierTypes)
-                                {
-                                    <option>@modifierType</option>
-                                }
-                            </select>
-                        </div>
-                    }                    
-                </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (InstrumentStringViewModel s in Model.Strings)
-        {
+    <table class="table table-sm align-middle">
+        <thead>
             <tr>
-                <th>
-                    <InputText @bind-Value="s.Note" class="form-control form-control-sm" />
-                </th>
+                <th></th>
 
-                @foreach (StringOffsetViewModel o in s.ModifierOffsets)
+                @foreach (InstrumentModifierViewModel m in Model.Modifiers)
                 {
-                    string? textClass = o.Offset < 0 ? "text-danger" : o.Offset > 0 ? "text-success" : null;
-
-                    <td>
-                        <div class="d-flex justify-content-between">
-                            <span>
-                                <button class="btn btn-icon" @onclick="(e => o.Offset--)">
-                                    <i class="bi bi-caret-left"></i>
-                                </button>
-                            </span>
-                            <span class="d-flex justify-content-center align-items-center @textClass">
-                                @for (int i = 0; i < Math.Abs(o.Offset); i++)
-                                {
-                                    <span>
-                                        @if (o.Offset < 0)
-                                        {
-                                            <i class="bi bi-dash-circle-fill"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-plus-circle-fill"></i>
-                                        }
-                                    </span>
-                                }
-                            </span>
-                            <span>
-                                <button class="btn btn-icon" @onclick="(e => o.Offset++)">
-                                    <i class="bi bi-caret-right"></i>
-                                </button>
-                            </span>
+                    <th>
+                        <div>
+                            <InputText @bind-Value="m.Name" class="form-control form-control-sm" />
                         </div>
-                    </td>
+                        @if (Model.ModifierTypes.Count > 0)
+                        {
+                            <div>
+                                <select class="form-control" @bind="@m.Type">
+                                    @foreach (string modifierType in Model.ModifierTypes)
+                                    {
+                                        <option>@modifierType</option>
+                                    }
+                                </select>
+                            </div>
+                        }                    
+                    </th>
                 }
             </tr>
-        }
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>
-                <button type="button" @onclick="(e => Model.AddString())">Add string</button>
-            </td>
-            <td colspan="@(Math.Max(Model.Modifiers.Count, 1))">
-                <button type="button" @onclick="(e => Model.AddModifier())">Add modifier</button>
-            </td>
-        </tr>
-    </tfoot>
-</table>
+        </thead>
+        <tbody>
+            @foreach (InstrumentStringViewModel s in Model.Strings)
+            {
+                <tr>
+                    <th>
+                        <InputText @bind-Value="s.Note" class="form-control form-control-sm" />
+                    </th>
 
-<button class="btn btn-primary" @onclick="HandleSubmitAsync">
-    @ButtonText
-</button>
+                    @foreach (StringOffsetViewModel o in s.ModifierOffsets)
+                    {
+                        string? textClass = o.Offset < 0 ? "text-danger" : o.Offset > 0 ? "text-success" : null;
+
+                        <td>
+                            <div class="d-flex justify-content-between">
+                                <span>
+                                    <button class="btn btn-icon" @onclick="(e => o.Offset--)">
+                                        <i class="bi bi-caret-left"></i>
+                                    </button>
+                                </span>
+                                <span class="d-flex justify-content-center align-items-center @textClass">
+                                    @for (int i = 0; i < Math.Abs(o.Offset); i++)
+                                    {
+                                        <span>
+                                            @if (o.Offset < 0)
+                                            {
+                                                <i class="bi bi-dash-circle-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-plus-circle-fill"></i>
+                                            }
+                                        </span>
+                                    }
+                                </span>
+                                <span>
+                                    <button class="btn btn-icon" @onclick="(e => o.Offset++)">
+                                        <i class="bi bi-caret-right"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <button type="button" @onclick="(e => Model.AddString())">Add string</button>
+                </td>
+                <td colspan="@(Math.Max(Model.Modifiers.Count, 1))">
+                    <button type="button" @onclick="(e => Model.AddModifier())">Add modifier</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button class="btn btn-primary" @onclick="HandleSubmitAsync">
+        @ButtonText
+    </button>
+</fieldset>
 
 @code {
     [Parameter]
     public string ButtonText { get; set; } = "";
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
 
     [Parameter]
     public UserInstrument? Template { get; set; }

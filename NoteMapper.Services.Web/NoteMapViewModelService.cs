@@ -1,4 +1,5 @@
-﻿using NoteMapper.Core.Guitars;
+﻿using NoteMapper.Core.Extensions;
+using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Services.Web.ViewModels.NoteMap;
@@ -17,6 +18,31 @@ namespace NoteMapper.Services.Web
             _instrumentFactory = instrumentFactory;
             _musicTheoryService = musicTheoryService;
             _userInstrumentRepository = userInstrumentRepository;
+        }
+
+        public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options,
+            string instrument, string key)
+        {
+            if (string.IsNullOrEmpty(instrument))
+            {
+                instrument = options?.DefaultInstruments.FirstOrDefault()?.Id ?? "";
+            }            
+
+            Scale.TryParse(key, out Scale? keyScale);
+
+            if (keyScale == null)
+            {
+                key = options?.KeyNames.FirstOrDefault() ?? "";
+                Scale.TryParse(key, out keyScale);
+            }
+
+            return new NoteMapCriteriaViewModel
+            {
+                InstrumentId = instrument,
+                KeyName = keyScale?.ElementAt(0).Name,
+                ScaleType = keyScale?.Type.ShortName(),
+                Type = NoteMapType.Chord
+            };
         }
 
         public async Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId)

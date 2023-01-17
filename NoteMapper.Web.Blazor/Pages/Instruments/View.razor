@@ -1,0 +1,56 @@
+﻿@page "/instruments/{id:guid}/view"
+@inherits NoteMapperComponentBase
+@attribute [Authorize]
+
+@using NoteMapper.Core
+@using NoteMapper.Data.Core.Instruments
+@using NoteMapper.Services.Instruments
+@using NoteMapper.Web.Blazor.Shared.Instruments
+@using NoteMapper.Web.Blazor.Shared.Shared
+
+<PageTitle>View instrument</PageTitle>
+
+@if (UserInstrument == null)
+{
+    return;
+}
+
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/instruments">Instruments</a>
+        </li>
+        <li class="breadcrumb-item active">View</li>
+    </ol>
+</nav>
+
+@if (Loading)
+{
+    <Loading />
+}
+else
+{
+    <InstrumentForm Template="@UserInstrument" ReadOnly="true" />
+}
+
+@inject NavigationManager NavigationManager
+@inject IUserInstrumentService UserInstrumentService
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    UserInstrument? UserInstrument { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {        
+        UserInstrument = await UserInstrumentService.FindDefaultInstrumentAsync(Id);
+
+        if (UserInstrument == null)
+        {
+            NavigationManager.NavigateTo("/instruments");
+            return;
+        }
+
+        Loading = false;
+    }
+}

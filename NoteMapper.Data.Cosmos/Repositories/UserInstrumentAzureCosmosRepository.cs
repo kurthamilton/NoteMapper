@@ -64,38 +64,14 @@ namespace NoteMapper.Data.Cosmos.Repositories
             }
         }
 
-        public async Task<UserInstrument?> FindAsync(string userInstrumentId)
+        public Task<UserInstrument?> FindDefaultInstrumentAsync(string userInstrumentId)
         {
-            using (CosmosClient client = CreateClient())
-            {
-                Container container = GetContainer(client);
-
-                UserInstruments? entry = await FindAsync(container, DefaultUserId);
-                if (entry == null)
-                {
-                    return null;
-                }
-
-                return entry.Instruments
-                    .FirstOrDefault(x => string.Equals(x.UserInstrumentId, userInstrumentId, StringComparison.InvariantCultureIgnoreCase));
-            }
+            return FindUserInstrumentAsync(DefaultUserId, userInstrumentId);
         }
 
-        public async Task<UserInstrument?> FindAsync(Guid userId, string userInstrumentId)
+        public Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId)
         {
-            using (CosmosClient client = CreateClient())
-            {
-                Container container = GetContainer(client);
-
-                UserInstruments? entry = await FindAsync(container, userId.ToString());
-                if (entry == null)
-                {
-                    return null;
-                }
-
-                return entry.Instruments
-                    .FirstOrDefault(x => string.Equals(x.UserInstrumentId, userInstrumentId, StringComparison.InvariantCultureIgnoreCase));
-            }
+            return FindUserInstrumentAsync(DefaultUserId.ToString(), userInstrumentId);
         }
 
         public async Task<IReadOnlyCollection<UserInstrument>> GetDefaultInstrumentsAsync()
@@ -150,6 +126,23 @@ namespace NoteMapper.Data.Cosmos.Repositories
                 }
 
                 return await UpdateAsync(container, userId.ToString(), entry);
+            }
+        }
+
+        private async Task<UserInstrument?> FindUserInstrumentAsync(string userId, string userInstrumentId)
+        {
+            using (CosmosClient client = CreateClient())
+            {
+                Container container = GetContainer(client);
+
+                UserInstruments? entry = await FindAsync(container, userId);
+                if (entry == null)
+                {
+                    return null;
+                }
+
+                return entry.Instruments
+                    .FirstOrDefault(x => string.Equals(x.UserInstrumentId, userInstrumentId, StringComparison.InvariantCultureIgnoreCase));
             }
         }
     }

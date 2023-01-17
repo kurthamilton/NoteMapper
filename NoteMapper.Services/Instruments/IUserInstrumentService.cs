@@ -12,6 +12,8 @@ namespace NoteMapper.Services.Instruments
 
         Task<GuitarBase?> FindAsync(Guid userId, string userInstrumentId);
 
+        Task<UserInstrument?> FindDefaultInstrumentAsync(string userInstrumentId);
+
         Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId);
 
         Task<IReadOnlyCollection<GuitarBase>> GetDefaultInstrumentsAsync();
