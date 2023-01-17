@@ -253,8 +253,18 @@ else
     void SetCriteriaFromQueryString()
     {
         NavigationManager.TryGetQueryStringValue("instrument", out string instrument);
-        NavigationManager.TryGetQueryStringValue("key", out string key);
-        
+        NavigationManager.TryGetQueryStringValue("key", out string key);        
+
+        if (string.IsNullOrEmpty(instrument))
+        {
+            instrument = CriteriaOptions?.DefaultInstruments.FirstOrDefault()?.Id ?? "";
+        }
+
+        if (string.IsNullOrEmpty(key))
+        {
+            key = CriteriaOptions?.KeyNames.FirstOrDefault() ?? "";
+        }
+
         Scale.TryParse(key, out Scale? keyScale);
 
         Criteria = new NoteMapCriteriaViewModel

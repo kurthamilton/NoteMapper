@@ -12,7 +12,6 @@
     <div class=form-group>
         <label for="instrument"><a href="/instruments">Instrument</a></label>
         <select class="form-control" id="instrument" value="@Model.InstrumentId" @onchange="OnInstrumentChange">
-            <option></option>
             @foreach (GuitarBase instrument in Options.DefaultInstruments)
             {
                 <option value="@instrument.Id">@instrument.Name</option>
@@ -35,7 +34,6 @@
             <label for="key">Key</label>
             <div class="d-flex">
                 <select class="form-control" id="key" value="@Model.KeyName" @onchange="OnKeyNameChange">
-                    <option></option>
                     @foreach (string name in Options.KeyNames)
                     {
                         <option>@name</option>
