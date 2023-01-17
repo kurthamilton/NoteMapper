@@ -48,7 +48,6 @@ namespace NoteMapper.Core.MusicTheory
         public static IReadOnlyCollection<string> GetNotes()
         {
             return _notes
-                .OrderBy(x => x)
                 .ToArray();
         }
 

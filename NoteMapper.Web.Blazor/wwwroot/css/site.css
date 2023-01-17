@@ -10911,6 +10911,10 @@ h3,
   text-align: right;
 }
 
+.string__name {
+  white-space: nowrap;
+}
+
 .modifier__fret,
 .string__fret {
   border-left: var(--fretboard-border-fret);

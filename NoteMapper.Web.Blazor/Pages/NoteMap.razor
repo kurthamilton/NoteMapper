@@ -47,6 +47,7 @@ else
             <tbody class="fretboard">
                 <tr class="fretboard__heading">
                     <th class="string__name" style="width: 0.001%;"></th>
+                    <th class="string__name" style="width: 0.001%;"></th>
                     @for (int i = StartFret; i <= EndFret; i++)
                     {
                         NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
@@ -63,6 +64,9 @@ else
                 {
                     GuitarString @string = Instrument.Strings.ElementAt(i);
                     <tr class="fretboard__string">
+                        <td class="string__name">
+                            @(i + 1)
+                        </td>
                         <th class="string__name">
                             @(@string.OpenNote.Name)
                         </th>
@@ -101,6 +105,7 @@ else
 
             <tbody class="modifiers">
                 <tr>
+                    <th></th>
                     <th></th>
 
                     @for (int i = StartFret; i <= EndFret; i++)
@@ -141,6 +146,7 @@ else
                 @foreach (GuitarStringModifier modifier in Instrument.Modifiers)
                 {
                     <tr class="modifiers__modifier">
+                        <th></th>
                         <th class="modifier__name">
                             @modifier.Name
                         </th>
