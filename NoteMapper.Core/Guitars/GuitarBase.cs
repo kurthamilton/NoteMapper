@@ -2,39 +2,47 @@
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Core.Permutations;
 
-namespace NoteMapper.Core.Instruments
+namespace NoteMapper.Core.Guitars
 {
-    public abstract class StringedInstrumentBase : InstrumentBase
+    public abstract class GuitarBase
     {
-        private readonly Lazy<int> _positions;
+        private readonly Lazy<int> _frets;
 
-        protected StringedInstrumentBase(InstrumentStringModifierCollection modifiers)
+        protected GuitarBase(GuitarStringModifierCollection modifiers)
         {
             Modifiers = modifiers;
 
-            _positions = new Lazy<int>(() => Strings.Max(x => x.Positions));
+            _frets = new Lazy<int>(() => Strings.Max(x => x.Frets));
         }
 
-        public InstrumentStringModifierCollection Modifiers { get; }
+        public int Frets => _frets.Value;
 
-        public int Positions => _positions.Value;
+        public abstract string Id { get; }
 
-        public abstract IReadOnlyCollection<InstrumentString> Strings { get; }
+        public abstract string Name { get; }
 
-        public IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> GetPermutations(StringPermutationOptions options)
+        public GuitarStringModifierCollection Modifiers { get; }
+
+        public IReadOnlyCollection<string> ModifierTypes => Type.ModifierTypes().ToArray();
+
+        public abstract IReadOnlyCollection<GuitarString> Strings { get; }
+
+        public abstract GuitarType Type { get; }                
+
+        public IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> GetPermutations(StringPermutationOptions options)
         {
             INoteCollection notes = options.Notes;
 
-            List<IReadOnlyCollection<InstrumentStringNote?>> notePermutations = new();
+            List<IReadOnlyCollection<GuitarStringNote?>> notePermutations = new();
             
             // Store an index of the modifier permutations that were used to avoid duplicating the
             // permutations containing redundant modifiers
             HashSet<int> usedPermutations = new();
 
-            foreach (IReadOnlyCollection<InstrumentStringModifier> modifierPermutation in Modifiers.GetPermutations())
+            foreach (IReadOnlyCollection<GuitarStringModifier> modifierPermutation in Modifiers.GetPermutations())
             {
                 // the composition of the note, string, and possible modifier
-                List<InstrumentStringNote?> stringNotes = new();
+                List<GuitarStringNote?> stringNotes = new();
                 // which modifier indexes have been used for this modifier permutation
                 bool[] usedModifiers = new bool[Modifiers.Count];
                 // which notes are being played in this permutation
@@ -43,14 +51,14 @@ namespace NoteMapper.Core.Instruments
                 for (int i = 0; i < Strings.Count; i++)
                 {
                     // the current string
-                    InstrumentString @string = Strings.ElementAt(i);
+                    GuitarString @string = Strings.ElementAt(i);
                     // get the first modifier from this permutation that applies to the current string
                     // it is assumed that modifiers are declared in order of precedence
-                    InstrumentStringModifier? modifier = modifierPermutation
+                    GuitarStringModifier? modifier = modifierPermutation
                         .FirstOrDefault(x => @string.HasModifier(x));
                     // the note being played on this string
-                    Note note = @string.NoteAt(options.Position, 
-                        modifier != null ? new[] { modifier } : Array.Empty<InstrumentStringModifier>());
+                    Note note = @string.NoteAt(options.Fret, 
+                        modifier != null ? new[] { modifier } : Array.Empty<GuitarStringModifier>());
                     if (notes.All(x => x.NoteIndex != note.NoteIndex))
                     {
                         // the note isn't in the current set of notes
@@ -66,7 +74,7 @@ namespace NoteMapper.Core.Instruments
                         usedModifiers[modifierIndex] = true;
                     }
 
-                    InstrumentStringNote stringNote = new(options.Position, @string, modifier);
+                    GuitarStringNote stringNote = new(options.Fret, @string, modifier);
                     stringNotes.Add(stringNote);
                 }
 
@@ -93,13 +101,13 @@ namespace NoteMapper.Core.Instruments
             return notePermutations;
         }
 
-        public IEnumerable<InstrumentStringModifier> AvailableModifiers(INoteCollection possibleNotes, int position)
+        public IEnumerable<GuitarStringModifier> AvailableModifiers(INoteCollection possibleNotes, int fret)
         {
-            foreach (InstrumentStringModifier modifier in Modifiers)
+            foreach (GuitarStringModifier modifier in Modifiers)
             {
-                foreach (InstrumentString @string in Strings.Where(x => x.HasModifier(modifier)))
+                foreach (GuitarString @string in Strings.Where(x => x.HasModifier(modifier)))
                 {
-                    Note note = @string.NoteAt(position, new[] { modifier });
+                    Note note = @string.NoteAt(fret, new[] { modifier });
                     if (possibleNotes.Contains(note))
                     {
                         yield return modifier;

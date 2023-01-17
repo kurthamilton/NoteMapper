@@ -1,6 +1,6 @@
 ﻿namespace NoteMapper.Core.MusicTheory
 {
-    public enum KeyType
+    public enum ScaleType
     {
         Major,
         Minor,

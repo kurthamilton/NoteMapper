@@ -1,5 +1,5 @@
 ﻿using NoteMapper.Core;
-using NoteMapper.Core.Instruments;
+using NoteMapper.Core.Guitars;
 using NoteMapper.Data.Core.Instruments;
 
 namespace NoteMapper.Services.Instruments
@@ -10,13 +10,13 @@ namespace NoteMapper.Services.Instruments
 
         Task<ServiceResult> DeleteInstrumentAsync(Guid userId, string userInstrumentId);
 
-        Task<InstrumentBase?> FindAsync(Guid userId, string userInstrumentId);
+        Task<GuitarBase?> FindAsync(Guid userId, string userInstrumentId);
 
         Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId);
 
-        Task<IReadOnlyCollection<InstrumentBase>> GetDefaultInstrumentsAsync();
+        Task<IReadOnlyCollection<GuitarBase>> GetDefaultInstrumentsAsync();
 
-        Task<IReadOnlyCollection<InstrumentBase>> GetUserInstrumentsAsync(Guid userId);
+        Task<IReadOnlyCollection<GuitarBase>> GetUserInstrumentsAsync(Guid userId);
 
         Task<ServiceResult> UpdateInstrumentAsync(Guid userId, UserInstrument instrument);
     }

@@ -1,4 +1,4 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Services.Web.ViewModels.NoteMap;
@@ -27,7 +27,7 @@ namespace NoteMapper.Services.Web
                 : Array.Empty<UserInstrument>();
 
             IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames();
-            IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetKeyTypes();
+            IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetScaleTypes();
             return new NoteMapCriteriaOptionsViewModel(
                 defaultInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
                 userInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
@@ -35,7 +35,7 @@ namespace NoteMapper.Services.Web
                 keyTypes);
         }
 
-        public NoteMapViewModel? GetNoteMapPermutationsViewModel(StringedInstrumentBase? instrument, string key,
+        public NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument, string key,
             NoteMapType type)
         {
             if (instrument == null)
@@ -45,23 +45,23 @@ namespace NoteMapper.Services.Web
 
             INoteCollection notes = Note.GetNotes(type, key);
 
-            int positions = instrument.Strings.Max(x => x.Positions);
+            int frets = instrument.Strings.Max(x => x.Frets);
 
             NoteMapViewModel viewModel = new();
 
-            for (int position = 0; position <= positions; position++)
+            for (int fret = 0; fret <= frets; fret++)
             {
-                NoteMapPositionViewModel positionViewModel = new(position);
+                NoteMapFretViewModel fretViewModel = new(fret);
 
-                StringPermutationOptions options = new(notes, position);
+                StringPermutationOptions options = new(notes, fret);
 
-                foreach (IReadOnlyCollection<InstrumentStringNote?> permutation in instrument.GetPermutations(options))
+                foreach (IReadOnlyCollection<GuitarStringNote?> permutation in instrument.GetPermutations(options))
                 {
                     NoteMapNotesViewModel permutationViewModel = new(permutation);
-                    positionViewModel.AddPermutation(permutationViewModel);
+                    fretViewModel.AddPermutation(permutationViewModel);
                 }
                 
-                viewModel.AddPosition(positionViewModel);
+                viewModel.AddFret(fretViewModel);
             }
 
             return viewModel;

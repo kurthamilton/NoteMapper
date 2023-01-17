@@ -1,4 +1,4 @@
-﻿namespace NoteMapper.Core.Instruments.Implementations
+﻿namespace NoteMapper.Core.Guitars.Implementations
 {
     public class PedalSteelGuitarConfig
     {
@@ -9,7 +9,7 @@
 
         public IReadOnlyCollection<string> Strings { get; set; } = Array.Empty<string>();
 
-        public static string GetModifierConfig(string name, params int[] offsets)
+        public static string GetModifierConfig(string type, string name, params int[] offsets)
         {
             int[][] groupedOffsets = new int[offsets.Length / 2][];
             for (int i = 0; i < offsets.Length; i+= 2)
@@ -21,7 +21,7 @@
                 };
             }
 
-            return $"{name}|{string.Join(",", groupedOffsets.Select(x => GetModifierOffsetConfig(x[0], x[1])))}";
+            return $"{type}|{name}|{string.Join(",", groupedOffsets.Select(x => GetModifierOffsetConfig(x[0], x[1])))}";
         }
 
         public static string GetStringConfig(string note, int frets)

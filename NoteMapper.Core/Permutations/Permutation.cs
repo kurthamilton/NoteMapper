@@ -19,7 +19,7 @@ namespace NoteMapper.Core.Permutations
         {
             int numberOfPermutations = (int)Math.Pow(2, numberOfOptions);
 
-            List<Permutation> permutations = new List<Permutation>();
+            Permutation[] permutations = new Permutation[numberOfPermutations];
 
             for (int i = 0; i < numberOfPermutations; i++)
             {
@@ -27,7 +27,7 @@ namespace NoteMapper.Core.Permutations
                 bool[] array = bitArray.ToArray(numberOfOptions);
                 
                 Permutation permutation = new Permutation(array);
-                permutations.Add(permutation);
+                permutations[i] = permutation;
             }
 
             return permutations;

@@ -2,19 +2,19 @@
 
 namespace NoteMapper.Core.Extensions
 {
-    public static class KeyTypeExtensions
+    public static class ScaleTypeExtensions
     {
-        public static string ShortName(this KeyType type)
+        public static string ShortName(this ScaleType type)
         {
             switch (type)
             {
-                case KeyType.DominantSeven:
+                case ScaleType.DominantSeven:
                     return "7";
-                case KeyType.MajorSeven:
+                case ScaleType.MajorSeven:
                     return "maj7";
-                case KeyType.Minor:
+                case ScaleType.Minor:
                     return "m";
-                case KeyType.MinorSeven:
+                case ScaleType.MinorSeven:
                     return "m7";
                 default:
                     return "";

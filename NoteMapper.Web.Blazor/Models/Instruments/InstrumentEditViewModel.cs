@@ -1,4 +1,4 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 
 namespace NoteMapper.Web.Blazor.Models.Instruments
 {
@@ -7,7 +7,7 @@ namespace NoteMapper.Web.Blazor.Models.Instruments
         private readonly List<InstrumentModifierViewModel> _modifiers = new();
         private readonly List<InstrumentStringViewModel> _strings = new();
         
-        public InstrumentEditViewModel(string id, InstrumentType type)
+        public InstrumentEditViewModel(string id, GuitarType type)
         {
             Id = id;
             Type = type;
@@ -17,16 +17,23 @@ namespace NoteMapper.Web.Blazor.Models.Instruments
 
         public IReadOnlyCollection<InstrumentModifierViewModel> Modifiers => _modifiers;
 
+        public IReadOnlyCollection<string> ModifierTypes => Type.ModifierTypes().ToArray();
+
         public string Name { get; set; } = "";
 
         public IReadOnlyCollection<InstrumentStringViewModel> Strings => _strings;
 
-        public InstrumentType Type { get; }
+        public GuitarType Type { get; }
 
         public void AddModifier() => AddModifier(new());
 
         public void AddModifier(InstrumentModifierViewModel modifier)
         {
+            if (string.IsNullOrEmpty(modifier.Type))
+            {
+                modifier.Type = ModifierTypes.FirstOrDefault() ?? "";
+            }
+
             _modifiers.Add(modifier);
 
             foreach (InstrumentStringViewModel s in _strings)

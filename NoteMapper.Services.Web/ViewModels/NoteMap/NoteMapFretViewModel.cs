@@ -1,22 +1,22 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
-    public class NoteMapPositionViewModel
+    public class NoteMapFretViewModel
     {
         private readonly HashSet<string> _availableModifiers = new();
         private readonly List<NoteMapNotesViewModel> _permutations = new();
 
-        public NoteMapPositionViewModel(int position)
+        public NoteMapFretViewModel(int fret)
         {
-            Position = position;
+            Fret = fret;
         }
 
         public IReadOnlyCollection<string> AvailableModifiers => _availableModifiers;
 
-        public IReadOnlyCollection<NoteMapNotesViewModel> Permutations => _permutations;
+        public int Fret { get; }
 
-        public int Position { get; }        
+        public IReadOnlyCollection<NoteMapNotesViewModel> Permutations => _permutations;        
 
         public NoteMapNotesViewModel? SelectedPermutation { get; private set; }
 
@@ -24,7 +24,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
         {
             _permutations.Add(permutation);
 
-            foreach (InstrumentStringNote? note in permutation.Notes)
+            foreach (GuitarStringNote? note in permutation.Notes)
             {
                 if (note?.Modifier == null || _availableModifiers.Contains(note.Modifier.Name))
                 {

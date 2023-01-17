@@ -18,17 +18,17 @@
             return new Chord(chordNotes);
         }
 
-        private static IEnumerable<int> GetChordNotes(KeyType type)
+        private static IEnumerable<int> GetChordNotes(ScaleType type)
         {
             switch (type)
             {
-                case KeyType.Major:
-                case KeyType.Minor:
+                case ScaleType.Major:
+                case ScaleType.Minor:
                     return new[] { 0, 2, 4 };
-                case KeyType.DominantSeven:
-                case KeyType.MajorSeven:
-                case KeyType.MinorSeven:
-                    return GetChordNotes(KeyType.Major).Append(6);
+                case ScaleType.DominantSeven:
+                case ScaleType.MajorSeven:
+                case ScaleType.MinorSeven:
+                    return GetChordNotes(ScaleType.Major).Append(6);
                 default:
                     return Enumerable.Empty<int>();
             }

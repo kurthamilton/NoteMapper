@@ -2,15 +2,15 @@
 using NoteMapper.Core.Extensions;
 using NoteMapper.Core.Permutations;
 
-namespace NoteMapper.Core.Instruments
+namespace NoteMapper.Core.Guitars
 {
-    public class InstrumentStringModifierCollection : IReadOnlyCollection<InstrumentStringModifier>
+    public class GuitarStringModifierCollection : IReadOnlyCollection<GuitarStringModifier>
     {        
-        private readonly IReadOnlyCollection<InstrumentStringModifier> _modifiers;
+        private readonly IReadOnlyCollection<GuitarStringModifier> _modifiers;
         private readonly IReadOnlyCollection<KeyValuePair<string, string>> _mutuallyExclusive;
-        private IReadOnlyCollection<IReadOnlyCollection<InstrumentStringModifier>>? _permutations;
+        private IReadOnlyCollection<IReadOnlyCollection<GuitarStringModifier>>? _permutations;
 
-        public InstrumentStringModifierCollection(IEnumerable<InstrumentStringModifier> modifiers,
+        public GuitarStringModifierCollection(IEnumerable<GuitarStringModifier> modifiers,
             IEnumerable<KeyValuePair<string, string>> mutuallyExclusive)
         {
             _modifiers = modifiers.ToArray();
@@ -19,7 +19,7 @@ namespace NoteMapper.Core.Instruments
 
         public int Count => _modifiers.Count;
 
-        public IEnumerator<InstrumentStringModifier> GetEnumerator()
+        public IEnumerator<GuitarStringModifier> GetEnumerator()
         {
             return _modifiers.GetEnumerator();
         }
@@ -29,21 +29,21 @@ namespace NoteMapper.Core.Instruments
             return GetEnumerator();
         }
 
-        public IReadOnlyCollection<IReadOnlyCollection<InstrumentStringModifier>> GetPermutations()
+        public IReadOnlyCollection<IReadOnlyCollection<GuitarStringModifier>> GetPermutations()
         {
             if (_permutations != null)
             {
                 return _permutations;
             }
 
-            List<IReadOnlyCollection<InstrumentStringModifier>> modifierPermutations = new();
+            List<IReadOnlyCollection<GuitarStringModifier>> modifierPermutations = new();
 
             HashSet<Permutation> invalidPermutations = new();
             foreach (KeyValuePair<string, string> pair in _mutuallyExclusive)
             {
-                InstrumentStringModifier? modifier1 = _modifiers
+                GuitarStringModifier? modifier1 = _modifiers
                     .FirstOrDefault(x => string.Equals(x.Name, pair.Key, StringComparison.InvariantCultureIgnoreCase));
-                InstrumentStringModifier? modifier2 = _modifiers
+                GuitarStringModifier? modifier2 = _modifiers
                     .FirstOrDefault(x => string.Equals(x.Name, pair.Value, StringComparison.InvariantCultureIgnoreCase));
 
                 if (modifier1 == null || modifier2 == null)
@@ -68,7 +68,7 @@ namespace NoteMapper.Core.Instruments
                     continue;
                 }
 
-                IReadOnlyCollection<InstrumentStringModifier> permutationModifiers = _modifiers
+                IReadOnlyCollection<GuitarStringModifier> permutationModifiers = _modifiers
                     .Where((modifier, i) => permutation.Get(i))
                     .ToArray();
                 modifierPermutations.Add(permutationModifiers);

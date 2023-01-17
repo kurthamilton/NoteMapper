@@ -7,7 +7,7 @@ using NoteMapper.Web.Blazor.Models;
 namespace NoteMapper.Web.Blazor.Pages
 {
     public abstract class NoteMapperComponentBase : ComponentBase
-    {        
+    {
         protected FeedbackViewModel? Feedback { get; set; }
 
         protected bool Loading { get; set; } = false;

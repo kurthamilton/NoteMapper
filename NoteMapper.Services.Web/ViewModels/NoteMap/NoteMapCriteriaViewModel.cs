@@ -8,7 +8,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public string? KeyName { get; set; }
 
-        public string? KeyType { get; set; }
+        public string? ScaleType { get; set; }
 
         public NoteMapType Type { get; set; } = NoteMapType.Chord;
     }

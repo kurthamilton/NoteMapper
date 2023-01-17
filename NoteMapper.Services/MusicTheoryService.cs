@@ -5,7 +5,7 @@ namespace NoteMapper.Services
 {
     public class MusicTheoryService : IMusicTheoryService
     {
-        private static readonly IReadOnlyCollection<string> _keyTypes = Enum.GetValues<KeyType>()
+        private static readonly IReadOnlyCollection<string> _keyTypes = Enum.GetValues<ScaleType>()
             .Select(x => x.ShortName())
             .ToArray();
 
@@ -30,7 +30,7 @@ namespace NoteMapper.Services
 
             foreach (string note in notes)
             {
-                foreach (string type in GetKeyTypes())
+                foreach (string type in GetScaleTypes())
                 {
                     Key key = new(note + type, $"{note} {type}");
                     keys.Add(key);
@@ -40,7 +40,7 @@ namespace NoteMapper.Services
             return keys;
         }
 
-        public IReadOnlyCollection<string> GetKeyTypes()
+        public IReadOnlyCollection<string> GetScaleTypes()
         {
             return _keyTypes;
         }

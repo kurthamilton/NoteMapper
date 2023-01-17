@@ -1,5 +1,5 @@
-﻿@using NoteMapper.Core.Instruments;
-@using NoteMapper.Core.Instruments.Implementations;
+﻿@using NoteMapper.Core.Guitars;
+@using NoteMapper.Core.Guitars.Implementations;
 @using NoteMapper.Data.Core.Instruments;
 @using NoteMapper.Web.Blazor.Models.Instruments;
 
@@ -21,7 +21,20 @@
             @foreach (InstrumentModifierViewModel m in Model.Modifiers)
             {
                 <th>
-                    <InputText @bind-Value="m.Name" class="form-control form-control-sm" />
+                    <div>
+                        <InputText @bind-Value="m.Name" class="form-control form-control-sm" />
+                    </div>
+                    @if (Model.ModifierTypes.Count > 0)
+                    {
+                        <div>
+                            <select class="form-control" @bind="@m.Type">
+                                @foreach (string modifierType in Model.ModifierTypes)
+                                {
+                                    <option>@modifierType</option>
+                                }
+                            </select>
+                        </div>
+                    }                    
                 </th>
             }
         </tr>
@@ -103,7 +116,7 @@
     {
         if (parameters.TryGetValue<UserInstrument?>(nameof(Template), out UserInstrument? template))
         {
-            Model = ToViewModel(template);
+            Model = ToViewModel(template);            
         }
 
         await base.SetParametersAsync(parameters);
@@ -136,7 +149,8 @@
             yield return new UserInstrumentModifier
             {
                 Name = modifierViewModel.Name,
-                Offsets = offsets                
+                Offsets = offsets,
+                Type = modifierViewModel.Type
             };
         }        
     }
@@ -165,7 +179,7 @@
             return null;
         }
 
-        InstrumentType type = Enum.Parse<InstrumentType>(template.Type, true);
+        GuitarType type = Enum.Parse<GuitarType>(template.Type, true);
         InstrumentEditViewModel viewModel = new InstrumentEditViewModel(template.UserInstrumentId, type)
         {            
             Name = template.Name
@@ -176,7 +190,8 @@
             UserInstrumentModifier modifier = template.Modifiers.ElementAt(modifierIndex);
             InstrumentModifierViewModel modifierViewModel = new InstrumentModifierViewModel
             {                
-                Name = modifier.Name
+                Name = modifier.Name,
+                Type = modifier.Type
             };
 
             viewModel.AddModifier(modifierViewModel);

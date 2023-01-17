@@ -1,15 +1,15 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapNotesViewModel
     {
-        public NoteMapNotesViewModel(IReadOnlyCollection<InstrumentStringNote?> notes)
+        public NoteMapNotesViewModel(IReadOnlyCollection<GuitarStringNote?> notes)
         {
             Notes = notes;
         }
 
-        public IReadOnlyCollection<InstrumentStringNote?> Notes { get; }
+        public IReadOnlyCollection<GuitarStringNote?> Notes { get; }
 
         public bool HasModifier(string name)
         {

@@ -27,6 +27,22 @@ BEGIN
 	CREATE UNIQUE INDEX UIX_UserPasswords_UserId ON UserPasswords(UserId)
 END
 
+IF (OBJECT_ID('UserPasswordResetCodes') IS NULL)
+BEGIN
+	CREATE TABLE dbo.UserPasswordResetCodes
+	(
+		UserPasswordResetCodeId UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+		UserId UNIQUEIDENTIFIER NOT NULL,
+		CreatedUtc DATETIME NOT NULL,
+		ExpiresUtc DATETIME NOT NULL,
+		Code NVARCHAR(255) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL,
+		CONSTRAINT PK_UserPasswordResetCodes PRIMARY KEY NONCLUSTERED (UserPasswordResetCodeId),
+		CONSTRAINT FK_UserPasswordResetCodes_Users_UserId FOREIGN KEY (UserId) REFERENCES Users (UserId) ON DELETE CASCADE
+	)
+
+	CREATE CLUSTERED INDEX CIX_UserPasswordResetCodes_UserId ON UserPasswordResetCodes (UserId)
+END
+
 IF (OBJECT_ID('UserActivations') IS NULL)
 BEGIN
 	CREATE TABLE dbo.UserActivations
@@ -73,4 +89,19 @@ BEGIN
 	)
 
 	INSERT INTO RegistrationCodes (CreatedUtc, Code) VALUES (GETUTCDATE(), 'NM-DEV')
+END
+
+IF (OBJECT_ID('UserRegistrationCodes') IS NULL)
+BEGIN
+	CREATE TABLE dbo.UserRegistrationCodes 
+	(
+		UserRegistrationCodeId UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+		CreatedUtc DATETIME NOT NULL,
+		UserId UNIQUEIDENTIFIER NOT NULL,
+		RegistrationCodeId UNIQUEIDENTIFIER NOT NULL,
+		CONSTRAINT PK_UserRegistrationCodes PRIMARY KEY (UserRegistrationCodeId),
+		CONSTRAINT FK_UserRegistrationCodes_Users_UserId FOREIGN KEY (UserId) REFERENCES Users (UserId) ON DELETE CASCADE,
+		CONSTRAINT FK_UserRegistrationCodes_RegistrationCodes_RegistrationCodeId FOREIGN KEY (RegistrationCodeId) REFERENCES RegistrationCodes (RegistrationCodeId),
+		CONSTRAINT UQ_UserRegistrationCodes_UserId UNIQUE (UserId)
+	)
 END

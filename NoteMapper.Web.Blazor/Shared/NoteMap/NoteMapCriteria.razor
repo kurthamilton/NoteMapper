@@ -1,5 +1,5 @@
 ﻿@using NoteMapper.Core
-@using NoteMapper.Core.Instruments;
+@using NoteMapper.Core.Guitars;
 @using NoteMapper.Core.MusicTheory
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 
@@ -13,7 +13,7 @@
         <label for="instrument"><a href="/instruments">Instrument</a></label>
         <select class="form-control" id="instrument" value="@Model.InstrumentId" @onchange="OnInstrumentChange">
             <option></option>
-            @foreach (InstrumentBase instrument in Options.DefaultInstruments)
+            @foreach (GuitarBase instrument in Options.DefaultInstruments)
             {
                 <option value="@instrument.Id">@instrument.Name</option>
             }
@@ -22,7 +22,7 @@
             {
                 <option disabled>----------</option>
 
-                @foreach (InstrumentBase instrument in Options.UserInstruments)
+                @foreach (GuitarBase instrument in Options.UserInstruments)
                 {
                     <option value="@instrument.Id">@instrument.Name</option>
                 }
@@ -41,8 +41,8 @@
                         <option>@name</option>
                     }
                 </select>
-                <select class="form-control" id="key" value="@Model.KeyType" @onchange="OnKeyTypeChange">
-                    @foreach (string type in Options.KeyTypes)
+                <select class="form-control" id="key" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
+                    @foreach (string type in Options.ScaleTypes)
                     {
                         <option>@type</option>
                     }
@@ -89,9 +89,9 @@
         return EmitChange();
     }
 
-    Task OnKeyTypeChange(ChangeEventArgs e)
+    Task OnScaleTypeChange(ChangeEventArgs e)
     {
-        Model.KeyType = (string?)e.Value;
+        Model.ScaleType = (string?)e.Value;
         return EmitChange();
     }
 

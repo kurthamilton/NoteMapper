@@ -2,34 +2,37 @@
 using System.Text.RegularExpressions;
 using NoteMapper.Core.Permutations;
 
-namespace NoteMapper.Core.Instruments
+namespace NoteMapper.Core.Guitars
 {
-    public class InstrumentStringModifier
+    public class GuitarStringModifier
     {
-        private static Regex _parseRegex = new Regex(@"^(?<name>\w+)\|(?<modifiers>.+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex _parseRegex = new Regex(@"^(?<type>\w*?)\|(?<name>\w+)\|(?<modifiers>.+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static Regex _parseModifierRegex = new Regex(@"^(?<string>\d+)(?<offset>(\+|\-)\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);        
 
-        private InstrumentStringModifier(string name, IDictionary<int, int> offsets)
+        private GuitarStringModifier(string type, string name, IDictionary<int, int> offsets)
         {
             Name = name;
             Offsets = new ReadOnlyDictionary<int, int>(offsets);
+            Type = type;
         }
 
         public string Name { get; }
 
-        private IReadOnlyDictionary<int, int> Offsets { get; }
+        private ICollection<GuitarStringModifier> MutuallyExclusiveModifiers { get; } = new List<GuitarStringModifier>();
 
-        private ICollection<InstrumentStringModifier> MutuallyExclusiveModifiers { get; } = new List<InstrumentStringModifier>();
+        private IReadOnlyDictionary<int, int> Offsets { get; }        
 
-        public static IDictionary<int, IReadOnlyCollection<InstrumentStringModifier>> GetPermutations(
-            IReadOnlyCollection<InstrumentStringModifier> modifiers)
+        public string Type { get; }
+
+        public static IDictionary<int, IReadOnlyCollection<GuitarStringModifier>> GetPermutations(
+            IReadOnlyCollection<GuitarStringModifier> modifiers)
         {
-            IDictionary<int, IReadOnlyCollection<InstrumentStringModifier>> modifierPermutations =
-                    new Dictionary<int, IReadOnlyCollection<InstrumentStringModifier>>();
+            IDictionary<int, IReadOnlyCollection<GuitarStringModifier>> modifierPermutations =
+                    new Dictionary<int, IReadOnlyCollection<GuitarStringModifier>>();
 
             foreach (Permutation permutation in Permutation.GetPermutations(modifiers.Count))
             {
-                IReadOnlyCollection<InstrumentStringModifier> permutationModifiers = modifiers
+                IReadOnlyCollection<GuitarStringModifier> permutationModifiers = modifiers
                     .Where((modifier, i) => permutation.Get(i))
                     .ToArray();
 
@@ -39,7 +42,7 @@ namespace NoteMapper.Core.Instruments
             return modifierPermutations;
         }
 
-        public static InstrumentStringModifier Parse(string s)
+        public static GuitarStringModifier Parse(string s)
         {
             Match match = _parseRegex.Match(s);
             if (!match.Success)
@@ -47,6 +50,7 @@ namespace NoteMapper.Core.Instruments
                 throw new ArgumentException("Invalid format", nameof(s));
             }
 
+            string type = match.Groups["type"].Value;
             string name = match.Groups["name"].Value;
             string modifierString = match.Groups["modifiers"].Value;
             string[] modifierStrings = modifierString.Split(',');            
@@ -67,10 +71,10 @@ namespace NoteMapper.Core.Instruments
                 offsets.Add(stringIndex, offset);
             }
 
-            return new InstrumentStringModifier(name, offsets);
+            return new GuitarStringModifier(type, name, offsets);
         }
 
-        public int GetOffset(InstrumentString @string)
+        public int GetOffset(GuitarString @string)
         {
             return GetOffset(@string.Index);
         }
@@ -87,7 +91,7 @@ namespace NoteMapper.Core.Instruments
             return Offsets.ContainsKey(stringIndex);
         }
 
-        public InstrumentStringModifier IsMutuallyExclusiveWith(InstrumentStringModifier other)
+        public GuitarStringModifier IsMutuallyExclusiveWith(GuitarStringModifier other)
         {
             if (other == this)
             {

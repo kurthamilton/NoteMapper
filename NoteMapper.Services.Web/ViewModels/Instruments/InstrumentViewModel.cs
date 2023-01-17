@@ -1,10 +1,10 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 
 namespace NoteMapper.Services.Web.ViewModels.Instruments
 {
     public class InstrumentViewModel
     {
-        public InstrumentViewModel(StringedInstrumentBase instrument)
+        public InstrumentViewModel(GuitarBase instrument)
         {
             Strings = instrument
                 .Strings

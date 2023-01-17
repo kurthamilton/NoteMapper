@@ -8,17 +8,17 @@ namespace NoteMapper.Core.MusicTheory
     {
         private static readonly Regex KeyRegex = new Regex(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
 
-        private static readonly IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> KeyIntervals = CreateKeyIntervals();
+        private static readonly IReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>> KeyIntervals = CreateKeyIntervals();
 
-        private static readonly IReadOnlyDictionary<KeyType, string> KeyShortNames = CreateKeyShortNames();
+        private static readonly IReadOnlyDictionary<ScaleType, string> KeyShortNames = CreateKeyShortNames();
 
-        private Scale(IEnumerable<Note> notes, KeyType type)
+        private Scale(IEnumerable<Note> notes, ScaleType type)
             : base(notes)
         {
             Type = type;
         }
 
-        public KeyType Type { get; }
+        public ScaleType Type { get; }
 
         public static Scale Parse(string key)
         {
@@ -30,7 +30,7 @@ namespace NoteMapper.Core.MusicTheory
 
             Note note = Note.Parse(match.Groups["note"].Value);
             Group typeGroup = match.Groups["type"];
-            KeyType type = ParseKeyType(typeGroup.Success ? typeGroup.Value : "");
+            ScaleType type = ParseScaleType(typeGroup.Success ? typeGroup.Value : "");
             IReadOnlyCollection<byte> intervals = GetIntervals(type);
             IEnumerable<Note> notes = GetNotes(note, intervals);
             return new(notes, type);
@@ -75,41 +75,41 @@ namespace NoteMapper.Core.MusicTheory
             }
         }
 
-        private static IReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>> CreateKeyIntervals()
+        private static IReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>> CreateKeyIntervals()
         {
-            IDictionary<KeyType, IReadOnlyCollection<byte>> intervals = new Dictionary<KeyType, IReadOnlyCollection<byte>>
+            IDictionary<ScaleType, IReadOnlyCollection<byte>> intervals = new Dictionary<ScaleType, IReadOnlyCollection<byte>>
             {
-                { KeyType.DominantSeven, new byte[] { 2, 2, 1, 2, 2, 1 } },
-                { KeyType.Major, new byte[] { 2, 2, 1, 2, 2, 2 } },
-                { KeyType.Minor, new byte[] { 2, 1, 2, 2, 1, 2 } }
+                { ScaleType.DominantSeven, new byte[] { 2, 2, 1, 2, 2, 1 } },
+                { ScaleType.Major, new byte[] { 2, 2, 1, 2, 2, 2 } },
+                { ScaleType.Minor, new byte[] { 2, 1, 2, 2, 1, 2 } }
             };
 
-            return new ReadOnlyDictionary<KeyType, IReadOnlyCollection<byte>>(intervals);
+            return new ReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>>(intervals);
         }
 
-        private static IReadOnlyDictionary<KeyType, string> CreateKeyShortNames()
+        private static IReadOnlyDictionary<ScaleType, string> CreateKeyShortNames()
         {
-            IDictionary<KeyType, string> keyShortNames = Enum.GetValues<KeyType>()
+            IDictionary<ScaleType, string> keyShortNames = Enum.GetValues<ScaleType>()
                 .ToDictionary(x => x, x => x.ShortName());
 
-            return new ReadOnlyDictionary<KeyType, string>(keyShortNames);
+            return new ReadOnlyDictionary<ScaleType, string>(keyShortNames);
         }
 
-        private static IReadOnlyCollection<byte> GetIntervals(KeyType type)
+        private static IReadOnlyCollection<byte> GetIntervals(ScaleType type)
         {
             if (KeyIntervals.ContainsKey(type))
             {
                 return KeyIntervals[type];
             }
 
-            if (type.ToString().StartsWith(KeyType.Major.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            if (type.ToString().StartsWith(ScaleType.Major.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                return KeyIntervals[KeyType.Major];
+                return KeyIntervals[ScaleType.Major];
             }
 
-            if (type.ToString().StartsWith(KeyType.Minor.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            if (type.ToString().StartsWith(ScaleType.Minor.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
-                return KeyIntervals[KeyType.Minor];
+                return KeyIntervals[ScaleType.Minor];
             }
 
             return Array.Empty<byte>();
@@ -125,9 +125,9 @@ namespace NoteMapper.Core.MusicTheory
             }
         }
 
-        private static KeyType ParseKeyType(string type)
+        private static ScaleType ParseScaleType(string type)
         {
-            if (Enum.TryParse(type, out KeyType parsed) && Enum.IsDefined(parsed))
+            if (Enum.TryParse(type, out ScaleType parsed) && Enum.IsDefined(parsed))
             {
                 return parsed;
             }

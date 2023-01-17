@@ -2,7 +2,7 @@
 @inherits NoteMapperComponentBase
 @attribute [Authorize]
 
-@using NoteMapper.Core.Instruments;
+@using NoteMapper.Core.Guitars;
 @using NoteMapper.Core;
 @using NoteMapper.Data.Core.Instruments;
 @using NoteMapper.Services.Instruments;
@@ -59,7 +59,7 @@ else
         {
             Template = new UserInstrument
             {
-                Type = InstrumentType.PedalSteelGuitar.ToString()
+                Type = GuitarType.PedalSteelGuitar.ToString()
             };            
         }
         else

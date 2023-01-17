@@ -1,5 +1,6 @@
-﻿using NoteMapper.Core.Instruments;
-using NoteMapper.Core.Instruments.Implementations;
+﻿using NoteMapper.Core.Guitars.Implementations;
+using NoteMapper.Core.Guitars;
+using NoteMapper.Core.Guitars.Implementations;
 using NoteMapper.Core.MusicTheory;
 using NUnit.Framework;
 
@@ -22,7 +23,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
 
             INoteCollection notes = Note.GetNotes(NoteMapType.Chord, "C");
             StringPermutationOptions options = new StringPermutationOptions(notes, 0);
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations = 
+            IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> permutations = 
                 psg.GetPermutations(options).ToArray();
 
             string[] expected = new[]
@@ -44,10 +45,10 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             {
                 Modifiers = new[]
                 {
-                    "A|0+2",
-                    "B|1+2",
-                    "C|2+2",
-                    "D|3+1"
+                    "Pedal|A|0+2",
+                    "Pedal|B|1+2",
+                    "Pedal|C|2+2",
+                    "Pedal|D|3+1"
                 },
                 Strings = new[]
                 {
@@ -60,7 +61,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
 
             INoteCollection notes = Note.GetNotes(NoteMapType.Chord, "C");
             StringPermutationOptions options = new StringPermutationOptions(notes, 0);
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations =
+            IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> permutations =
                 psg.GetPermutations(options).ToArray();
 
             string[] expected = new[]
@@ -83,9 +84,9 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             {
                 Modifiers = new[]
                 {
-                    "A|0+2",
-                    "B|1+2",
-                    "C|2+2"
+                    "Pedal|A|0+2",
+                    "Pedal|B|1+2",
+                    "Pedal|C|2+2"
                 },
                 Strings = new[]
                 {
@@ -97,7 +98,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
 
             INoteCollection notes = Note.GetNotes(NoteMapType.Chord, "C");
             StringPermutationOptions options = new StringPermutationOptions(notes, 1);
-            IReadOnlyCollection<IReadOnlyCollection<InstrumentStringNote?>> permutations =
+            IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> permutations =
                 psg.GetPermutations(options).ToArray();
 
             string[] actual = permutations

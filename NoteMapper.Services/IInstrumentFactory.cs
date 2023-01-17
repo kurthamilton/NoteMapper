@@ -1,12 +1,12 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 using NoteMapper.Data.Core.Instruments;
 
 namespace NoteMapper.Services
 {
     public interface IInstrumentFactory
     {
-        InstrumentBase FromUserInstrument(UserInstrument userInstrument);
+        GuitarBase FromUserInstrument(UserInstrument userInstrument);
 
-        UserInstrument ToUserInstrument(StringedInstrumentBase instrument);
+        UserInstrument ToUserInstrument(GuitarBase instrument);
     }
 }

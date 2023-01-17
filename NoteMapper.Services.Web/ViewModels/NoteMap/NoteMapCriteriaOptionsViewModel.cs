@@ -1,20 +1,20 @@
-﻿using NoteMapper.Core.Instruments;
+﻿using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapCriteriaOptionsViewModel
     {
-        public NoteMapCriteriaOptionsViewModel(IEnumerable<InstrumentBase> defaultInstruments, 
-            IEnumerable<InstrumentBase> userInstruments,
+        public NoteMapCriteriaOptionsViewModel(IEnumerable<GuitarBase> defaultInstruments, 
+            IEnumerable<GuitarBase> userInstruments,
             IReadOnlyCollection<string> keyNames,
-            IReadOnlyCollection<string> keyTypes)
+            IReadOnlyCollection<string> scaleTypes)
         {
             DefaultInstruments = defaultInstruments.ToArray();
             UserInstruments = userInstruments.ToArray();
 
             KeyNames = keyNames;
-            KeyTypes = keyTypes;
+            ScaleTypes = scaleTypes;
 
             Types = new[]
             {
@@ -22,14 +22,14 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             };
         }
 
-        public IReadOnlyCollection<InstrumentBase> DefaultInstruments { get; }
+        public IReadOnlyCollection<GuitarBase> DefaultInstruments { get; }
 
         public IReadOnlyCollection<string> KeyNames { get; }
 
-        public IReadOnlyCollection<string> KeyTypes { get; }
+        public IReadOnlyCollection<string> ScaleTypes { get; }
 
         public IReadOnlyCollection<NoteMapType> Types { get; }
 
-        public IReadOnlyCollection<InstrumentBase> UserInstruments { get; }
+        public IReadOnlyCollection<GuitarBase> UserInstruments { get; }
     }
 }

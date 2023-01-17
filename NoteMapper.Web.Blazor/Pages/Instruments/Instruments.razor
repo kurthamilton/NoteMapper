@@ -5,7 +5,7 @@
 <PageTitle>Instruments</PageTitle>
 
 @using System.Net;
-@using NoteMapper.Core.Instruments
+@using NoteMapper.Core.Guitars
 @using NoteMapper.Core;
 @using NoteMapper.Data.Core.Instruments;
 @using NoteMapper.Services
@@ -31,7 +31,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (InstrumentBase instrument in DefaultInstruments)
+            @foreach (GuitarBase instrument in DefaultInstruments)
             {
                 <tr>
                     <td>@instrument.Name</td>
@@ -52,7 +52,7 @@ else
                         <h4>Custom</h4>
                     </td>
                 </tr>
-                @foreach (InstrumentBase instrument in UserInstruments)
+                @foreach (GuitarBase instrument in UserInstruments)
                 {
                     <tr>
                         <td>
@@ -89,8 +89,8 @@ else
 @inject NavigationManager NavigationManager;
 @inject IUserInstrumentService UserInstrumentService
 @code {
-    IReadOnlyCollection<InstrumentBase>? DefaultInstruments;
-    IReadOnlyCollection<InstrumentBase>? UserInstruments;
+    IReadOnlyCollection<GuitarBase>? DefaultInstruments;
+    IReadOnlyCollection<GuitarBase>? UserInstruments;
 
     Guid UserId { get; set; }
 

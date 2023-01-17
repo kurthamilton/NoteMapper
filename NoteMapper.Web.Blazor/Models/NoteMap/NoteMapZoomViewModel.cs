@@ -2,8 +2,8 @@
 {
     public class NoteMapZoomViewModel
     {
-        public int EndPosition { get; set; }
+        public int EndFret { get; set; }
 
-        public int StartPosition { get; set; }
+        public int StartFret { get; set; }
     }
 }

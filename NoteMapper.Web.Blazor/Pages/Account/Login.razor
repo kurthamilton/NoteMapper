@@ -30,7 +30,7 @@
                     Forgotten password?
                 </a>
             </div>
-            <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" tabindex="2" />
+            <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" tabindex="2" />            
             <ValidationMessage For="() => Model.Password" />
         </div>
 
@@ -73,6 +73,6 @@
         string url = "/account/dologin?email={email}&token={token}"
             .Replace("{email}", UrlEncoder.UrlEncode(user.Email))
             .Replace("{token}", UrlEncoder.UrlEncode(token.Token));
-        NavigationManager.NavigateTo(url, new NavigationOptions { ForceLoad = true });
+        NavigationManager.NavigateTo(url, new NavigationOptions { ForceLoad = true });        
     }
 }

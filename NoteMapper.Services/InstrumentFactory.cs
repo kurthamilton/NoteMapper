@@ -1,18 +1,18 @@
-﻿using NoteMapper.Core.Instruments;
-using NoteMapper.Core.Instruments.Implementations;
+﻿using NoteMapper.Core.Guitars;
+using NoteMapper.Core.Guitars.Implementations;
 using NoteMapper.Data.Core.Instruments;
 
 namespace NoteMapper.Services
 {
     public class InstrumentFactory : IInstrumentFactory
     {
-        public InstrumentBase FromUserInstrument(UserInstrument userInstrument)
+        public GuitarBase FromUserInstrument(UserInstrument userInstrument)
         {
-            InstrumentType type = Enum.Parse<InstrumentType>(userInstrument.Type, true);
+            GuitarType type = Enum.Parse<GuitarType>(userInstrument.Type, true);
             
             switch (type)
             {
-                case InstrumentType.PedalSteelGuitar:
+                case GuitarType.PedalSteelGuitar:
                     List<string> modifiers = new();
                     List<KeyValuePair<string, string>> mutuallyExclusiveModifiers = new();
                     List<string> strings = new();
@@ -26,7 +26,7 @@ namespace NoteMapper.Services
                             offsets.Add(offset.Offset);
                         }
 
-                        string modifierConfig = PedalSteelGuitarConfig.GetModifierConfig(modifier.Name, offsets.ToArray());
+                        string modifierConfig = PedalSteelGuitarConfig.GetModifierConfig(modifier.Type, modifier.Name, offsets.ToArray());
                         modifiers.Add(modifierConfig);
 
                         if (modifier.MutuallyExclusive != null)
@@ -55,7 +55,7 @@ namespace NoteMapper.Services
             }
         }
 
-        public UserInstrument ToUserInstrument(StringedInstrumentBase instrument)
+        public UserInstrument ToUserInstrument(GuitarBase instrument)
         {
             return new UserInstrument
             {
@@ -77,7 +77,8 @@ namespace NoteMapper.Services
                     return new UserInstrumentModifier
                     {
                         Name = x.Name,
-                        Offsets = offsets.ToArray()                        
+                        Offsets = offsets.ToArray(),
+                        Type = x.Type
                     };
                 }).ToArray(),
                 Name = instrument.Name, 

@@ -2,13 +2,13 @@
 {
     public class NoteMapViewModel
     {
-        private readonly List<NoteMapPositionViewModel> _positions = new();
+        private readonly List<NoteMapFretViewModel> _frets = new();
 
-        public IReadOnlyCollection<NoteMapPositionViewModel> Positions => _positions;
+        public IReadOnlyCollection<NoteMapFretViewModel> Frets => _frets;
 
-        public void AddPosition(NoteMapPositionViewModel position)
+        public void AddFret(NoteMapFretViewModel fret)
         {
-            _positions.Add(position);            
+            _frets.Add(fret);            
         }
     }
 }

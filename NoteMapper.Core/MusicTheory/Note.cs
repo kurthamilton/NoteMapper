@@ -94,11 +94,6 @@ namespace NoteMapper.Core.MusicTheory
             return new Note(index);
         }
 
-        public bool InScale(Scale scale)
-        {
-            return scale.Contains(this);
-        }
-
         public Note Next(int offset)
         {
             return new Note(Index + offset);
