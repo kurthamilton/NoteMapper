@@ -14,9 +14,10 @@
         <InputText @bind-Value="Model.Name" class="form-control" />
     </div>
 
-    <table class="table table-sm align-middle">
+    <table class="table table-sm align-middle table-bordered-body">
         <thead>
             <tr>
+                <th></th>
                 <th></th>
 
                 @foreach (InstrumentModifierViewModel m in Model.Modifiers)
@@ -38,12 +39,25 @@
                         }                    
                     </th>
                 }
+
+                @if (!ReadOnly)
+                {
+                    <th class="border-bottom-0">
+                        <button type="button" class="btn btn-outline-primary btn-sm"
+                            data-tooltip="Add modifier"
+                            @onclick="(e => Model.AddModifier())">
+                            +
+                        </button>
+                    </th>
+                }                
             </tr>
         </thead>
         <tbody>
-            @foreach (InstrumentStringViewModel s in Model.Strings)
+            @for (int i = 0; i < Model.Strings.Count; i++)
             {
+                InstrumentStringViewModel s = Model.Strings.ElementAt(i);
                 <tr>
+                    <th>@(i + 1)</th>
                     <th>
                         <InputText @bind-Value="s.Note" class="form-control form-control-sm" />
                     </th>
@@ -63,7 +77,7 @@
                                     }                                    
                                 </span>
                                 <span class="d-flex justify-content-center align-items-center @textClass">
-                                    @for (int i = 0; i < Math.Abs(o.Offset); i++)
+                                    @for (int offset = 0; offset < Math.Abs(o.Offset); offset++)
                                     {
                                         <span>
                                             @if (o.Offset < 0)
@@ -87,7 +101,7 @@
                                 </span>
                             </div>
                         </td>
-                    }
+                    }                    
                 </tr>
             }
         </tbody>
@@ -96,11 +110,11 @@
         {
             <tfoot>
                 <tr>
-                    <td>
-                        <button type="button" @onclick="(e => Model.AddString())">Add string</button>
-                    </td>
-                    <td colspan="@(Math.Max(Model.Modifiers.Count, 1))">
-                        <button type="button" @onclick="(e => Model.AddModifier())">Add modifier</button>
+                    <td class="border-bottom-0"></td>
+                    <td class="border-bottom-0">
+                        <button type="button" class="w-100 btn btn-outline-primary btn-sm" 
+                                data-tooltip="Add string"
+                                @onclick="(e => Model.AddString())">+</button>
                     </td>
                 </tr>
             </tfoot>

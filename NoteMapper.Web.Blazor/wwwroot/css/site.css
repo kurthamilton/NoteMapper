@@ -10858,6 +10858,10 @@ label.required:after {
   width: 100%;
 }
 
+.table-bordered-body tbody td {
+  border-width: 1px;
+}
+
 h1,
 .h1 {
   font-size: 2rem;
