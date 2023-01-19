@@ -25,22 +25,24 @@
                     <th>
                         @if (!ReadOnly)
                         {
-                            <div class="d-flex justify-content-between">
-                                <button class="btn btn-icon" 
-                                        data-tooltip="Move left"
-                                        @onclick="(e => MoveModifier(m, -1))">
-                                    &lt;
-                                </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm"
-                                        @onclick="(e => RemoveModifierAsync(m))">
-                                    &times;
-                                </button>
-                                <button class="btn btn-icon" 
-                                        data-tooltip="Move right"
-                                        @onclick="(e => MoveModifier(m, 1))">
-                                    &gt;
-                                </button>
-                            </div>                            
+                            <div class="d-flex justify-content-center mb-1">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary" 
+                                            data-tooltip="Move left"
+                                            @onclick="(e => MoveModifier(m, -1))">
+                                        <i class="bi bi-caret-left-square"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                            @onclick="(e => RemoveModifierAsync(m))">
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary"
+                                    data-tooltip="Move right"
+                                            @onclick="(e => MoveModifier(m, 1))">
+                                        <i class="bi bi-caret-right-square"></i>
+                                    </button>
+                                </div>
+                            </div>
                         }
                         <div>
                             <InputText @bind-Value="m.Name" class="form-control form-control-sm" />
