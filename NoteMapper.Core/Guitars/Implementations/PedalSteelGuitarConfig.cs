@@ -21,7 +21,8 @@
                 };
             }
 
-            return $"{type}|{name}|{string.Join(",", groupedOffsets.Select(x => GetModifierOffsetConfig(x[0], x[1])))}";
+            string offsetConfig = string.Join(",", groupedOffsets.Select(x => GetModifierOffsetConfig(x[0], x[1])));
+            return $"{type}|{name}|{offsetConfig}";
         }
 
         public static string GetStringConfig(string note, int frets)

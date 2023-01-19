@@ -119,7 +119,7 @@ namespace NoteMapper.Data.Cosmos.Repositories
 
                 for (int i = 0; i < entry.Instruments.Count; i++)
                 {
-                    if (entry.Instruments[i].Name == instrument.Name)
+                    if (entry.Instruments[i].UserInstrumentId == instrument.UserInstrumentId)
                     {
                         entry.Instruments[i] = instrument;
                     }
