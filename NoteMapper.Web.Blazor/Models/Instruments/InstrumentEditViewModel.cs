@@ -1,4 +1,5 @@
-﻿using NoteMapper.Core.Guitars;
+﻿using NoteMapper.Core.Extensions;
+using NoteMapper.Core.Guitars;
 
 namespace NoteMapper.Web.Blazor.Models.Instruments
 {
@@ -49,6 +50,21 @@ namespace NoteMapper.Web.Blazor.Models.Instruments
             @string.SetModifierOffsetCount(_modifiers.Count);
 
             _strings.Add(@string);
+        }
+
+        public void MoveModifier(InstrumentModifierViewModel modifier, int direction)
+        {
+            _modifiers.MoveOne(modifier, direction);
+        }
+
+        public void RemoveModifier(InstrumentModifierViewModel modifier)
+        {
+            _modifiers.Remove(modifier);
+        }
+
+        public void RemoveString(InstrumentStringViewModel @string)
+        {
+            _strings.Remove(@string);
         }
 
         public void Reset()
