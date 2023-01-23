@@ -22,6 +22,10 @@ namespace NoteMapper.Web.Blazor.Models.Instruments
 
         public string Name { get; set; } = "";
 
+        public IReadOnlyCollection<string> NoteOptions { get; set; } = Array.Empty<string>();
+
+        public IReadOnlyCollection<int> OctaveOptions { get; set; } = Array.Empty<int>();
+
         public IReadOnlyCollection<InstrumentStringViewModel> Strings => _strings;
 
         public GuitarType Type { get; }

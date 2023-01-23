@@ -10,7 +10,7 @@ namespace NoteMapper.Web.Blazor.Models.Instruments
 
         public string Note { get; set; } = "";
 
-        public int Octave { get; set; }
+        public int Octave { get; set; }        
 
         public void SetModifierOffsetCount(int count)
         {

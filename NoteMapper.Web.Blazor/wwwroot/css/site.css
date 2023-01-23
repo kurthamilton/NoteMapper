@@ -10844,6 +10844,14 @@ label.required:after {
   display: inline-block;
 }
 
+.select--notes {
+  min-width: 2.5rem;
+}
+
+.select--octaves {
+  min-width: 2rem;
+}
+
 .content-page {
   max-width: 700px;
   margin: 0 auto;
