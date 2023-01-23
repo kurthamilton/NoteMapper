@@ -4,11 +4,11 @@
     {
         public int Frets { get; set; } = 12;
 
-        public IReadOnlyCollection<UserInstrumentModifier> Modifiers { get; set; } = Array.Empty<UserInstrumentModifier>();
+        public List<UserInstrumentModifier> Modifiers { get; set; } = new();
 
         public string Name { get; set; } = "";
 
-        public IReadOnlyCollection<UserInstrumentString> Strings { get; set; } = Array.Empty<UserInstrumentString>();
+        public List<UserInstrumentString> Strings { get; set; } = new();
 
         public string Type { get; set; } = "";
 

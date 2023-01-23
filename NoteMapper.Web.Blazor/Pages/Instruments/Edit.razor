@@ -20,7 +20,13 @@
         <li class="breadcrumb-item">
             <a href="/instruments">Instruments</a>
         </li>
+        <li class="breadcrumb-item active">
+            @UserInstrument.Name
+        </li>
         <li class="breadcrumb-item active">Edit</li>
+        <li class="breadcrumb-item">
+            <a href="/instruments/@UserInstrument.UserInstrumentId/edit/modifiers">Modifiers</a>
+        </li>
     </ol>
 </nav>
 
@@ -31,6 +37,10 @@
 else
 {
     <Feedback Model="Feedback" />
+
+    <h1>@UserInstrument.Name</h1>
+    <h3>Edit</h3>
+
     <InstrumentForm Template="@UserInstrument" ButtonText="Update" OnChange="UpdateInstrumentAsync" />
 }
 

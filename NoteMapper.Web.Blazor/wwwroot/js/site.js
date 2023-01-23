@@ -45,5 +45,4 @@
 
         target.setAttribute('data-tooltip-ready', 'true');
     });
-
 })(bootstrap);

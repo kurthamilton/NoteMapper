@@ -77,10 +77,10 @@ namespace NoteMapper.Services
                     return new UserInstrumentModifier
                     {
                         Name = x.Name,
-                        Offsets = offsets.ToArray(),
+                        Offsets = offsets.ToList(),
                         Type = x.Type
                     };
-                }).ToArray(),
+                }).ToList(),
                 Name = instrument.Name, 
                 Type = instrument.Type.ToString(),
                 UserInstrumentId = Guid.NewGuid().ToString()

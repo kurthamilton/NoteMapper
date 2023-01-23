@@ -2,11 +2,11 @@
 {
     public class UserInstrumentModifier
     {
-        public IReadOnlyCollection<string>? MutuallyExclusive { get; set; }
+        public List<string>? MutuallyExclusive { get; set; }
 
         public string Name { get; set; } = "";
 
-        public IReadOnlyCollection<ModifierOffset> Offsets { get; set; } = Array.Empty<ModifierOffset>();
+        public List<ModifierOffset> Offsets { get; set; } = new();
 
         public string Type { get; set; } = "";
     }
