@@ -25,6 +25,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Data.Sql", "Note
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Data.Cosmos", "NoteMapper.Data.Cosmos\NoteMapper.Data.Cosmos.csproj", "{D33E888E-C61C-4CFA-B39A-ACCCD4F7E356}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2C2051A2-3447-4F2A-9C73-87C929EF703C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteMapper.Services.Web.Tests", "NoteMapper.Services.Web.Tests\NoteMapper.Services.Web.Tests.csproj", "{28544338-2B15-490C-BD8D-9810D2743685}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,9 +79,17 @@ Global
 		{D33E888E-C61C-4CFA-B39A-ACCCD4F7E356}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D33E888E-C61C-4CFA-B39A-ACCCD4F7E356}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D33E888E-C61C-4CFA-B39A-ACCCD4F7E356}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28544338-2B15-490C-BD8D-9810D2743685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28544338-2B15-490C-BD8D-9810D2743685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28544338-2B15-490C-BD8D-9810D2743685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28544338-2B15-490C-BD8D-9810D2743685}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7D1E1600-6555-4FFC-BF67-6D4F7984B648} = {2C2051A2-3447-4F2A-9C73-87C929EF703C}
+		{28544338-2B15-490C-BD8D-9810D2743685} = {2C2051A2-3447-4F2A-9C73-87C929EF703C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B25C582A-993F-46C0-B57B-8370273C5F46}

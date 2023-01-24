@@ -1,3 +1,4 @@
+using BlazorStrap;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using NoteMapper.Core.IO;
@@ -14,6 +15,7 @@ IServiceCollection services = builder.Services;
 services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true);
 services.AddRazorPages();
 services.AddServerSideBlazor();
+services.AddBlazorStrap();
 
 IDependencyContainer container = new DependencyContainer(services)
     .AddScoped<IFilePathResolver, FilePathResolver>()

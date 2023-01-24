@@ -96,7 +96,8 @@ namespace NoteMapper.Infrastructure
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
                 .AddScoped<IMusicTheoryService, MusicTheoryService>()
-                .AddScoped<IUserInstrumentService, UserInstrumentService>();            
+                .AddScoped<IUserInstrumentService, UserInstrumentService>()
+                .AddScoped<IUserInstrumentViewModelService, UserInstrumentViewModelService>();
         }
 
         private static void RegisterWebServices(IDependencyContainer container)

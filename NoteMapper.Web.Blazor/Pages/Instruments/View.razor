@@ -5,13 +5,16 @@
 @using NoteMapper.Core
 @using NoteMapper.Data.Core.Instruments
 @using NoteMapper.Services.Instruments
+@using NoteMapper.Services.Web.ViewModels.Instruments;
+@using NoteMapper.Services.Web;
 @using NoteMapper.Web.Blazor.Shared.Instruments
 @using NoteMapper.Web.Blazor.Shared.Shared
 
 <PageTitle>View instrument</PageTitle>
 
-@if (UserInstrument == null)
+@if (Model == null)
 {
+    <Loading />
     return;
 }
 
@@ -20,24 +23,22 @@
         <li class="breadcrumb-item">
             <a href="/instruments">Instruments</a>
         </li>
-        <li class="breadcrumb-item active">@UserInstrument.Name</li>
+        <li class="breadcrumb-item active">@Model.Name</li>
     </ol>
 </nav>
 
-@if (Loading)
-{
-    <Loading />
-}
-else
-{
-    <InstrumentForm Template="@UserInstrument" ReadOnly="true" />
-}
+<InstrumentForm Model="@Model" ReadOnly="true" />
+
+<a href="/instruments" class="btn btn-outline-secondary">Back</a>
 
 @inject NavigationManager NavigationManager
 @inject IUserInstrumentService UserInstrumentService
+@inject IUserInstrumentViewModelService UserInstrumentViewModelService
 @code {
     [Parameter]
     public string Id { get; set; } = "";
+
+    InstrumentEditViewModel? Model { get; set; }
 
     UserInstrument? UserInstrument { get; set; }
 
@@ -51,6 +52,6 @@ else
             return;
         }
 
-        Loading = false;
+        Model = UserInstrumentViewModelService.MapUserInstrumentToEditViewModel(UserInstrument);
     }
 }

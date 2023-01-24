@@ -8,7 +8,7 @@ namespace NoteMapper.Services
     {
         public GuitarBase FromUserInstrument(UserInstrument userInstrument)
         {
-            GuitarType type = Enum.Parse<GuitarType>(userInstrument.Type, true);
+            GuitarType type = userInstrument.Type;
             
             switch (type)
             {
@@ -82,7 +82,7 @@ namespace NoteMapper.Services
                     };
                 }).ToList(),
                 Name = instrument.Name, 
-                Type = instrument.Type.ToString(),
+                Type = instrument.Type,
                 UserInstrumentId = Guid.NewGuid().ToString()
             };
         }

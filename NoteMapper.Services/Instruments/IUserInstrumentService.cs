@@ -18,6 +18,8 @@ namespace NoteMapper.Services.Instruments
 
         Task<IReadOnlyCollection<GuitarBase>> GetDefaultInstrumentsAsync();
 
+        UserInstrument GetNewUserInstrument(GuitarType type);
+
         Task<IReadOnlyCollection<GuitarBase>> GetUserInstrumentsAsync(Guid userId);
 
         Task<ServiceResult> UpdateInstrumentAsync(Guid userId, UserInstrument instrument);

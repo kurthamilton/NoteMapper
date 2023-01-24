@@ -1,4 +1,4 @@
-﻿namespace NoteMapper.Web.Blazor.Models.Instruments
+﻿namespace NoteMapper.Services.Web.ViewModels.Instruments
 {
     public class StringOffsetViewModel
     {

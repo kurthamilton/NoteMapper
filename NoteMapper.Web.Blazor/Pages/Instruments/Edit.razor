@@ -5,13 +5,16 @@
 @using NoteMapper.Core
 @using NoteMapper.Data.Core.Instruments
 @using NoteMapper.Services.Instruments
+@using NoteMapper.Services.Web.ViewModels.Instruments;
+@using NoteMapper.Services.Web;
 @using NoteMapper.Web.Blazor.Shared.Instruments
 @using NoteMapper.Web.Blazor.Shared.Shared
 
 <PageTitle>Edit instrument</PageTitle>
 
-@if (UserInstrument == null)
+@if (Model == null)
 {
+    <Loading />
     return;
 }
 
@@ -21,36 +24,38 @@
             <a href="/instruments">Instruments</a>
         </li>
         <li class="breadcrumb-item active">
-            @UserInstrument.Name
-        </li>
-        <li class="breadcrumb-item active">Edit</li>
-        <li class="breadcrumb-item">
-            <a href="/instruments/@UserInstrument.UserInstrumentId/edit/modifiers">Modifiers</a>
+            @UserInstrument?.Name
         </li>
     </ol>
 </nav>
 
-@if (Loading)
-{
-    <Loading />    
-}
-else
-{
-    <Feedback Model="Feedback" />
+<Feedback Model="Feedback" />
 
-    <h1>@UserInstrument.Name</h1>
-    <h3>Edit</h3>
+<h1>Edit instrument</h1>
 
-    <InstrumentForm Template="@UserInstrument" ButtonText="Update" OnChange="UpdateInstrumentAsync" />
-}
+<EditForm Model="@Model" Context="editContext" OnValidSubmit="UpdateInstrumentAsync">
+    <InstrumentForm Model="@Model" EditContext="@editContext" />
+
+    <button class="btn btn-primary me-1">
+        Update
+    </button>
+
+    <a class="btn btn-outline-secondary" href="/instruments">
+        Cancel
+    </a>
+</EditForm>
 
 @inject NavigationManager NavigationManager
 @inject IUserInstrumentService UserInstrumentService
+@inject IUserInstrumentViewModelService UserInstrumentViewModelService
 @code {
     [Parameter]
     public Guid Id { get; set; }
 
+    InstrumentEditViewModel? Model { get; set; }
+
     Guid UserId { get; set; }
+
     UserInstrument? UserInstrument { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -71,12 +76,19 @@ else
             return;
         }
 
-        Loading = false;
+        Model = UserInstrumentViewModelService.MapUserInstrumentToEditViewModel(UserInstrument);
     }
 
-    async Task UpdateInstrumentAsync(UserInstrument userInstrument)
+    async Task UpdateInstrumentAsync()
     {
-        ServiceResult result = await UserInstrumentService.UpdateInstrumentAsync(UserId, userInstrument);
+        if (Model == null || UserInstrument == null)
+        {
+            return;
+        }
+
+        UserInstrumentViewModelService.MapEditViewModelToUserInstrument(Model, UserInstrument);
+
+        ServiceResult result = await UserInstrumentService.UpdateInstrumentAsync(UserId, UserInstrument);
         if (result.Success)
         {
             NavigationManager.NavigateTo("/instruments");

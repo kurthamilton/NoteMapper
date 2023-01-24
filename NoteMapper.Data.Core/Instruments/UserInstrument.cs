@@ -1,4 +1,6 @@
-﻿namespace NoteMapper.Data.Core.Instruments
+﻿using NoteMapper.Core.Guitars;
+
+namespace NoteMapper.Data.Core.Instruments
 {
     public class UserInstrument
     {
@@ -10,7 +12,7 @@
 
         public List<UserInstrumentString> Strings { get; set; } = new();
 
-        public string Type { get; set; } = "";
+        public GuitarType Type { get; set; }
 
         public string UserInstrumentId { get; set; } = "";
     }

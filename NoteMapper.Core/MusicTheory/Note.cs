@@ -31,6 +31,11 @@ namespace NoteMapper.Core.MusicTheory
         {
         }
 
+        public Note(string noteName, int octaveIndex)
+            : this(_notes.IndexOf(noteName), octaveIndex)
+        {
+        }
+
         /// <summary>
         /// The index of the note including the octave
         /// </summary>

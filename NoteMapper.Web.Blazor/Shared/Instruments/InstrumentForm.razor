@@ -1,7 +1,9 @@
 ﻿@using NoteMapper.Core.Guitars;
 @using NoteMapper.Core.Guitars.Implementations;
+@using NoteMapper.Core.MusicTheory
 @using NoteMapper.Data.Core.Instruments;
-@using NoteMapper.Web.Blazor.Models.Instruments;
+@using NoteMapper.Services.Web;
+@using NoteMapper.Services.Web.ViewModels.Instruments;
 
 @if (Model == null)
 {
@@ -10,297 +12,43 @@
 
 @if (!ReadOnly)
 {
-    <div class="form-inline">
-        <div class="form-group mb-3 p-0">
-            <label for="name" class="form-label">Name</label>
-            <InputText @bind-Value="Model.Name" class="form-control" />
+    <EditForm EditContext="@EditContext">
+        <div class="form-inline">
+            <div class="form-group mb-3 p-0">
+                <label for="name" class="form-label required">Name</label>
+                <InputText @bind-Value="Model.Name" class="form-control" />
+                <ValidationMessage For="() => Model.Name" />
+            </div>
         </div>
-    </div>
+    </EditForm>
 }
 else
 {
     <h3>@Model.Name</h3>
 }
 
-<table class="table table-sm align-middle table-bordered-body w-auto text-center">
-    <thead>
-        <tr>
-            <th></th>
-            <th></th>
+<BSNav IsTabs="true" Class="mb-3">
+    <BSNavItem>
+        <TabLabel>Strings</TabLabel>
+        <TabContent>
+            <InstrumentStrings Model="@Model" ReadOnly="@ReadOnly" />
+        </TabContent>
+    </BSNavItem>
+    <BSNavItem>
+        <TabLabel>Modifiers</TabLabel>
+        <TabContent>
+            <InstrumentModifiers Model="@Model" ReadOnly="@ReadOnly" />
+        </TabContent>
+    </BSNavItem>
+</BSNav>
 
-            @foreach (InstrumentModifierViewModel m in Model.Modifiers)
-            {
-                <th>
-                    @m.Name
-                </th>
-            }
-
-            @if (!ReadOnly)
-            {
-                <th>
-                </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @for (int i = 0; i < Model.Strings.Count; i++)
-        {
-            InstrumentStringViewModel s = Model.Strings.ElementAt(i);
-            <tr>
-                <td>@(i + 1)</td>
-                <td>
-                    @if (!ReadOnly)
-                    {
-                        <div class="d-flex">
-                            <InputSelect @bind-Value="s.Note" class="form-control form-control-sm select--notes">
-                                @foreach (string note in Model.NoteOptions)
-                                {
-                                    <option>@note</option>
-                                }
-                            </InputSelect>
-                            <InputSelect @bind-Value="s.Octave" class="form-control form-control-sm select--octaves">
-                                @foreach (int octave in Model.OctaveOptions)
-                                {
-                                    <option>@octave</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    }
-                    else
-                    {
-                        @s.Note
-                    }
-                </td>
-
-                @foreach (StringOffsetViewModel o in s.ModifierOffsets)
-                {
-                    string? textClass = o.Offset < 0 ? "text-danger" : o.Offset > 0 ? "text-success" : null;
-
-                    <td>
-                        <div class="d-flex justify-content-between">
-                            <span>
-                                @if (!ReadOnly)
-                                {
-                                    <button class="btn btn-icon" @onclick="(e => o.Offset--)">
-                                        <i class="bi bi-caret-left"></i>
-                                    </button>
-                                }
-                            </span>
-                            <span class="d-flex justify-content-center align-items-center @textClass">
-                                @for (int offset = 0; offset < Math.Abs(o.Offset); offset++)
-                                {
-                                    <span>
-                                        @if (o.Offset < 0)
-                                        {
-                                            <i class="bi bi-dash-circle-fill"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-plus-circle-fill"></i>
-                                        }
-                                    </span>
-                                }
-                            </span>
-                            <span>
-                                @if (!ReadOnly)
-                                {
-                                    <button class="btn btn-icon" @onclick="(e => o.Offset++)">
-                                        <i class="bi bi-caret-right"></i>
-                                    </button>
-                                }
-                            </span>
-                        </div>
-                    </td>
-                }
-
-                @if (!ReadOnly)
-                {
-                    <td>
-                        <button type="button" class="btn btn-outline-danger btn-sm"
-                                @onclick="(e => RemoveStringAsync(s))">
-                            <i class="bi bi-x-circle"></i>
-                        </button>
-                    </td>
-                }
-            </tr>
-        }
-    </tbody>
-
-    @if (!ReadOnly)
-    {
-        <tfoot>
-            <tr>
-                <td class="border-bottom-0"></td>
-                <td class="border-bottom-0">
-                    <button type="button" class="w-100 btn btn-outline-primary btn-sm"
-                        data-tooltip="Add string"
-                        @onclick="(e => Model.AddString())">
-                        &plus;
-                    </button>
-                </td>
-            </tr>
-        </tfoot>
-    }
-</table>
-
-@if (!ReadOnly)
-{
-    <button class="btn btn-primary" @onclick="HandleSubmitAsync">
-        @ButtonText
-    </button>
-}
-
-@using NoteMapper.Core.MusicTheory
-@inject IJSRuntime JsRuntime
 @code {
     [Parameter]
-    public string ButtonText { get; set; } = "";
+    public EditContext? EditContext { get; set; }
 
     [Parameter]
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public UserInstrument? Template { get; set; }
-
-    [Parameter]
-    public EventCallback<UserInstrument> OnChange { get; set; }
-
-    private InstrumentEditViewModel? Model { get; set; }
-
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        if (parameters.TryGetValue<UserInstrument?>(nameof(Template), out UserInstrument? template))
-        {
-            Model = ToViewModel(template);            
-        }
-
-        await base.SetParametersAsync(parameters);
-    }
-
-    private static IEnumerable<UserInstrumentModifier> ToUserInstrumentModifiers(InstrumentEditViewModel viewModel)
-    {
-        for (int modifierIndex = 0; modifierIndex < viewModel.Modifiers.Count; modifierIndex++)
-        {
-            InstrumentModifierViewModel modifierViewModel = viewModel.Modifiers.ElementAt(modifierIndex);
-
-            List<ModifierOffset> offsets = new();
-
-            for (int stringIndex = 0; stringIndex < viewModel.Strings.Count; stringIndex++)
-            {
-                InstrumentStringViewModel stringViewModel = viewModel.Strings.ElementAt(stringIndex);
-                StringOffsetViewModel offsetViewModel = stringViewModel.ModifierOffsets.ElementAt(modifierIndex);
-                if (offsetViewModel.Offset == 0)
-                {
-                    continue;
-                }
-
-                offsets.Add(new ModifierOffset
-                {
-                    Offset = offsetViewModel.Offset,
-                    String = stringIndex
-                });
-            }
-
-            yield return new UserInstrumentModifier
-            {
-                Name = modifierViewModel.Name,
-                Offsets = offsets,
-                Type = modifierViewModel.Type
-            };
-        }        
-    }
-
-    private static UserInstrument ToUserInstrument(InstrumentEditViewModel viewModel)
-    {
-        return new UserInstrument
-        {
-            Modifiers = ToUserInstrumentModifiers(viewModel).ToList(),
-            Name = viewModel.Name,
-            Strings = viewModel.Strings
-                .Select(x => new UserInstrumentString
-                {
-                    Note = $"{x.Note}{x.Octave}"
-                })
-                .ToList(),
-            Type = viewModel.Type.ToString(),
-            UserInstrumentId = viewModel.Id
-        };
-    }
-
-    private static InstrumentEditViewModel? ToViewModel(UserInstrument? template)
-    {
-        if (template == null)
-        {
-            return null;
-        }
-
-        GuitarType type = Enum.Parse<GuitarType>(template.Type, true);
-        InstrumentEditViewModel viewModel = new InstrumentEditViewModel(template.UserInstrumentId, type)
-        {            
-            Name = template.Name,
-            NoteOptions = Note.GetNotes(),
-            OctaveOptions = Note.GetOctaves()
-        };
-
-        for (int modifierIndex = 0; modifierIndex < template.Modifiers.Count; modifierIndex++)
-        {
-            UserInstrumentModifier modifier = template.Modifiers.ElementAt(modifierIndex);
-            InstrumentModifierViewModel modifierViewModel = new InstrumentModifierViewModel
-            {                
-                Name = modifier.Name,
-                Type = modifier.Type
-            };
-
-            viewModel.AddModifier(modifierViewModel);
-        }
-
-        for (int stringIndex = 0; stringIndex < template.Strings.Count; stringIndex++)
-        {
-            UserInstrumentString @string = template.Strings.ElementAt(stringIndex);
-
-            Note note = Note.Parse(@string.Note);
-
-            InstrumentStringViewModel stringViewModel = new InstrumentStringViewModel
-            {
-                Note = note.Name,
-                Octave = note.OctaveIndex
-            };
-
-            stringViewModel.SetModifierOffsetCount(template.Modifiers.Count);
-
-            for (int modifierIndex = 0; modifierIndex < template.Modifiers.Count; modifierIndex++)
-            {
-                UserInstrumentModifier modifier = template.Modifiers.ElementAt(modifierIndex);
-                ModifierOffset? offset = modifier.Offsets.FirstOrDefault(x => x.String == stringIndex);
-                stringViewModel.ModifierOffsets.ElementAt(modifierIndex).Offset = offset != null
-                    ? offset.Offset
-                    : 0;
-            }
-
-            viewModel.AddString(stringViewModel);
-        }
-
-        return viewModel;
-    }
-
-    private Task HandleSubmitAsync()
-    {
-        if (Model == null)
-        {
-            return Task.CompletedTask;
-        }
-
-        UserInstrument userInstrument = ToUserInstrument(Model);
-        return OnChange.InvokeAsync(userInstrument);
-    }
-
-    private async Task RemoveStringAsync(InstrumentStringViewModel s)
-    {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this string?"))
-        {
-            return;
-        }
-
-        Model?.RemoveString(s);
-    }
+    public InstrumentEditViewModel? Model { get; set; }
 }

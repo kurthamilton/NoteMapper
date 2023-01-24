@@ -11,7 +11,6 @@
 @using NoteMapper.Services
 @using NoteMapper.Services.Instruments;
 @using NoteMapper.Services.Web.StateManagement;
-@using NoteMapper.Web.Blazor.Models.Instruments;
 @using NoteMapper.Web.Blazor.Shared.Instruments;
 @using NoteMapper.Web.Blazor.Shared.Shared
 
@@ -20,74 +19,68 @@
 @if (DefaultInstruments == null || UserInstruments == null)
 {
     <Loading />
+    return;
 }
-else
-{
-    <table class="table">
-        <thead>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (GuitarBase instrument in DefaultInstruments)
+        {
             <tr>
-                <th>Name</th>
-                <th></th>
+                <td>
+                    <a href="/instruments/@instrument.Id/view">@instrument.Name</a>
+                </td>
+                <td>
+                    <a href="/instruments/create?template=@instrument.Id"
+                   class="btn btn-outline-primary btn-sm">
+                        Copy
+                    </a>
+                </td>
             </tr>
-        </thead>
+        }
+    </tbody>
+
+    @if (UserInstruments.Count > 0)
+    {
         <tbody>
-            @foreach (GuitarBase instrument in DefaultInstruments)
+            <tr>
+                <td colspan="2">
+                    <h4>Custom</h4>
+                </td>
+            </tr>
+            @foreach (GuitarBase instrument in UserInstruments)
             {
                 <tr>
                     <td>
-                        <a href="/instruments/@instrument.Id/view">@instrument.Name</a>
+                        <a href="/instruments/@instrument.Id/edit">@instrument.Name</a>
                     </td>
                     <td>
-                        <a href="/instruments/create?template=@instrument.Id" 
-                           class="btn btn-outline-primary btn-sm">
+                        <a href="/instruments/create?template=@instrument.Id"
+                   class="btn btn-outline-primary btn-sm">
                             Copy
                         </a>
+                        <button type="button" class="btn btn-outline-danger btn-sm"
+                        @onclick="(e => DeleteInstrumentAsync(instrument.Id))">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
                     </td>
                 </tr>
             }
         </tbody>
+    }
 
-        @if (UserInstruments.Count > 0)
-        {
-            <tbody>
-                <tr>
-                    <td colspan="2">
-                        <h4>Custom</h4>
-                    </td>
-                </tr>
-                @foreach (GuitarBase instrument in UserInstruments)
-                {
-                    <tr>
-                        <td>
-                            <a href="/instruments/@instrument.Id/edit">@instrument.Name</a>
-                        </td>
-                        <td>
-                            <a href="/instruments/create?template=@instrument.Id" 
-                               class="btn btn-outline-primary btn-sm">
-                                Copy
-                            </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm"
-                                    @onclick="(e => DeleteInstrumentAsync(instrument.Id))">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        }
+</table>
 
-        <tfoot>
-            <tr>
-                <td colspan="2">
-                    <a class="btn btn-primary" href="/instruments/create">
-                        Create new instrument
-                    </a>
-                </td>
-            </tr>
-        </tfoot>
-
-    </table>    
-}
+<a class="btn btn-outline-primary btn-sm" href="/instruments/create">
+    <i class="bi bi-plus-circle"></i>
+    Create new instrument
+</a>
 
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager;

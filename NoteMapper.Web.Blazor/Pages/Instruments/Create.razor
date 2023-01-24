@@ -7,12 +7,20 @@
 @using NoteMapper.Data.Core.Instruments;
 @using NoteMapper.Services.Instruments;
 @using NoteMapper.Services.Web.StateManagement;
+@using NoteMapper.Services.Web.ViewModels.Instruments;
+@using NoteMapper.Services.Web;
 @using NoteMapper.Web.Blazor.Extensions;
 @using NoteMapper.Web.Blazor.Models;
 @using NoteMapper.Web.Blazor.Shared.Instruments
 @using NoteMapper.Web.Blazor.Shared.Shared
 
 <PageTitle>Create instrument</PageTitle>
+
+@if (Model == null)
+{
+    <Loading />
+    return;
+}
 
 <nav>
     <ol class="breadcrumb">
@@ -23,20 +31,32 @@
     </ol>
 </nav>
 
-@if (Loading)
-{
-    <Loading />    
-}
-else
-{
-    <Feedback Model="Feedback" />
-    <InstrumentForm Template="@Template" ButtonText="Create" OnChange="CreateInstrumentAsync" />
-}
+<Feedback Model="Feedback" />
+
+<h1>Create new instrument</h1>
+
+<EditForm Model="@Model" OnValidSubmit="CreateInstrumentAsync" Context="editContext">
+    <DataAnnotationsValidator />
+
+    <InstrumentForm Model="@Model" EditContext="@editContext" />
+
+    <button class="btn btn-primary me-1">
+        Create
+    </button>
+
+    <a class="btn btn-outline-secondary" href="/instruments">
+        Cancel
+    </a>
+</EditForm>
 
 @inject NavigationManager NavigationManager
 @inject IUserInstrumentService UserInstrumentService
+@inject IUserInstrumentViewModelService UserInstrumentViewModelService
 @code {
+    InstrumentEditViewModel? Model { get; set; }
+
     UserInstrument? Template { get; set; }
+
     Guid UserId { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -51,28 +71,32 @@ else
         UserId = userId.Value;
 
         if (NavigationManager.TryGetQueryStringValue("template", out string template))
-        {            
+        {
             Template = await UserInstrumentService.FindUserInstrumentAsync(UserId, template);
-        }        
+        }
 
         if (Template == null)
         {
-            Template = new UserInstrument
-            {
-                Type = GuitarType.PedalSteelGuitar.ToString()
-            };            
+            Template = UserInstrumentService.GetNewUserInstrument(GuitarType.PedalSteelGuitar);
         }
         else
         {
             Template.Name += " (Copy)";
         }
 
-        Loading = false;
+        Model = UserInstrumentViewModelService.MapUserInstrumentToEditViewModel(Template);
     }
 
-    async Task CreateInstrumentAsync(UserInstrument userInstrument)
+    async Task CreateInstrumentAsync()
     {
-        ServiceResult result = await UserInstrumentService.CreateInstrumentAsync(UserId, userInstrument);
+        if (Model == null || Template == null)
+        {
+            return;
+        }
+
+        UserInstrumentViewModelService.MapEditViewModelToUserInstrument(Model, Template);
+
+        ServiceResult result = await UserInstrumentService.CreateInstrumentAsync(UserId, Template);
         if (result.Success)
         {
             NavigationManager.NavigateTo("/instruments");

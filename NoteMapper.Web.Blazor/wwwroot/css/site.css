@@ -10771,6 +10771,10 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+:focus-visible {
+  outline: none;
+}
+
 :root {
   --color-danger: var(--bs-danger);
 }

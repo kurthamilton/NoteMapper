@@ -1,5 +1,6 @@
 ﻿using NoteMapper.Core;
 using NoteMapper.Core.Guitars;
+using NoteMapper.Core.MusicTheory;
 using NoteMapper.Data.Core.Instruments;
 
 namespace NoteMapper.Services.Instruments
@@ -66,6 +67,23 @@ namespace NoteMapper.Services.Instruments
             return instruments
                 .Select(_instrumentFactory.FromUserInstrument)
                 .ToArray();
+        }
+
+        public UserInstrument GetNewUserInstrument(GuitarType type)
+        {
+            UserInstrument userInstrument = new UserInstrument
+            {                
+                Type = type
+            };
+
+            Note defaultNote = new Note(0, 0);
+
+            userInstrument.Strings.Add(new UserInstrumentString
+            {
+                Note = defaultNote.ToString()
+            });
+
+            return userInstrument;
         }
 
         public async Task<IReadOnlyCollection<GuitarBase>> GetUserInstrumentsAsync(Guid userId)
