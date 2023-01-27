@@ -1,24 +1,43 @@
-﻿<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-    <div class="@(Fluid ? "container-fluid px-4" : "container") @Class">
-        <a class="navbar-brand" href="#">Note Mapper</a>
-        
-        <ul class="navbar-nav me-auto">
+﻿@*Mobile nav*@
+<BSNavbar Class="d-sm-none" Color="BSColor.Dark" IsDark="true" Expand="Size.Small">
+    <BSContainer>
+        <BSNavbarBrand Url="/">Note Mapper</BSNavbarBrand>
+        <BSCollapse IsInNavbar="true">
+            <Toggler>
+                <BSNavbarToggle />
+            </Toggler>            
+            <Content>
+                <BSNav>
+                    <AuthorizeView>
+                        <Authorized>
+                            <BSNavItem Url="/instruments">Instruments</BSNavItem>
+                        </Authorized>
+                    </AuthorizeView>
+                    <BSNavItem Url="/about">About</BSNavItem>
+
+                    <AccountNav IsMobile="true" />
+                </BSNav>
+            </Content>
+        </BSCollapse>
+    </BSContainer>
+</BSNavbar>
+
+@*Desktop nav*@
+<BSNavbar Class="d-none d-sm-flex" Color="BSColor.Dark" IsDark="true" Expand="Size.Small">
+    <BSContainer Container="Fluid ? Container.Fluid : Container.Default" Class="@Class">
+        <BSNavbarBrand Url="/">Note Mapper</BSNavbarBrand>
+        <BSNav MarginEnd="Margins.Auto">
             <AuthorizeView>
                 <Authorized>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/instruments">Instruments</a>
-                    </li>
+                    <BSNavItem Url="/instruments">Instruments</BSNavItem>
                 </Authorized>
             </AuthorizeView>
+            <BSNavItem Url="/about">About</BSNavItem>            
+        </BSNav>
 
-            <li class="nav-item">
-                <a class="nav-link" href="/about">About</a>
-            </li>            
-        </ul>
-
-        <AccountNav />
-    </div>
-</nav>
+        <AccountNav IsMobile="false" />
+    </BSContainer>
+</BSNavbar>
 
 @code{
     [Parameter]
