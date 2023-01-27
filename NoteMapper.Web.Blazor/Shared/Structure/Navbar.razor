@@ -24,7 +24,7 @@
 
 @*Desktop nav*@
 <BSNavbar Class="d-none d-sm-flex" Color="BSColor.Dark" IsDark="true" Expand="Size.Small">
-    <BSContainer Container="Fluid ? Container.Fluid : Container.Default" Class="@Class">
+    <BSContainer Container="Fluid ? Container.Fluid : Container.Default" Class="@ContainerClass">
         <BSNavbarBrand Url="/">Note Mapper</BSNavbarBrand>
         <BSNav MarginEnd="Margins.Auto">
             <AuthorizeView>
@@ -41,8 +41,8 @@
 
 @code{
     [Parameter]
-    public bool Fluid { get; set; } = true;
+    public string? ContainerClass { get; set; }
 
     [Parameter]
-    public string? Class { get; set; }
+    public bool Fluid { get; set; } = true;    
 }
