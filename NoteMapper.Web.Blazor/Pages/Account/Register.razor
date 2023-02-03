@@ -13,6 +13,14 @@
 
 <Feedback Model="@Feedback" />
 
+@if (RegistrationType == RegistrationType.Closed)
+{
+    <div class="alert alert-danger">
+        Registration is currently closed
+    </div>
+    return;
+}
+
 @if (Feedback == null || Feedback.Type != FeedbackType.Success)
 {
     <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
@@ -30,7 +38,7 @@
                 <ValidationMessage For="() => Model.Code" />
             </div>
         }        
-
+        
         <div class="mb-3">
             <label for="email" class="form-label required">Email</label>
             <InputText id="email" @bind-Value="Model.Email" class="form-control" />
@@ -53,15 +61,7 @@
 
     protected override void OnInitialized()
     {
-        RegistrationType = IdentityService.GetRegistrationType();
-        if (RegistrationType == RegistrationType.Closed)
-        {
-            Feedback = new FeedbackViewModel
-            {
-                Message = "Registration is currently closed",
-                Type = FeedbackType.Danger
-            };
-        }
+        RegistrationType = IdentityService.GetRegistrationType();        
     }
 
     private async Task HandleValidSubmitAsync()
