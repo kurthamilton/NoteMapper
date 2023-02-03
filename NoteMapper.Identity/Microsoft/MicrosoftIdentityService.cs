@@ -182,7 +182,7 @@ namespace NoteMapper.Identity.Microsoft
             }
             else
             {
-                user = await _userRepository.CreateAsync(new User(Guid.Empty, DateTime.UtcNow, email, null));
+                user = await _userRepository.CreateAsync(new User(Guid.Empty, DateTime.UtcNow, email, null, false));
                 if (user == null)
                 {
                     return defaultErrorResult;
@@ -212,11 +212,14 @@ namespace NoteMapper.Identity.Microsoft
                 return defaultResult;
             }
 
-            IReadOnlyCollection<UserActivation> activations = await _userActivationRepository.GetAllAsync(user.UserId);
-            if (activations.Count > 0)
+            if (user.PreventEmails)
+            {
+                return defaultResult;
+            }
+            
+            if (user.ActivatedUtc == null)
             {
                 // Do not allow password reset if the user has a pending activation
-                // Activations are cleared out after the user is activated.
                 return defaultResult;
             }
 

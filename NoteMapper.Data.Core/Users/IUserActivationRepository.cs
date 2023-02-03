@@ -9,7 +9,5 @@ namespace NoteMapper.Data.Core.Users
         Task<ServiceResult> DeleteAllAsync(Guid userId);
 
         Task<UserActivation?> FindAsync(Guid userId, string code);
-
-        Task<IReadOnlyCollection<UserActivation>> GetAllAsync(Guid userId);
     }
 }

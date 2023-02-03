@@ -55,18 +55,6 @@ namespace NoteMapper.Data.Sql.Repositories.Users
             });
         }
 
-        public Task<IReadOnlyCollection<UserActivation>> GetAllAsync(Guid userId)
-        {
-            string sql = "SELECT UserId, CreatedUtc, ExpiresUtc, Code " +
-                         $"FROM {TableName} " +
-                         $"WHERE UserId = @UserId";
-
-            return ReadAsync(sql, new[]
-            {
-                GetParameter("@UserId", userId, SqlDbType.UniqueIdentifier)
-            });
-        }
-
         protected override UserActivation Map(SqlDataReader reader)
         {
             return new UserActivation(

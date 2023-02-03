@@ -2,11 +2,12 @@
 {
     public class User
     {
-        public User(Guid userId, DateTime createdUtc, string email, DateTime? activatedUtc)
+        public User(Guid userId, DateTime createdUtc, string email, DateTime? activatedUtc, bool preventEmails)
         {
             ActivatedUtc = activatedUtc;
             CreatedUtc = createdUtc;
             Email = email;
+            PreventEmails = preventEmails;
             UserId = userId;
         }
 
@@ -15,6 +16,8 @@
         public DateTime CreatedUtc { get; }
 
         public string Email { get; }
+
+        public bool PreventEmails { get; }
 
         public Guid UserId { get; }
 
