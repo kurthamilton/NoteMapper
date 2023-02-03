@@ -50,6 +50,10 @@
         </div>
     </EditForm>
 }
+else
+{
+    <button class="btn btn-outline-secondary" @onclick="() => Feedback = null">Back</button>
+}
 
 @inject IIdentityService IdentityService
 @code {

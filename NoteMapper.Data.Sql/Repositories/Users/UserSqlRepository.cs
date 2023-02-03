@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using NoteMapper.Core;
 using NoteMapper.Data.Core.Users;
+using NoteMapper.Data.Sql.Extensions;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
@@ -14,13 +15,26 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         protected override string TableName => "Users";
 
+        public Task<ServiceResult> ActivateAsync(User user)
+        {
+            string sql = $"UPDATE {TableName} " +
+                         "SET ActivatedUtc = @ActivatedUtc " +
+                         "WHERE UserId = @UserId ";
+
+            return ExecuteQueryAsync(sql, new[]
+            {
+                GetParameter("@ActivatedUtc", user.ActivatedUtc, SqlDbType.DateTime),
+                GetParameter("@UserId", user.UserId, SqlDbType.UniqueIdentifier)
+            });
+        }
+
         public Task<User?> CreateAsync(User user)
         {
             string sql = $"INSERT INTO {TableName} (CreatedUtc, Email) " +
                          "VALUES (@CreatedUtc, @Email)" +
                          "SELECT TOP 1 UserId, CreatedUtc, Email " +
                          $"FROM {TableName} " +
-                         $"WHERE UserId = SCOPE_IDENTITY()";
+                         $"WHERE Email = @Email";
 
             return ReadSingleAsync(sql, new[]
             {
@@ -42,7 +56,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<User?> FindAsync(Guid userId)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email " +
+            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc " +
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId";
 
@@ -54,9 +68,9 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<User?> FindByEmailAsync(string email)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email " +
+            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc " +
                          $"FROM {TableName} " +
-                         $"WHERE Email = email";
+                         $"WHERE Email = @Email";
 
             return ReadSingleAsync(sql, new[]
             {
@@ -68,7 +82,8 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
             return new User(reader.GetGuid(0),
                 reader.GetDateTime(1),
-                reader.GetString(2));
+                reader.GetString(2),
+                reader.GetDateTimeOrNull(3));
         }
     }
 }

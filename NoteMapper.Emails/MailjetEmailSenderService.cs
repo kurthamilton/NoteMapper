@@ -3,15 +3,19 @@ using Mailjet.Client.TransactionalEmails;
 using Mailjet.Client.TransactionalEmails.Response;
 using NoteMapper.Core;
 using NoteMapper.Services.Emails;
+using NoteMapper.Services.Logging;
 
 namespace NoteMapper.Emails
 {
     public class MailjetEmailSenderService : IEmailSenderService
     {
+        private readonly IErrorLoggingService _errorLoggingService;
         private readonly MailjetEmailSenderServiceSettings _settings;
 
-        public MailjetEmailSenderService(MailjetEmailSenderServiceSettings settings)
+        public MailjetEmailSenderService(MailjetEmailSenderServiceSettings settings,
+            IErrorLoggingService errorLoggingService)
         {
+            _errorLoggingService = errorLoggingService;
             _settings = settings;
         }
 
@@ -33,6 +37,10 @@ namespace NoteMapper.Emails
             }
             else
             {
+                string responseMessage = string.Join("; ",
+                    response.Messages.SelectMany(m => m.Errors.Select(x => x.ErrorMessage)));
+                string message = $"Error sending email: {responseMessage}";
+                await _errorLoggingService.LogErrorMessageAsync(message);
                 return ServiceResult.Failure("Error sending email");
             }
         }

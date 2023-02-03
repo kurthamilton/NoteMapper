@@ -29,7 +29,7 @@ namespace NoteMapper.Web.Blazor.Extensions
 
             if (QueryHelpers.ParseQuery(uri.Query).TryGetValue(key, out StringValues queryValue))
             {
-                value = WebUtility.UrlDecode(queryValue.ToString());
+                value = queryValue.ToString();
                 return true;
             }
 

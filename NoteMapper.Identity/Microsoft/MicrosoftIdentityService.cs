@@ -65,7 +65,14 @@ namespace NoteMapper.Identity.Microsoft
             ServiceResult passwordResult = await SetUserPasswordAsync(user.UserId, password);
             if (!passwordResult.Success)
             {
-                return ServiceResult.Failure("An error occurred when updating your password");
+                return ServiceResult.Failure("An error occurred activating your account");
+            }
+
+            user.Activate();
+            ServiceResult activateResult = await _userRepository.ActivateAsync(user);
+            if (!activateResult.Success)
+            {
+                return ServiceResult.Failure("An error occurred activating your account");
             }
 
             await _userActivationRepository.DeleteAllAsync(user.UserId);
@@ -73,11 +80,16 @@ namespace NoteMapper.Identity.Microsoft
             return ServiceResult.Successful("Your account has been activated");
         }
 
-        public async Task<ServiceResult> CanUserSignIn(Guid userId, string password)
+        public async Task<ServiceResult> CanUserSignIn(User? user, string password)
         {
             ServiceResult defaultResult = ServiceResult.Failure("Invalid email or password");
 
-            UserPassword? userPassword = await FindUserPasswordAsync(userId);
+            if (user == null || user.ActivatedUtc == null)
+            {
+                return defaultResult;
+            }
+
+            UserPassword? userPassword = await FindUserPasswordAsync(user.UserId);
             if (userPassword == null)
             {
                 return defaultResult;
@@ -148,46 +160,43 @@ namespace NoteMapper.Identity.Microsoft
             }
 
             ServiceResult defaultResult = ServiceResult.Successful($"An activation email has been sent to {email}. " +
-                "If you have already registered then login or reset your password.");
+                "If you have already registered you can login or reset your password.");
             ServiceResult defaultErrorResult = ServiceResult.Failure("An error has occurred while creating your account");
 
             User? existing = await FindUserAsync(email);
-            if (existing != null)
+            if (existing != null && existing.ActivatedUtc != null)
             {
+                // give the appearance of some work being done before returning a result
+                Thread.Sleep(500);
+
+                // activated user already exists with this email address
                 return defaultResult;
             }
 
-            DateTime createdUtc = DateTime.UtcNow;
+            User? user;
 
-            User? user = new User(Guid.Empty, createdUtc, email);            
-            user = await _userRepository.CreateAsync(user);
-            if (user == null)
+            if (existing != null)
             {
-                return defaultErrorResult;
+                // unactivated user already exists with this email address; re-send activation email
+                user = existing;
             }
-
-            string activationCode = Guid.NewGuid().ToString();
-            DateTime activationCodeExpiresUtc = createdUtc.AddMinutes(_settings.ActivationCodeExpiresAfterMinutes);
-
-            UserActivation? userActivation = new UserActivation(user.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
-            userActivation = await _userActivationRepository.CreateAsync(userActivation);
-            if (userActivation == null)
+            else
             {
-                return defaultErrorResult;
-            }
+                user = await _userRepository.CreateAsync(new User(Guid.Empty, DateTime.UtcNow, email, null));
+                if (user == null)
+                {
+                    return defaultErrorResult;
+                }
+            }            
 
             if (registrationCode != null)
             {
-                UserRegistrationCode? userRegistrationCode = new UserRegistrationCode(user.UserId, 
-                    registrationCode.RegistrationCodeId, createdUtc);
+                UserRegistrationCode? userRegistrationCode = new UserRegistrationCode(user.UserId,
+                    registrationCode.RegistrationCodeId, user.CreatedUtc);
                 await _userRegistrationCodeRepository.CreateAsync(userRegistrationCode);
             }
 
-            ServiceResult activationEmailResult = await SendActivationEmailAsync(user, userActivation);
-            if (!activationEmailResult.Success)
-            {
-                return defaultErrorResult;
-            }
+            await SendActivationEmailAsync(user);
 
             return defaultResult;
         }
@@ -320,18 +329,32 @@ namespace NoteMapper.Identity.Microsoft
             return userPassword;
         }
 
-        private Task<ServiceResult> SendActivationEmailAsync(User user, UserActivation activation)
+        private async Task<ServiceResult> SendActivationEmailAsync(User user)
         {
+            ServiceResult defaultErrorResult = ServiceResult.Failure("Your account has been created, but an error occurred sending the activation email");
+
+            DateTime createdUtc = DateTime.UtcNow;
+
+            string activationCode = Guid.NewGuid().ToString();
+            DateTime activationCodeExpiresUtc = createdUtc.AddMinutes(_settings.ActivationCodeExpiresAfterMinutes);
+
+            UserActivation? userActivation = new UserActivation(user.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
+            userActivation = await _userActivationRepository.CreateAsync(userActivation);
+            if (userActivation == null)
+            {
+                return defaultErrorResult;
+            }            
+
             string url = _settings.ActivationUrl
                 .Replace("{email}", _urlEncoder.UrlEncode(user.Email))
-                .Replace("{code}", _urlEncoder.UrlEncode(activation.Code));
+                .Replace("{code}", _urlEncoder.UrlEncode(userActivation.Code));
 
             string body = 
                 "<p>Welcome to Note Mapper</p>" +
                 "<p>Please use the link below to activate your account.</p>" +
                 @$"<p><a href=""{url}"">{url}</a></p>";
             Email email = new Email(user.Email, "Activate your Note Mapper account", body);
-            return _emailSenderService.SendEmailAsync(email);
+            return await _emailSenderService.SendEmailAsync(email);
         }
 
         private Task<ServiceResult> SendPasswordResetEmailAsync(User user, UserPasswordResetCode userPasswordResetCode)

@@ -8,7 +8,7 @@ namespace NoteMapper.Services.Users
     {
         Task<ServiceResult> ActivateUserAsync(string email, string code, string password);
 
-        Task<ServiceResult> CanUserSignIn(Guid userId, string password);
+        Task<ServiceResult> CanUserSignIn(User? user, string password);
 
         Task<UserLoginToken?> CreateLoginTokenAsync(Guid userId);
 

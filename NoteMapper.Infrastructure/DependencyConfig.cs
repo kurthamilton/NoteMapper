@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using NoteMapper.Core.Users;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Cosmos;
 using NoteMapper.Data.Cosmos.Repositories;
 using NoteMapper.Data.Sql.Repositories;
+using NoteMapper.Data.Sql.Repositories.Errors;
 using NoteMapper.Data.Sql.Repositories.Users;
 using NoteMapper.Emails;
 using NoteMapper.Identity;
@@ -14,6 +16,7 @@ using NoteMapper.Infrastructure.Extensions;
 using NoteMapper.Services;
 using NoteMapper.Services.Emails;
 using NoteMapper.Services.Instruments;
+using NoteMapper.Services.Logging;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
 using NoteMapper.Services.Web.StateManagement;
@@ -37,6 +40,7 @@ namespace NoteMapper.Infrastructure
                 {
                     ConnectionString = config.GetConnectionString("note-mapper-sql") ?? ""
                 })
+                .AddScoped<IApplicationErrorRepository, ApplicationErrorSqlRepository>()
                 .AddScoped<IRegistrationCodeRepository, RegistrationCodeRepository>()
                 .AddScoped<IUserActivationRepository, UserActivationSqlRepository>()
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
@@ -92,6 +96,9 @@ namespace NoteMapper.Infrastructure
                     FromEmail = config.GetValue("Emails.Mailjet.FromEmail"),
                     FromName = config.GetValue("Emails.Mailjet.FromName"),
                 });
+
+            container
+                .AddScoped<IErrorLoggingService, ErrorLoggingService>();
 
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()

@@ -55,8 +55,8 @@
     {
         SetLoading();
 
-        User? user = await IdentityService.FindUserAsync(Model.Email);        
-        ServiceResult result = await IdentityService.CanUserSignIn(user?.UserId ?? Guid.Empty, Model.Password);
+        User? user = await IdentityService.FindUserAsync(Model.Email);
+        ServiceResult result = await IdentityService.CanUserSignIn(user, Model.Password);
         if (user == null || !result.Success)
         {            
             SetFeedback(result);
