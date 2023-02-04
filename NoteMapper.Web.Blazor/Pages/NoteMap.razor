@@ -1,6 +1,6 @@
 ﻿@page "/"
 @inherits NoteMapperComponentBase
-@attribute [Authorize]
+
 @using System.Linq;
 @using NoteMapper.Core
 @using NoteMapper.Core.Extensions
@@ -203,19 +203,13 @@ else
     int EndFret { get; set; }
     GuitarBase? Instrument { get; set; }
     int StartFret { get; set; }
-    Guid UserId { get; set; }
+    Guid? UserId { get; set; }
     NoteMapViewModel? ViewModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Guid? userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-        {
-            NavigationManager.NavigateTo("/");
-            return;
-        }
-
-        UserId = userId.Value;
+        UserId = await GetCurrentUserIdAsync();
+        
         CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaViewModelAsync(UserId);
 
         SetCriteriaFromQueryString();

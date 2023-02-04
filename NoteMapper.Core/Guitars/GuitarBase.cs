@@ -19,6 +19,8 @@ namespace NoteMapper.Core.Guitars
 
         public abstract string Id { get; }
 
+        public int? MaxStringPairDistance { get; }
+
         public abstract string Name { get; }
 
         public GuitarStringModifierCollection Modifiers { get; }

@@ -36,7 +36,7 @@ namespace NoteMapper.Services.Instruments
             return _userInstrumentRepository.DeleteUserInstrumentAsync(userId, userInstrumentId);
         }
 
-        public async Task<GuitarBase?> FindAsync(Guid userId, string userInstrumentId)
+        public async Task<GuitarBase?> FindAsync(Guid? userId, string userInstrumentId)
         {
             UserInstrument? userInstrument = await FindUserInstrumentAsync(userId, userInstrumentId);
             return userInstrument != null
@@ -49,7 +49,7 @@ namespace NoteMapper.Services.Instruments
             return _userInstrumentRepository.FindDefaultInstrumentAsync(userInstrumentId);            
         }
 
-        public async Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId)
+        public async Task<UserInstrument?> FindUserInstrumentAsync(Guid? userId, string userInstrumentId)
         {            
             UserInstrument? @default = await FindDefaultInstrumentAsync(userInstrumentId);
             if (@default != null)
@@ -57,7 +57,12 @@ namespace NoteMapper.Services.Instruments
                 return @default;
             }
 
-            UserInstrument? userInstrument = await _userInstrumentRepository.FindUserInstrumentAsync(userId, userInstrumentId);
+            if (userId == null)
+            {
+                return null;
+            }
+
+            UserInstrument? userInstrument = await _userInstrumentRepository.FindUserInstrumentAsync(userId.Value, userInstrumentId);
             return userInstrument;
         }
 
