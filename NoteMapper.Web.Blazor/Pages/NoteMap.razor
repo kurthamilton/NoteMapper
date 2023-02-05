@@ -82,11 +82,12 @@ else
                                     @if (note != null)
                                     {
                                         <div class="d-flex align-items-center">
-                                            <span class="me-auto">@note.Note.Name</span>
-
+                                            <span class="me-auto badge bg-light text-dark">@note.Note.Name</span>
+                                            @*Force the table cell contents to filll the table cell*@
+                                            &nbsp;
                                             @if (note.Modifier != null)
                                             {
-                                                <span class="badge bg-light text-dark">@note.Modifier.Name</span>
+                                                <span class="badge bg-dark text-light">@note.Modifier.Name</span>
                                             }
                                         </div>
                                     }
