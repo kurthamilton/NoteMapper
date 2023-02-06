@@ -10834,6 +10834,9 @@ textarea.form-control-lg {
 .form-inline .form-control {
   width: auto;
 }
+.form-inline .form-label {
+  margin-bottom: 0;
+}
 
 label.required:after {
   color: var(--color-danger);

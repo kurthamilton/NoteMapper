@@ -9,6 +9,10 @@
     .form-control {
         width: auto;
     }
+
+    .form-label {
+        margin-bottom: 0;
+    }
 }
 
 label.required:after {

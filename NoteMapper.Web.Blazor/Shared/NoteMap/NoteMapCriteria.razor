@@ -9,9 +9,13 @@
     return;
 }
 
-<div class="form-inline d-block d-sm-flex">
-    <div class=form-group>
-        <label for="instrument">Instrument</label>
+@{
+    string formGroupClass = Inline ? "form-group" : "mb-3";
+}
+
+<div class="@(Inline ? "form-inline d-block d-sm-flex align-items-center" : "")">
+    <div class="@formGroupClass">
+        <label class="form-label" for="instrument">Instrument</label>
         <select class="form-control" id="instrument" value="@Model.InstrumentId" @onchange="OnInstrumentChange">
             @foreach (GuitarBase instrument in Options.DefaultInstruments)
             {
@@ -30,57 +34,62 @@
         </select>
     </div>
 
-    <div class="form-inline align-items-center">
-        <div class=form-group>
-            <label for="key">Key</label>
-            <div class="d-flex">
-                <select class="form-control" id="key" value="@Model.KeyName" @onchange="OnKeyNameChange">
-                    @foreach (string name in Options.KeyNames)
-                    {
-                        <option>@name</option>
-                    }
-                </select>
-                <select class="form-control" id="key" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
-                    @foreach (string type in Options.ScaleTypes)
-                    {
-                        <option>@type</option>
-                    }
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="type">Type</label>
-            <select class="form-control" id="type" value="@Model.Type.ToString()" @onchange="OnTypeChange">
-                @foreach (NoteMapType type in Options.Types)
+    <div class="@formGroupClass">
+        <label class="form-label" for="key">Key</label>
+        <div class="d-flex">
+            <select class="form-control" id="key" value="@Model.KeyName" @onchange="OnKeyNameChange">
+                @foreach (string name in Options.KeyNames)
                 {
-                    <option>@type.ToString()</option>
+                    <option>@name</option>
+                }
+            </select>
+            <select class="form-control" id="key" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
+                @foreach (string type in Options.ScaleTypes)
+                {
+                    <option>@type</option>
                 }
             </select>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="mode">Mode</label>
-            <select class="form-control" id="mode" value="@Model.Mode.ToString()" @onchange="OnModeChange">
-                @foreach (NoteMapMode mode in Options.Modes)
-                {
-                    <option>@mode.ToString()</option>
-                }
-            </select>
-        </div>
+    <div class="@formGroupClass">
+        <label class="form-label" for="type">Type</label>
+        <select class="form-control" id="type" value="@Model.Type.ToString()" @onchange="OnTypeChange">
+            @foreach (NoteMapType type in Options.Types)
+            {
+                <option>@type.ToString()</option>
+            }
+        </select>
+    </div>
 
-        <div class="form-group">
+    <div class="@formGroupClass">
+        <label class="form-label" for="mode">Mode</label>
+        <select class="form-control" id="mode" value="@Model.Mode.ToString()" @onchange="OnModeChange">
+            @foreach (NoteMapMode mode in Options.Modes)
+            {
+                <option>@mode.ToString()</option>
+            }
+        </select>
+    </div>
+
+    <div class="@formGroupClass">
+        @if (Inline)
+        {
             <label>&nbsp;</label>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="show-intervals" 
-                       checked="@Model.ShowIntervals" @onchange="OnShowIntervalsChange">
-                <label class="form-check-label" for="show-intervals">Show intervals</label>
-            </div>
+        }        
+
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="show-intervals"
+                   checked="@Model.ShowIntervals" @onchange="OnShowIntervalsChange">
+            <label class="form-check-label" for="show-intervals">Show intervals</label>
         </div>
     </div>
 </div>
 
 @code {
+    [Parameter]
+    public bool Inline { get; set; }
+
     [Parameter]
     public NoteMapCriteriaOptionsViewModel? Options { get; set; }
 

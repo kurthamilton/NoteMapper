@@ -25,10 +25,30 @@
 }
 else
 {
-    <div class="card mb-3">
+    <div class="card mb-3 d-none d-md-block">
         <div class="card-body">
-            <NoteMapCriteria Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
+            <NoteMapCriteria Inline="true" Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
         </div>
+    </div>
+
+    <div class="d-block d-md-none">
+        <button class="btn btn-outline-secondary" @onclick="ToggleOptions">
+            Options
+        </button>
+
+        <div class="offcanvas offcanvas-start @(OptionsVisible ? "show" : "")">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">Options</h5>
+                <button type="button" class="btn-close" @onclick="() => OptionsVisible = false"></button>
+            </div>
+            <div class="offcanvas-body">
+                <NoteMapCriteria Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
+            </div>
+        </div>
+        @if (OptionsVisible)
+        {
+            <div class="offcanvas-backdrop fade show" @onclick="() => OptionsVisible = false"></div>
+        }        
     </div>
 
     @if (Instrument != null)
@@ -115,7 +135,7 @@ else
 
             <tbody class="separator">
                 <tr>
-                    <td>&nbsp;</td>
+                    <td colspan="@((EndFret - StartFret) + 3)">&nbsp;</td>
                 </tr>
             </tbody>
 
@@ -258,6 +278,7 @@ else
     NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }    
     int EndFret { get; set; }
     GuitarBase? Instrument { get; set; }
+    bool OptionsVisible { get; set; }
     List<GuitarStringModifier> SelectedModifiers { get; } = new();
     int StartFret { get; set; }
     Guid? UserId { get; set; }
@@ -308,6 +329,11 @@ else
     {
         EndFret = zoom != null ? zoom.EndFret : 0;
         StartFret = zoom != null ? zoom.StartFret : 0;                
+    }
+
+    void ToggleOptions()
+    {
+        OptionsVisible = !OptionsVisible;
     }
 
     void SetCriteriaFromQueryString()
