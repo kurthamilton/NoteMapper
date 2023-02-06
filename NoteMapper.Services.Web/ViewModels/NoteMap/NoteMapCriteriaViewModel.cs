@@ -1,4 +1,5 @@
 ﻿using NoteMapper.Core.MusicTheory;
+using NoteMapper.Core.NoteMap;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
@@ -7,6 +8,8 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
         public string? InstrumentId { get; set; }
 
         public string? KeyName { get; set; }
+
+        public NoteMapMode Mode { get; set; } = NoteMapMode.Permutations;
 
         public string? ScaleType { get; set; }
 

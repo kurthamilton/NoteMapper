@@ -1,6 +1,7 @@
 ﻿@using NoteMapper.Core
 @using NoteMapper.Core.Guitars;
 @using NoteMapper.Core.MusicTheory
+@using NoteMapper.Core.NoteMap;
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 
 @if (Options == null)
@@ -57,6 +58,14 @@
                 }
             </select>
         </div>
+
+        <div class="form-group">
+            <label for="mode">Mode</label>
+            <select class="form-control" id="mode" value="@Model.Mode.ToString()" @onchange="OnModeChange">
+                <option>@(NoteMapMode.Permutations.ToString())</option>
+                <option>@(NoteMapMode.Manual.ToString())</option>
+            </select>
+        </div>
     </div>
 </div>
 
@@ -84,6 +93,14 @@
     Task OnKeyNameChange(ChangeEventArgs e)
     {
         Model.KeyName = (string?)e.Value;
+        return EmitChange();
+    }
+
+    Task OnModeChange(ChangeEventArgs e)
+    {
+        string value = (string?)e.Value ?? "";
+        NoteMapMode mode = Enum.Parse<NoteMapMode>(value, true);
+        Model.Mode = Enum.IsDefined<NoteMapMode>(mode) ? mode : default;
         return EmitChange();
     }
 

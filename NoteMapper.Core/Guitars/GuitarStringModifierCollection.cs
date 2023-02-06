@@ -15,6 +15,8 @@ namespace NoteMapper.Core.Guitars
         {
             _modifiers = modifiers.ToArray();
             _mutuallyExclusive = mutuallyExclusive.ToArray();
+
+            SetMutuallyExclusiveModifiers();
         }
 
         public int Count => _modifiers.Count;
@@ -27,7 +29,7 @@ namespace NoteMapper.Core.Guitars
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
+        }        
 
         public IReadOnlyCollection<IReadOnlyCollection<GuitarStringModifier>> GetPermutations()
         {
@@ -39,25 +41,26 @@ namespace NoteMapper.Core.Guitars
             List<IReadOnlyCollection<GuitarStringModifier>> modifierPermutations = new();
 
             HashSet<Permutation> invalidPermutations = new();
-            foreach (KeyValuePair<string, string> pair in _mutuallyExclusive)
+            foreach (GuitarStringModifier modifier1 in this)
             {
-                GuitarStringModifier? modifier1 = _modifiers
-                    .FirstOrDefault(x => string.Equals(x.Name, pair.Key, StringComparison.InvariantCultureIgnoreCase));
-                GuitarStringModifier? modifier2 = _modifiers
-                    .FirstOrDefault(x => string.Equals(x.Name, pair.Value, StringComparison.InvariantCultureIgnoreCase));
-
-                if (modifier1 == null || modifier2 == null)
+                foreach (GuitarStringModifier modifier2 in this)
                 {
-                    continue;
+                    if (modifier1 == modifier2)
+                    {
+                        continue;
+                    }
+
+                    if (!modifier1.IsMutuallyExclusiveWith(modifier2))
+                    {
+                        continue;
+                    }
+
+                    bool[] bits = new bool[_modifiers.Count];
+                    bits[_modifiers.IndexOf(modifier1)] = true;
+                    bits[_modifiers.IndexOf(modifier2)] = true;
+
+                    invalidPermutations.Add(new Permutation(bits));
                 }                
-
-                modifier1.IsMutuallyExclusiveWith(modifier2);
-
-                bool[] bits = new bool[_modifiers.Count];
-                bits[_modifiers.IndexOf(modifier1)] = true;
-                bits[_modifiers.IndexOf(modifier2)] = true;
-
-                invalidPermutations.Add(new Permutation(bits));
             }
 
             IReadOnlyCollection<Permutation> permutations = Permutation.GetPermutations(_modifiers.Count);
@@ -77,6 +80,24 @@ namespace NoteMapper.Core.Guitars
             _permutations = modifierPermutations;
 
             return _permutations;
+        }
+
+        private void SetMutuallyExclusiveModifiers()
+        {
+            foreach (KeyValuePair<string, string> pair in _mutuallyExclusive)
+            {
+                GuitarStringModifier? modifier1 = _modifiers
+                    .FirstOrDefault(x => string.Equals(x.Name, pair.Key, StringComparison.InvariantCultureIgnoreCase));
+                GuitarStringModifier? modifier2 = _modifiers
+                    .FirstOrDefault(x => string.Equals(x.Name, pair.Value, StringComparison.InvariantCultureIgnoreCase));
+
+                if (modifier1 == null || modifier2 == null)
+                {
+                    continue;
+                }
+
+                modifier1.SetMutuallyExclusiveWith(modifier2);                
+            }
         }
     }
 }

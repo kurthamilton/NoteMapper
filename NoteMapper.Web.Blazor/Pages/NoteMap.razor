@@ -6,6 +6,7 @@
 @using NoteMapper.Core.Extensions
 @using NoteMapper.Core.Guitars
 @using NoteMapper.Core.MusicTheory
+@using NoteMapper.Core.NoteMap;
 @using NoteMapper.Data.Core.Users;
 @using NoteMapper.Services
 @using NoteMapper.Services.Instruments;
@@ -104,92 +105,128 @@ else
                 </tr>
             </tbody>
 
-            <tbody class="modifiers">
-                <tr>
-                    <th></th>
-                    <th></th>
-
-                    @for (int i = StartFret; i <= EndFret; i++)
-                    {
-                        NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
-
-                        <td class="modifier__fret">
-                            @if (fretViewModel != null && fretViewModel.Permutations.Count > 0)
-                            {
-                                <div class="modifier__permutations">
-                                    @for (int p = 0; p < fretViewModel.Permutations.Count; p++)
-                                    {
-                                        NoteMapNotesViewModel permutation = fretViewModel.Permutations.ElementAt(p);
-                                        bool selected = fretViewModel.SelectedPermutation == permutation;
-                                        string[] cssClasses = new[]
-                                        {
-                                            selected ? "active" : ""
-                                        };
-
-                                        <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                                             @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
-                                             data-hover="modifier-f-@i-p-@p">
-                                            @if (selected)
-                                            {
-                                                @:*
-                                            }
-                                        </div>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                @:&nbsp;
-                            }
-                        </td>
-                    }
-                </tr>
-                @foreach (GuitarStringModifier modifier in Instrument.Modifiers)
-                {
-                    <tr class="modifiers__modifier">
+            @if (Criteria?.Mode == NoteMapMode.Permutations)
+            {
+                <tbody class="modifiers">
+                    <tr>
                         <th></th>
-                        <th class="modifier__name">
-                            @modifier.Name
-                        </th>
+                        <th></th>
 
                         @for (int i = StartFret; i <= EndFret; i++)
                         {
                             NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
 
-                            bool available = fretViewModel != null &&
-                            fretViewModel.AvailableModifiers.Contains(modifier.Name);
-
                             <td class="modifier__fret">
-                                <div class="inner @(available ? "enabled" : "unavailable")">
-                                    @if (fretViewModel != null && fretViewModel.Permutations.Count > 0)
-                                    {
-                                        <div class="modifier__permutations">
-                                            @for (int p = 0; p < fretViewModel.Permutations.Count; p++)
+                                @if (fretViewModel != null && fretViewModel.Permutations.Count > 0)
+                                {
+                                    <div class="modifier__permutations">
+                                        @for (int p = 0; p < fretViewModel.Permutations.Count; p++)
+                                        {
+                                            NoteMapNotesViewModel permutation = fretViewModel.Permutations.ElementAt(p);
+                                            bool selected = fretViewModel.SelectedPermutation == permutation;
+                                            string[] cssClasses = new[]
                                             {
-                                                NoteMapNotesViewModel permutation = fretViewModel.Permutations.ElementAt(p);
-                                                bool enabled = permutation.HasModifier(modifier.Name);
-                                                bool selected = fretViewModel.SelectedPermutation == permutation;
-                                                string[] cssClasses = new[]
-                                                {
-                                                    enabled ? "enabled" : "disabled",
-                                                    selected ? "active" : ""
-                                                };
+                    selected ? "active" : ""
+                            };
 
-                                                <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                                                     @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
-                                                     data-hover="modifier-f-@i-p-@p">
-                                                    &nbsp;
-                                                </div>
-                                            }
-                                        </div>
-                                    }
-                                </div>                                
+                                            <div class="modifier__permutation @string.Join(" ", cssClasses) col"
+                         @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
+                         data-hover="modifier-f-@i-p-@p">
+                                                @if (selected)
+                                                {
+                                                    @:*
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    @:&nbsp;
+                                }
                             </td>
                         }
                     </tr>
-                }
-            </tbody>
+                    @foreach (GuitarStringModifier modifier in Instrument.Modifiers)
+                    {
+                        <tr class="modifiers__modifier">
+                            <th></th>
+                            <th class="modifier__name">
+                                @modifier.Name
+                            </th>
+
+                            @for (int i = StartFret; i <= EndFret; i++)
+                            {
+                                NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
+
+                                bool available = fretViewModel != null &&
+                                fretViewModel.AvailableModifiers.Contains(modifier.Name);
+
+                                <td class="modifier__fret">
+                                    <div class="inner @(available ? "enabled" : "unavailable")">
+                                        @if (fretViewModel != null && fretViewModel.Permutations.Count > 0)
+                                        {
+                                            <div class="modifier__permutations">
+                                                @for (int p = 0; p < fretViewModel.Permutations.Count; p++)
+                                                {
+                                                    NoteMapNotesViewModel permutation = fretViewModel.Permutations.ElementAt(p);
+                                                    bool enabled = permutation.HasModifier(modifier.Name);
+                                                    bool selected = fretViewModel.SelectedPermutation == permutation;
+                                                    string[] cssClasses = new[]
+                                                    {
+                                                        enabled ? "enabled" : "disabled",
+                                                        selected ? "active" : ""
+                                                    };
+
+                                                    <div class="modifier__permutation @string.Join(" ", cssClasses) col"
+                                                        @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
+                                                        data-hover="modifier-f-@i-p-@p">
+                                                        &nbsp;
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            }
+
         </table>        
+
+        if (Criteria?.Mode == NoteMapMode.Manual)
+        {
+            <div class="d-flex">
+                @foreach (IGrouping<string, GuitarStringModifier> group in Instrument.Modifiers.GroupBy(x => x.Type))
+                {   
+                    <div class="me-1">
+                        <div>
+                            @group.Key
+                        </div>
+                        <div class="btn-group">                            
+                            @foreach (GuitarStringModifier modifier in group)
+                            {
+                                bool disabled = !modifier.CanBeUsedWith(SelectedModifiers);
+
+                                string cssClass = disabled 
+                                    ? "btn-outline-secondary"
+                                    : SelectedModifiers.Contains(modifier)
+                                    ? "btn-success"
+                                    : "btn-outline-success";                                
+
+                                <button class="btn @cssClass"
+                                    @onclick="e => ToggleSelectedModifier(modifier)"
+                                    disabled="@disabled">
+                                    @modifier.Name
+                                </button>
+                            }
+                        </div>
+                    </div>                    
+                }
+            </div>
+        }
     }
 }
 
@@ -203,6 +240,7 @@ else
     NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }    
     int EndFret { get; set; }
     GuitarBase? Instrument { get; set; }
+    List<GuitarStringModifier> SelectedModifiers { get; } = new();
     int StartFret { get; set; }
     Guid? UserId { get; set; }
     NoteMapViewModel? ViewModel { get; set; }
@@ -210,7 +248,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         UserId = await GetCurrentUserIdAsync();
-        
+
         CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaViewModelAsync(UserId);
 
         SetCriteriaFromQueryString();
@@ -228,6 +266,7 @@ else
         else if (Criteria.InstrumentId != Instrument?.Id)
         {
             Instrument = await UserInstrumentService.FindAsync(UserId, Criteria.InstrumentId);
+            SelectedModifiers.Clear();
         }
     }
 
@@ -241,7 +280,8 @@ else
         NavigationManager.SetQueryStringValues(new Dictionary<string, string?>
         {
             { "instrument", Criteria.InstrumentId },
-            { "key", Criteria.KeyName + Criteria.ScaleType }
+            { "key", Criteria.KeyName + Criteria.ScaleType },
+            { "mode", Criteria.Mode.ToString() }
         });        
     }
 
@@ -255,8 +295,10 @@ else
     {
         NavigationManager.TryGetQueryStringValue("instrument", out string instrument);
         NavigationManager.TryGetQueryStringValue("key", out string key);
+        NavigationManager.TryGetQueryStringValue("mode", out string mode);
 
-        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions, instrument, key);
+        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions, 
+            instrument, key, mode);
     }
 
     void SetPermutations()
@@ -267,10 +309,31 @@ else
             StateHasChanged();
             return;
         }
-        
+
         string key = (Criteria.KeyName + Criteria.ScaleType).Trim();
-        ViewModel = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument,
-            key, Criteria.Type);
+        NoteMapOptionsViewModel options = new NoteMapOptionsViewModel
+        {
+            Key = key,
+            Mode = Criteria.Mode,
+            Modifiers = SelectedModifiers.Select(x => x.Name).ToArray(),
+            Type = Criteria.Type
+        };
+
+        ViewModel = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument, options);
         StateHasChanged();
+    }
+
+    void ToggleSelectedModifier(GuitarStringModifier modifier)
+    {
+        if (SelectedModifiers.Contains(modifier))
+        {
+            SelectedModifiers.Remove(modifier);
+        }
+        else
+        {
+            SelectedModifiers.Add(modifier);
+        }
+
+        SetPermutations();
     }
 }

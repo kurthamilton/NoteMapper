@@ -59,15 +59,17 @@
                                 continue;
                             }
 
+                            bool isSelf = modifier == m;
+                            bool disabled = ReadOnly || isSelf;
                             bool incompatible = m.IncompatibleModifiers.Contains(modifier);
-                            string cssClass = modifier == m 
+                            string cssClass = isSelf
                                 ? "btn-outline-secondary" 
                                 : incompatible 
                                 ? "btn-danger" 
                                 : "btn-outline-danger";
-                                
-                            <button class="btn @(cssClass)"
-                                    disabled="@(ReadOnly || modifier == m)"
+                               
+                            <button class="btn @cssClass"
+                                    disabled="@disabled"
                                     @onclick="() => ToggleIncompatibleModifier(m, modifier)">
                                 @modifier.Name
                             </button>

@@ -79,6 +79,27 @@ namespace NoteMapper.Core.Guitars
             return new GuitarStringModifier(type, name, offsets);
         }
 
+        public bool CanBeUsedWith(IEnumerable<GuitarStringModifier> modifiers)
+        {
+            foreach (GuitarStringModifier mutuallyExclusiveModifier in MutuallyExclusiveModifiers)
+            {
+                if (modifiers.Contains(mutuallyExclusiveModifier))
+                {
+                    return false;
+                }
+            }
+
+            foreach (GuitarStringModifier modifier in modifiers)
+            {
+                if (MutuallyExclusiveModifiers.Contains(modifier))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public int GetOffset(GuitarString @string)
         {
             return GetOffset(@string.Index);
@@ -96,7 +117,12 @@ namespace NoteMapper.Core.Guitars
             return Offsets.ContainsKey(stringIndex);
         }
 
-        public GuitarStringModifier IsMutuallyExclusiveWith(GuitarStringModifier other)
+        public bool IsMutuallyExclusiveWith(GuitarStringModifier other)
+        {
+            return MutuallyExclusiveModifiers.Contains(other);
+        }
+
+        public GuitarStringModifier SetMutuallyExclusiveWith(GuitarStringModifier other)
         {
             if (other == this)
             {
@@ -109,7 +135,7 @@ namespace NoteMapper.Core.Guitars
             }
 
             MutuallyExclusiveModifiers.Add(other);
-            other.IsMutuallyExclusiveWith(this);
+            other.SetMutuallyExclusiveWith(this);
             return this;
         }
 
