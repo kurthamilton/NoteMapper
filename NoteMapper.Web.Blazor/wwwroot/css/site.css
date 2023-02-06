@@ -10868,6 +10868,10 @@ label.required:after {
   padding-top: 1.1rem;
 }
 
+.offcanvas {
+  max-width: 100vw;
+}
+
 .table-fixed {
   table-layout: fixed;
   width: 100%;
