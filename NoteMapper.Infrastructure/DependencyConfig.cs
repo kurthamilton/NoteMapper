@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using NoteMapper.Core.Users;
+using NoteMapper.Data.Core.Contact;
 using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Cosmos;
 using NoteMapper.Data.Cosmos.Repositories;
 using NoteMapper.Data.Sql.Repositories;
+using NoteMapper.Data.Sql.Repositories.Contact;
 using NoteMapper.Data.Sql.Repositories.Errors;
 using NoteMapper.Data.Sql.Repositories.Users;
 using NoteMapper.Emails;
@@ -19,6 +21,7 @@ using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Logging;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
+using NoteMapper.Services.Web.Contact;
 using NoteMapper.Services.Web.StateManagement;
 
 namespace NoteMapper.Infrastructure
@@ -30,7 +33,7 @@ namespace NoteMapper.Infrastructure
             RegisterData(container, config);
             RegisterIdentity(container, config);
             RegisterServices(container, config);
-            RegisterWebServices(container);
+            RegisterWebServices(container, config);
         }
 
         private static void RegisterData(IDependencyContainer container, IConfiguration config)
@@ -41,6 +44,7 @@ namespace NoteMapper.Infrastructure
                     ConnectionString = config.GetConnectionString("note-mapper-sql") ?? ""
                 })
                 .AddScoped<IApplicationErrorRepository, ApplicationErrorSqlRepository>()
+                .AddScoped<IContactRepository, ContactSqlRepository>()
                 .AddScoped<IRegistrationCodeRepository, RegistrationCodeRepository>()
                 .AddScoped<IUserActivationRepository, UserActivationSqlRepository>()
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
@@ -107,9 +111,14 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IUserInstrumentViewModelService, UserInstrumentViewModelService>();
         }
 
-        private static void RegisterWebServices(IDependencyContainer container)
+        private static void RegisterWebServices(IDependencyContainer container, IConfiguration config)
         {
             container
+                .AddScoped<IContactService, ContactService>()
+                .AddSingleton(new ContactServiceSettings
+                {
+                    ContactEmailAddress = config.GetValue("Contact.EmailAddress")
+                })
                 .AddScoped<INoteMapViewModelService, NoteMapViewModelService>();
 
             container.AddSingleton<IStateContainer>(new StateContainer());

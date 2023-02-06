@@ -2,9 +2,9 @@
 {
     public class Email
     {
-        public Email(string to, string subject, string body)
+        public Email(string to, string subject, string bodyHtml)
         {
-            BodyHtml = body;
+            BodyHtml = bodyHtml;
             Subject = subject;
             To = to;
         }

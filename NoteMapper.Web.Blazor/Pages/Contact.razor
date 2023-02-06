@@ -1,0 +1,72 @@
+﻿@page "/contact"
+@inherits NoteMapperComponentBase
+@layout ContentLayout
+@attribute [AllowAnonymous]
+@using NoteMapper.Core;
+@using NoteMapper.Data.Core.Users;
+@using NoteMapper.Services.Web.Contact;
+@using NoteMapper.Services.Web.ViewModels.Contact;
+@using NoteMapper.Web.Blazor.Shared.Layouts;
+@using NoteMapper.Web.Blazor.Shared.Shared
+
+<h1>Contact</h1>
+
+<Feedback Model="@Feedback" />
+
+@if (Model != null && Feedback == null)
+{
+    <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+
+        <fieldset disabled="@Loading">
+            @if (User == null)
+            {
+                <div class="mb-3">
+                    <label for="email" class="form-label required">Email</label>
+                    <InputText id="email" type="email" @bind-Value="Model.Email" class="form-control" />
+                    <ValidationMessage For="() => Model.Email" />
+                </div>
+            }
+            else
+            {
+                <input type="hidden" value="@User.Email" />
+            }
+
+            <div class="mb-3">
+                <label for="message" class="form-label required">Message</label>
+                <InputTextArea id="message" @bind-Value="Model.Message" class="form-control"></InputTextArea>
+                <ValidationMessage For="() => Model.Message" />
+            </div>
+
+            <button class="btn btn-primary">
+                Submit
+                <ButtonSpinner Loading="@Loading" />
+            </button>
+        </fieldset>    
+    </EditForm>
+}
+
+@inject IContactService ContactService
+@code {
+    ContactRequestViewModel? Model { get; set; } = new();
+
+    User? User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = await GetCurrentUserAsync();
+        Model = new ContactRequestViewModel
+        {
+            Email = User?.Email ?? "",
+            Message = ""
+        };
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        ServiceResult result = await ContactService.SendContactRequestAsync(Model);
+        SetFeedback(result);
+    }
+}
