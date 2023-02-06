@@ -2,10 +2,13 @@
 {
     public class Chord : NoteCollection
     {
-        private Chord(IEnumerable<Note> notes)
+        private Chord(IEnumerable<Note> notes, Scale key)
             : base(notes)
         {
+            Key = key;
         }
+
+        public override Scale Key { get; }
 
         public static Chord Parse(string key)
         {
@@ -15,7 +18,7 @@
 
             IEnumerable<Note> chordNotes = notes
                 .Select(x => scale.ElementAt(x));
-            return new Chord(chordNotes);
+            return new Chord(chordNotes, scale);
         }
 
         private static IEnumerable<int> GetChordNotes(ScaleType type)

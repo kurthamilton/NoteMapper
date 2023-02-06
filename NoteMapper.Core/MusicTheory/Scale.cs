@@ -18,6 +18,8 @@ namespace NoteMapper.Core.MusicTheory
             Type = type;
         }
 
+        public override Scale Key => this;
+
         public ScaleType Type { get; }
 
         public static Scale Parse(string key)
@@ -48,6 +50,11 @@ namespace NoteMapper.Core.MusicTheory
                 scale = null;
                 return false;
             }
+        }
+
+        public int GetInterval(string note)
+        {
+            return IndexOf(note) + 1;
         }
 
         public IEnumerable<Note> NotesBetween(int start, int end)

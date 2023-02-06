@@ -1,5 +1,6 @@
 ﻿using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
+using NoteMapper.Core.NoteMap;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
@@ -16,6 +17,12 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             KeyNames = keyNames;
             ScaleTypes = scaleTypes;
 
+            Modes = new[]
+            {
+                NoteMapMode.Permutations,
+                NoteMapMode.Manual
+            };
+
             Types = new[]
             {
                 NoteMapType.Chord
@@ -25,6 +32,8 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
         public IReadOnlyCollection<GuitarBase> DefaultInstruments { get; }
 
         public IReadOnlyCollection<string> KeyNames { get; }
+
+        public IReadOnlyCollection<NoteMapMode> Modes { get; }
 
         public IReadOnlyCollection<string> ScaleTypes { get; }
 

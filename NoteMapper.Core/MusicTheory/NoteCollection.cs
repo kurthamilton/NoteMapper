@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core.MusicTheory
 {
@@ -17,9 +18,25 @@ namespace NoteMapper.Core.MusicTheory
 
         public int Count => _notes.Count;
 
+        public abstract Scale Key { get; }
+
         public bool Contains(Note note)
         {
             return Contains(note.NoteIndex);
+        }
+
+        public int IndexOf(string name)
+        {
+            for (int i = 0; i < _notes.Count; i++)
+            {
+                Note note = _notes.ElementAt(i);
+                if (string.Equals(note.Name, name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         public IEnumerator<Note> GetEnumerator()

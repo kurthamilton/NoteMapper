@@ -2,6 +2,10 @@
 {
     public interface INoteCollection : IReadOnlyCollection<Note>
     {
+        Scale Key { get; }
+
         bool Contains(Note note);
+
+        int IndexOf(string note);
     }
 }

@@ -22,7 +22,7 @@ namespace NoteMapper.Services.Web
         }
 
         public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options,
-            string instrument, string key, string mode)
+            string instrument, string key, string mode, string intervals)
         {
             if (string.IsNullOrEmpty(instrument))
             {
@@ -42,12 +42,15 @@ namespace NoteMapper.Services.Web
                 parsedMode = NoteMapMode.Permutations;
             }
 
+            bool.TryParse(intervals, out bool parsedIntervals);
+
             return new NoteMapCriteriaViewModel
             {
                 InstrumentId = instrument,
                 KeyName = keyScale?.ElementAt(0).Name,
                 Mode = parsedMode,
                 ScaleType = keyScale?.Type.ShortName(),
+                ShowIntervals = parsedIntervals,
                 Type = NoteMapType.Chord
             };
         }
@@ -106,7 +109,7 @@ namespace NoteMapper.Services.Web
 
                 foreach (IReadOnlyCollection<GuitarStringNote?> permutation in permutations)
                 {
-                    NoteMapNotesViewModel permutationViewModel = new(permutation);
+                    NoteMapNotesViewModel permutationViewModel = new(permutation, notes.Key);
                     fretViewModel.AddPermutation(permutationViewModel);
                 }
                 

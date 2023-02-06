@@ -6,7 +6,7 @@ namespace NoteMapper.Services.Web
     public interface INoteMapViewModelService
     {
         NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options, 
-            string instrument, string key, string mode);
+            string instrument, string key, string mode, string intervals);
 
         Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId);
 

@@ -46,6 +46,8 @@ else
 
         <table class="w-100" cellpadding="0">
             <tbody class="fretboard">
+                @** STRING HEADER ROW **@
+
                 <tr class="fretboard__heading">
                     <th class="string__name" style="width: 0.001%;"></th>
                     <th class="string__name" style="width: 0.001%;"></th>
@@ -63,6 +65,8 @@ else
 
                 @for (int i = 0; i < Instrument.Strings.Count; i++)
                 {
+                    @** STRING ROW **@
+
                     GuitarString @string = Instrument.Strings.ElementAt(i);
                     <tr class="fretboard__string">
                         <td class="string__name">
@@ -76,19 +80,27 @@ else
                         {
                             NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(j);
                             NoteMapNotesViewModel? selectedPermutation = fretViewModel?.SelectedPermutation;
-                            GuitarStringNote? note = selectedPermutation?.Notes.ElementAt(i);
+                            NoteMapNoteViewModel? note = selectedPermutation?.Notes.ElementAt(i);
 
                             <td class="string__fret">
                                 <div class="inner @(note != null ? "enabled" : "disabled")">
                                     @if (note != null)
                                     {
                                         <div class="d-flex align-items-center">
-                                            <span class="me-auto badge bg-light text-dark">@note.Note.Name</span>
-                                            @*Force the table cell contents to filll the table cell*@
-                                            &nbsp;
+                                            <span class="me-auto badge bg-light text-dark">
+                                                @if (Criteria?.ShowIntervals == true)
+                                                {
+                                                    @note.Interval
+                                                }
+                                                else
+                                                {
+                                                    @note.Note
+                                                }                                                
+                                            </span>
+                                            &nbsp;@*Force the table cell contents to filll the table cell*@                                            
                                             @if (note.Modifier != null)
                                             {
-                                                <span class="badge bg-dark text-light">@note.Modifier.Name</span>
+                                                <span class="badge bg-dark text-light">@note.Modifier</span>
                                             }
                                         </div>
                                     }
@@ -99,6 +111,8 @@ else
                 }
             </tbody>
 
+            @** SEPARATOR **@
+
             <tbody class="separator">
                 <tr>
                     <td>&nbsp;</td>
@@ -108,6 +122,8 @@ else
             @if (Criteria?.Mode == NoteMapMode.Permutations)
             {
                 <tbody class="modifiers">
+                    @** MODIFIER HEADER ROW **@
+
                     <tr>
                         <th></th>
                         <th></th>
@@ -126,12 +142,12 @@ else
                                             bool selected = fretViewModel.SelectedPermutation == permutation;
                                             string[] cssClasses = new[]
                                             {
-                    selected ? "active" : ""
-                            };
+                                                selected ? "active" : ""
+                                            };
 
                                             <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                         @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
-                         data-hover="modifier-f-@i-p-@p">
+                                                @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
+                                                data-hover="modifier-f-@i-p-@p">
                                                 @if (selected)
                                                 {
                                                     @:*
@@ -149,6 +165,8 @@ else
                     </tr>
                     @foreach (GuitarStringModifier modifier in Instrument.Modifiers)
                     {
+                        @** MODIFIER ROW **@
+
                         <tr class="modifiers__modifier">
                             <th></th>
                             <th class="modifier__name">
@@ -280,8 +298,9 @@ else
         NavigationManager.SetQueryStringValues(new Dictionary<string, string?>
         {
             { "instrument", Criteria.InstrumentId },
+            { "intervals", Criteria.ShowIntervals ? "true" : null },
             { "key", Criteria.KeyName + Criteria.ScaleType },
-            { "mode", Criteria.Mode.ToString() }
+            { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : null },
         });        
     }
 
@@ -294,11 +313,12 @@ else
     void SetCriteriaFromQueryString()
     {
         NavigationManager.TryGetQueryStringValue("instrument", out string instrument);
+        NavigationManager.TryGetQueryStringValue("intervals", out string intervals);
         NavigationManager.TryGetQueryStringValue("key", out string key);
         NavigationManager.TryGetQueryStringValue("mode", out string mode);
 
         Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions, 
-            instrument, key, mode);
+            instrument, key, mode, intervals);
     }
 
     void SetPermutations()

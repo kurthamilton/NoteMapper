@@ -24,14 +24,14 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
         {
             _permutations.Add(permutation);
 
-            foreach (GuitarStringNote? note in permutation.Notes)
+            foreach (NoteMapNoteViewModel? note in permutation.Notes)
             {
-                if (note?.Modifier == null || _availableModifiers.Contains(note.Modifier.Name))
+                if (note?.Modifier == null || _availableModifiers.Contains(note.Modifier))
                 {
                     continue;
                 }
 
-                _availableModifiers.Add(note.Modifier.Name);
+                _availableModifiers.Add(note.Modifier);
             }
 
             if (SelectedPermutation == null)
