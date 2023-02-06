@@ -32,7 +32,7 @@ else
     </div>
 
     <div class="d-block d-md-none">
-        <button class="btn btn-outline-secondary" @onclick="ToggleOptions">
+        <button class="btn btn-outline-secondary btn-sm" @onclick="ToggleOptions">
             Options
         </button>
 
@@ -58,13 +58,9 @@ else
         {
             NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
             totalWidth += fretViewModel?.Permutations.Count > 0 ? fretViewModel.Permutations.Count : 1;
-        }
+        }        
 
-        <div class="d-flex justify-content-end my-3">
-            <NoteMapToolbar Instrument="@Instrument" OnChange="OnZoomChange" />
-        </div>
-
-        <table class="w-100" cellpadding="0">
+        <table class="w-100 mt-3" cellpadding="0">
             <tbody class="fretboard">
                 @** STRING HEADER ROW **@
 
@@ -135,7 +131,11 @@ else
 
             <tbody class="separator">
                 <tr>
-                    <td colspan="@((EndFret - StartFret) + 3)">&nbsp;</td>
+                    <td colspan="@((EndFret - StartFret) + 3)">
+                        <div class="d-flex my-3">
+                            <NoteMapToolbar Instrument="@Instrument" OnChange="OnZoomChange" />
+                        </div>
+                    </td>
                 </tr>
             </tbody>
 
