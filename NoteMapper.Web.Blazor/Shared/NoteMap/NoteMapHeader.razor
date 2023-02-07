@@ -1,0 +1,61 @@
+﻿@using NoteMapper.Core.Guitars;
+@using NoteMapper.Services.Web.ViewModels.NoteMap
+@using NoteMapper.Web.Blazor.Models.NoteMap;
+
+<div class="card mb-3 d-none d-md-block">
+    <div class="card-body">
+        <NoteMapCriteria Inline="true" Model="@Criteria" Options="@CriteriaOptions" 
+                         OnChange="OnCriteriaChange" />
+    </div>
+</div>
+
+<div class="d-flex">
+    <button class="btn btn-outline-secondary btn-sm me-auto d-block d-md-none"
+            @onclick="ToggleOptions">
+        Options
+    </button>
+
+    <div class="d-flex flex-grow-1 justify-content-end">
+        <NoteMapToolbar Instrument="@Instrument" OnChange="OnZoomChange" />
+    </div>
+</div>
+
+<div class="d-block d-md-none">
+    <div class="offcanvas offcanvas-start @(OptionsVisible ? "show" : "")">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Options</h5>
+            <button type="button" class="btn-close" @onclick="() => OptionsVisible = false"></button>
+        </div>
+        <div class="offcanvas-body">
+            <NoteMapCriteria Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
+        </div>
+    </div>
+    @if (OptionsVisible)
+    {
+        <div class="offcanvas-backdrop fade show" @onclick="() => OptionsVisible = false"></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public NoteMapCriteriaViewModel Criteria { get; set; } = new NoteMapCriteriaViewModel();
+
+    [Parameter]
+    public NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }
+
+    [Parameter]
+    public GuitarBase? Instrument { get; set; }
+
+    [Parameter]
+    public EventCallback<NoteMapCriteriaViewModel> OnCriteriaChange { get; set; }
+
+    [Parameter]
+    public EventCallback<NoteMapZoomViewModel?> OnZoomChange { get; set; }
+
+    bool OptionsVisible { get; set; }
+
+    void ToggleOptions()
+    {
+        OptionsVisible = !OptionsVisible;
+    }
+}

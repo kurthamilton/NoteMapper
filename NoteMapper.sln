@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Data.Cosmos", "N
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2C2051A2-3447-4F2A-9C73-87C929EF703C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteMapper.Services.Web.Tests", "NoteMapper.Services.Web.Tests\NoteMapper.Services.Web.Tests.csproj", "{28544338-2B15-490C-BD8D-9810D2743685}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Services.Web.Tests", "NoteMapper.Services.Web.Tests\NoteMapper.Services.Web.Tests.csproj", "{28544338-2B15-490C-BD8D-9810D2743685}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
