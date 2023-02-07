@@ -1,5 +1,6 @@
 ﻿@page "/instruments"
 @inherits NoteMapperComponentBase
+@layout ContentLayout
 
 <PageTitle>Instruments</PageTitle>
 
@@ -11,6 +12,7 @@
 @using NoteMapper.Services.Instruments;
 @using NoteMapper.Services.Web.StateManagement;
 @using NoteMapper.Web.Blazor.Shared.Instruments;
+@using NoteMapper.Web.Blazor.Shared.Layouts;
 @using NoteMapper.Web.Blazor.Shared.Shared
 
 <h1>Instruments</h1>
@@ -28,7 +30,7 @@
 
             @if (UserId != null)
             {
-                    <th></th>
+                <th></th>
             }            
         </tr>
     </thead>
@@ -89,6 +91,15 @@
         <i class="bi bi-plus-circle"></i>
         Create new instrument
     </a>
+}
+else
+{
+    <div class="d-flex align-items-center">
+        <a href="/account/login" class="btn btn-primary">Login</a>
+        <span class="mx-1">or</span>
+        <a href="/account/register" class="btn btn-outline-primary">Register</a>
+        <span class="mx-1">to create your own custom instrument.</span>
+    </div>
 }
 
 @inject IJSRuntime JsRuntime
