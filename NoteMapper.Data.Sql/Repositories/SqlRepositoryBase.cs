@@ -1,16 +1,20 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Sql.Repositories;
 
 namespace NoteMapper.Data.Sql
 {
     public abstract class SqlRepositoryBase<T> where T : class
     {
+        private readonly IApplicationErrorRepository _errorRepository;
         private readonly SqlRepositorySettings _settings;
 
-        protected SqlRepositoryBase(SqlRepositorySettings settings)
+        protected SqlRepositoryBase(SqlRepositorySettings settings, 
+            IApplicationErrorRepository errorRepository)
         {
+            _errorRepository = errorRepository;
             _settings = settings;
         }
 
@@ -29,8 +33,9 @@ namespace NoteMapper.Data.Sql
                         await cmd.ExecuteNonQueryAsync();
                         return ServiceResult.Successful();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        await LogExceptionAsync(ex, cmd);
                         return ServiceResult.Failure("");
                     }
                 }
@@ -39,18 +44,7 @@ namespace NoteMapper.Data.Sql
 
         protected SqlParameter GetParameter(string name, object? value, SqlDbType type)
         {
-            SqlParameter parameter = new();
-            parameter.ParameterName = name;
-
-            if (value != null)
-            {
-                parameter.Value = value;
-            }            
-            else
-            {
-                parameter.Value = DBNull.Value;
-            }
-            return parameter;
+            return SqlUtils.GetParameter(name, value, type);
         }
 
         protected abstract T Map(SqlDataReader reader);
@@ -101,11 +95,30 @@ namespace NoteMapper.Data.Sql
                     }
                     catch (Exception ex)
                     {
+                        await LogExceptionAsync(ex, cmd);
                         return default;
                     }                    
                 }
             }
         }        
+
+        private Task LogExceptionAsync(Exception ex, SqlCommand cmd)
+        {
+            if (!_settings.LogErrors)
+            {
+                return Task.CompletedTask;
+            }
+
+            ApplicationError error = new(ex);
+            error.AddProperty("Command.Sql", cmd.CommandText);
+
+            foreach (SqlParameter parameter in cmd.Parameters)
+            {
+                error.AddProperty($"Command.Parameters.{parameter.ParameterName}", parameter.Value.ToString());
+            }
+
+            return _errorRepository.CreateAsync(error);
+        }
 
         private SqlCommand GetCommand(SqlConnection conn, string sql, IEnumerable<SqlParameter> parameters)
         {

@@ -3,5 +3,7 @@
     public class SqlRepositorySettings
     {
         public string ConnectionString { get; set; } = "";
+
+        public bool LogErrors { get; set; }
     }
 }

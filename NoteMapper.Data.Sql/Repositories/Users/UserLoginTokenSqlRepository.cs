@@ -1,14 +1,16 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class UserLoginTokenSqlRepository : SqlRepositoryBase<UserLoginToken>, IUserLoginTokenRepository
     {
-        public UserLoginTokenSqlRepository(SqlRepositorySettings settings)
-            : base(settings)
+        public UserLoginTokenSqlRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository)
+            : base(settings, errorRepository)
         {
         }
 

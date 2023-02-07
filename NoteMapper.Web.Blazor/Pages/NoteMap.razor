@@ -262,10 +262,10 @@
 
         await LoadInstrumentAsync();
         SetPermutations();        
-    }    
+    }
 
     async Task LoadInstrumentAsync()
-    {
+    {        
         if (Criteria == null || string.IsNullOrEmpty(Criteria.InstrumentId))
         {
             Instrument = null;

@@ -62,7 +62,7 @@
     Guid UserId { get; set; }
 
     protected override async Task OnInitializedAsync()
-    {
+    {        
         Guid? userId = await GetCurrentUserIdAsync();
         if (userId == null)
         {

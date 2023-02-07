@@ -1,15 +1,16 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Users;
-using NoteMapper.Data.Sql.Extensions;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class UserPasswordSqlRepository : SqlRepositoryBase<UserPassword>, IUserPasswordRepository
     {
-        public UserPasswordSqlRepository(SqlRepositorySettings settings)
-            : base(settings)
+        public UserPasswordSqlRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository)
+            : base(settings, errorRepository)
         {
         }
 

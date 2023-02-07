@@ -1,14 +1,16 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class UserActivationSqlRepository : SqlRepositoryBase<UserActivation>, IUserActivationRepository
     {
-        public UserActivationSqlRepository(SqlRepositorySettings settings)
-            : base(settings)
+        public UserActivationSqlRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository)
+            : base(settings, errorRepository)
         {
         }
 

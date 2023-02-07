@@ -35,14 +35,26 @@ namespace NoteMapper.Emails
             {
                 return ServiceResult.Successful();
             }
-            else
+
+            IDictionary<string, string> data = new Dictionary<string, string>
             {
-                string responseMessage = string.Join("; ",
-                    response.Messages.SelectMany(m => m.Errors.Select(x => x.ErrorMessage)));
-                string message = $"Error sending email: {responseMessage}";
-                await _errorLoggingService.LogErrorMessageAsync(message);
-                return ServiceResult.Failure("Error sending email");
+                { "Mail.To", email.To },
+                { "Mail.Subject", email.Subject },
+                { "Mail.BodyHtml", email.BodyHtml }
+            };
+
+            for (int i = 0; i < response.Messages.Length; i++)
+            {
+                MessageResult messageResult = response.Messages[i];
+                for (int j = 0; j < messageResult.Errors.Count; j++)
+                {
+                    data.Add($"Mail.Response.Messages[{i}].Errors[{j}]", messageResult.Errors[j].ErrorMessage);
+                }
             }
+
+            await _errorLoggingService.LogErrorMessageAsync("Error sending email", data);
+
+            return ServiceResult.Failure("Error sending email");
         }
 
         private static bool IsSuccess(TransactionalEmailResponse response)

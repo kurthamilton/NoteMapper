@@ -102,7 +102,11 @@ namespace NoteMapper.Infrastructure
                 });
 
             container
-                .AddScoped<IErrorLoggingService, ErrorLoggingService>();
+                .AddScoped<IErrorLoggingService, ErrorLoggingService>()
+                .AddSingleton(new ErrorLoggingServiceSettings
+                {
+                    Enabled = config.GetBool("Logging.Enabled")
+                });
 
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()

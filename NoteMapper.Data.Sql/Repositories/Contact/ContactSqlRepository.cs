@@ -2,13 +2,15 @@
 using System.Data.SqlClient;
 using NoteMapper.Core;
 using NoteMapper.Data.Core.Contact;
+using NoteMapper.Data.Core.Errors;
 
 namespace NoteMapper.Data.Sql.Repositories.Contact
 {
     public class ContactSqlRepository : SqlRepositoryBase<ContactRequest>, IContactRepository
     {
-        public ContactSqlRepository(SqlRepositorySettings settings)
-            : base(settings)
+        public ContactSqlRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository)
+            : base(settings, errorRepository)
         {
         }
 

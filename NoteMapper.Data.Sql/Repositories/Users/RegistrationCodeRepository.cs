@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Sql.Extensions;
 
@@ -7,8 +8,9 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class RegistrationCodeRepository : SqlRepositoryBase<RegistrationCode>, IRegistrationCodeRepository
     {
-        public RegistrationCodeRepository(SqlRepositorySettings settings) 
-            : base(settings)
+        public RegistrationCodeRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository) 
+            : base(settings, errorRepository)
         {
         }
 

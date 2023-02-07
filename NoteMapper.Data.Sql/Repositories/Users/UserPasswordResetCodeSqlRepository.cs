@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class UserPasswordResetCodeSqlRepository : SqlRepositoryBase<UserPasswordResetCode>, IUserPasswordResetCodeRepository
     {
-        public UserPasswordResetCodeSqlRepository(SqlRepositorySettings settings) 
-            : base(settings)
+        public UserPasswordResetCodeSqlRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository) 
+            : base(settings, errorRepository)
         {
         }
 

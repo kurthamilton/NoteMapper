@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class UserRegistrationCodeSqlRepository : SqlRepositoryBase<UserRegistrationCode>, IUserRegistrationCodeRepository
     {
-        public UserRegistrationCodeSqlRepository(SqlRepositorySettings settings) 
-            : base(settings)
+        public UserRegistrationCodeSqlRepository(SqlRepositorySettings settings,
+            IApplicationErrorRepository errorRepository) 
+            : base(settings, errorRepository)
         {
         }
 

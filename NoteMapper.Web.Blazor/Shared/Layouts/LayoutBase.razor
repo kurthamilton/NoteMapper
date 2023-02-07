@@ -1,4 +1,5 @@
-﻿@using NoteMapper.Web.Blazor.Shared.Structure
+﻿@using NoteMapper.Web.Blazor.Shared.Logging
+@using NoteMapper.Web.Blazor.Shared.Structure
 @inherits LayoutComponentBase
 
 <PageTitle>Note Mapper</PageTitle>
@@ -10,7 +11,19 @@
     <main>
         <div class="@(Fluid ? "container-xl" : "container") @ContainerClass">
             <article class="content">
-                @ChildContent
+                <LoggingErrorBoundary>
+                    <ChildContent>
+                        @ChildContent
+                    </ChildContent>
+                    <ErrorContent>
+                        <h1 class="text-danger">Error</h1>
+                        <p class="text-danger">An error occurred while processing your request.</p>
+                        <p>
+                            The error has been logged. 
+                            Any relevant information you could send via the <a href="/contact">contact</a> page would be gratefully received.
+                        </p>
+                    </ErrorContent>
+                </LoggingErrorBoundary>
             </article>
         </div>
     </main>
