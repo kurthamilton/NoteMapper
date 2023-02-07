@@ -1,6 +1,5 @@
 ﻿@page "/instruments"
 @inherits NoteMapperComponentBase
-@attribute [Authorize]
 
 <PageTitle>Instruments</PageTitle>
 
@@ -26,7 +25,11 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th></th>
+
+            @if (UserId != null)
+            {
+                    <th></th>
+            }            
         </tr>
     </thead>
     <tbody>
@@ -36,12 +39,16 @@
                 <td>
                     <a href="/instruments/@instrument.Id/view">@instrument.Name</a>
                 </td>
-                <td>
-                    <a href="/instruments/create?template=@instrument.Id"
-                   class="btn btn-outline-primary btn-sm">
-                        Copy
-                    </a>
-                </td>
+
+                @if (UserId != null)
+                {
+                    <td>
+                        <a href="/instruments/create?template=@instrument.Id"
+                           class="btn btn-outline-primary btn-sm">
+                            Copy
+                        </a>
+                    </td>
+                }                
             </tr>
         }
     </tbody>
@@ -74,13 +81,15 @@
             }
         </tbody>
     }
-
 </table>
 
-<a class="btn btn-outline-primary btn-sm" href="/instruments/create">
-    <i class="bi bi-plus-circle"></i>
-    Create new instrument
-</a>
+@if (UserId != null)
+{
+    <a class="btn btn-outline-primary btn-sm" href="/instruments/create">
+        <i class="bi bi-plus-circle"></i>
+        Create new instrument
+    </a>
+}
 
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager;
@@ -89,34 +98,34 @@
     IReadOnlyCollection<GuitarBase>? DefaultInstruments;
     IReadOnlyCollection<GuitarBase>? UserInstruments;
 
-    Guid UserId { get; set; }
+    Guid? UserId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Guid? userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-        {
-            NavigationManager.NavigateTo("/");
-            return;
-        }
-
-        UserId = userId.Value;
+        UserId = await GetCurrentUserIdAsync();        
 
         DefaultInstruments = await UserInstrumentService.GetDefaultInstrumentsAsync();
-        UserInstruments = await UserInstrumentService.GetUserInstrumentsAsync(UserId);
+        UserInstruments = UserId != null 
+            ? await UserInstrumentService.GetUserInstrumentsAsync(UserId.Value)
+            : Array.Empty<GuitarBase>();
     }
 
     async Task DeleteInstrumentAsync(string userInstrumentId)
     {
+        if (UserId == null)
+        {
+            return;
+        }
+
         if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this instrument?"))
         {
             return;
         }        
 
-        ServiceResult result = await UserInstrumentService.DeleteInstrumentAsync(UserId, userInstrumentId);
+        ServiceResult result = await UserInstrumentService.DeleteInstrumentAsync(UserId.Value, userInstrumentId);
         if (result.Success)
         {
-            UserInstruments = await UserInstrumentService.GetUserInstrumentsAsync(UserId);
+            UserInstruments = await UserInstrumentService.GetUserInstrumentsAsync(UserId.Value);
         }
     }
 }

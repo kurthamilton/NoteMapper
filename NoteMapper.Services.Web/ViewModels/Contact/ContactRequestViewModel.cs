@@ -6,7 +6,9 @@ namespace NoteMapper.Services.Web.ViewModels.Contact
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = "";
+        public string Email { get; set; } = "";        
+
+        public bool Enabled { get; set; }
 
         [Required]
         public string Message { get; set; } = "";

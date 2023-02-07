@@ -4,6 +4,12 @@ namespace NoteMapper.Infrastructure.Extensions
 {
     public static class ConfigurationExtensions
     {
+        public static bool GetBool(this IConfiguration config, string key)
+        {
+            bool.TryParse(config[key], out bool boolValue);
+            return boolValue;
+        }
+
         public static T GetEnum<T>(this IConfiguration config, string key) where T : struct
         {
             return Enum.TryParse(config[key], true, out T value)

@@ -117,7 +117,8 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IContactService, ContactService>()
                 .AddSingleton(new ContactServiceSettings
                 {
-                    ContactEmailAddress = config.GetValue("Contact.EmailAddress")
+                    ContactEmailAddress = config.GetValue("Contact.EmailAddress"),
+                    Enabled = config.GetBool("Contact.Enabled")
                 })
                 .AddScoped<INoteMapViewModelService, NoteMapViewModelService>();
 

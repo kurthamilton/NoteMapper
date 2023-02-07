@@ -1,6 +1,8 @@
 ﻿using NoteMapper.Core;
 using NoteMapper.Data.Core.Contact;
+using NoteMapper.Data.Core.Users;
 using NoteMapper.Services.Emails;
+using NoteMapper.Services.Users;
 using NoteMapper.Services.Web.ViewModels.Contact;
 
 namespace NoteMapper.Services.Web.Contact
@@ -10,18 +12,38 @@ namespace NoteMapper.Services.Web.Contact
         private readonly IContactRepository _contactRepository;
         private readonly IEmailSenderService _emailSenderService;
         private readonly ContactServiceSettings _settings;
+        private readonly IUserLocator _userLocator;
 
         public ContactService(IContactRepository contactRepository,
             IEmailSenderService emailSenderService, 
-            ContactServiceSettings settings)
+            ContactServiceSettings settings,
+            IUserLocator userLocator)
         {
             _contactRepository = contactRepository;
             _emailSenderService = emailSenderService;
             _settings = settings;
+            _userLocator = userLocator;
+        }
+
+        public async Task<ContactRequestViewModel> GetContactRequestViewModelAsync()
+        {            
+            User? user = await _userLocator.GetCurrentUserAsync();
+
+            return new ContactRequestViewModel
+            {
+                Email = user?.Email ?? "",
+                Enabled = _settings.Enabled,
+                Message = ""
+            };
         }
 
         public async Task<ServiceResult> SendContactRequestAsync(ContactRequestViewModel request)
         {
+            if (!_settings.Enabled)
+            {
+                return ServiceResult.Failure("The contact form is currently closed");
+            }
+
             await _contactRepository.CreateAsync(new ContactRequest
             {
                 CreatedUtc = DateTime.UtcNow,
