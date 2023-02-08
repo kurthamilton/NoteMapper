@@ -122,7 +122,7 @@ namespace NoteMapper.Data.Sql
 
         private SqlCommand GetCommand(SqlConnection conn, string sql, IEnumerable<SqlParameter> parameters)
         {
-            SqlCommand cmd = new SqlCommand(sql, conn);
+            SqlCommand cmd = new(sql, conn);
             cmd.Parameters.AddRange(parameters.ToArray());
             return cmd;
         }

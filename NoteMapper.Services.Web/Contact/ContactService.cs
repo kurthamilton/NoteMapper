@@ -15,7 +15,7 @@ namespace NoteMapper.Services.Web.Contact
         private readonly IUserLocator _userLocator;
 
         public ContactService(IContactRepository contactRepository,
-            IEmailSenderService emailSenderService, 
+            IEmailSenderService emailSenderService,
             ContactServiceSettings settings,
             IUserLocator userLocator)
         {
@@ -26,7 +26,7 @@ namespace NoteMapper.Services.Web.Contact
         }
 
         public async Task<ContactRequestViewModel> GetContactRequestViewModelAsync()
-        {            
+        {
             User? user = await _userLocator.GetCurrentUserAsync();
 
             return new ContactRequestViewModel
@@ -51,11 +51,10 @@ namespace NoteMapper.Services.Web.Contact
                 Message = request.Message
             });
 
-            const string subject = "Note Mapper: New contact request";
-            string body = $"<p>From: {request.Email}</p>" +
-                          $"<p>{request.Message}</p>";
+            string subject = $"{_settings.ApplicationName}: New contact request";
+            string bodyPlain = $"From: {request.Email}" + Environment.NewLine + request.Message;
 
-            Email email = new Email(_settings.ContactEmailAddress, subject, body);
+            Email email = new(_settings.ContactEmailAddress, subject, "", bodyPlain);
             ServiceResult sendResult = await _emailSenderService.SendEmailAsync(email);
 
             return sendResult.Success

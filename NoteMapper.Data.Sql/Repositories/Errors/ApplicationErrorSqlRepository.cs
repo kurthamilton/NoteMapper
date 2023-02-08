@@ -58,9 +58,9 @@ namespace NoteMapper.Data.Sql.Repositories.Errors
                 sql = "INSERT INTO ApplicationErrorProperties (ApplicationErrorId, Name, Value) " +
                       "VALUES (@ApplicationErrorId, @Name, @Value) ";
 
-                using (SqlConnection conn = new SqlConnection(_settings.ConnectionString))
+                using (SqlConnection conn = new(_settings.ConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (SqlCommand cmd = new(sql, conn))
                     {
                         await conn.OpenAsync();
 

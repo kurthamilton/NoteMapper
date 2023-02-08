@@ -97,7 +97,7 @@
     public EventCallback<NoteMapCriteriaViewModel> OnChange { get; set; }
 
     [Parameter]
-    public NoteMapCriteriaViewModel Model { get; set; } = new NoteMapCriteriaViewModel();
+    public NoteMapCriteriaViewModel Model { get; set; } = new();
 
     protected override void OnInitialized()
     {

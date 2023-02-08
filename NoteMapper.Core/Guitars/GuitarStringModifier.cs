@@ -6,8 +6,8 @@ namespace NoteMapper.Core.Guitars
 {
     public class GuitarStringModifier
     {
-        private static Regex _parseRegex = new Regex(@"^(?<type>\w*?)\|(?<name>.+)\|(?<modifiers>.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static Regex _parseModifierRegex = new Regex(@"^(?<string>\d+)(?<offset>(\+|\-)\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);        
+        private static Regex _parseRegex = new(@"^(?<type>\w*?)\|(?<name>.+)\|(?<modifiers>.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex _parseModifierRegex = new(@"^(?<string>\d+)(?<offset>(\+|\-)\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);        
 
         private GuitarStringModifier(string type, string name, IDictionary<int, int> offsets)
         {

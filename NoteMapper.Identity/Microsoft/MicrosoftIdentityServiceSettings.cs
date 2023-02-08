@@ -8,6 +8,8 @@ namespace NoteMapper.Identity.Microsoft
 
         public string ActivationUrl { get; set; } = "";
 
+        public string ApplicationName { get; set; } = "";
+
         public int LoginTokenExpiresAfterSeconds { get; set; }
 
         public int PasswordResetCodeExpiresAfterHours { get; set; }

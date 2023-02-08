@@ -23,10 +23,10 @@ namespace NoteMapper.Core.Permutations
 
             for (int i = 0; i < numberOfPermutations; i++)
             {
-                BitArray bitArray = new BitArray(new[] { i });                
+                BitArray bitArray = new(new[] { i });                
                 bool[] array = bitArray.ToArray(numberOfOptions);
                 
-                Permutation permutation = new Permutation(array);
+                Permutation permutation = new(array);
                 permutations[i] = permutation;
             }
 

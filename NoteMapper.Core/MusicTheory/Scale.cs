@@ -6,7 +6,7 @@ namespace NoteMapper.Core.MusicTheory
 {
     public class Scale : NoteCollection
     {
-        private static readonly Regex KeyRegex = new Regex(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
+        private static readonly Regex KeyRegex = new(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
 
         private static readonly IReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>> KeyIntervals = CreateKeyIntervals();
 

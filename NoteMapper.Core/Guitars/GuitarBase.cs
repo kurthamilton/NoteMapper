@@ -147,7 +147,7 @@ namespace NoteMapper.Core.Guitars
                 usedModifiers[modifierIndex] = true;
             }
 
-            Permutation permutation = new Permutation(usedModifiers);
+            Permutation permutation = new(usedModifiers);
             return permutation;
         }
     }

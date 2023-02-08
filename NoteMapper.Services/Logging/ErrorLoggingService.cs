@@ -21,7 +21,7 @@ namespace NoteMapper.Services.Logging
 
         public Task LogErrorMessageAsync(string message, IDictionary<string, string> data)
         {
-            ApplicationError error = new ApplicationError(message);
+            ApplicationError error = new(message);
             foreach (string key in data.Keys)
             {
                 error.AddProperty(key, data[key]);
@@ -31,13 +31,13 @@ namespace NoteMapper.Services.Logging
 
         public Task LogExceptionAsync(Exception ex)
         {
-            ApplicationError error = new ApplicationError(ex);
+            ApplicationError error = new(ex);
             return LogExceptionAsync(error);
         }
 
         public Task LogExceptionAsync(Exception ex, string url)
         {
-            ApplicationError error = new ApplicationError(ex, url);
+            ApplicationError error = new(ex, url);
             return LogExceptionAsync(error);
         }
 

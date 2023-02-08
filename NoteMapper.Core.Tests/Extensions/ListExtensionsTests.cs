@@ -7,7 +7,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void SetCount_SameCount_DoesNotAlter()
         {
-            List<int> list = new List<int>
+            List<int> list = new()
             {
                 1, 2, 3
             };
@@ -23,7 +23,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void SetCount_AddItems()
         {
-            List<int> list = new List<int>
+            List<int> list = new()
             {
                 1, 2
             };
@@ -39,7 +39,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void SetCount_RemoveItems()
         {
-            List<int> list = new List<int>
+            List<int> list = new()
             {
                 1, 2, 3, 4
             };

@@ -5,7 +5,7 @@ namespace NoteMapper.Core.Guitars
 {
     public class GuitarString
     {
-        private static Regex _stringRegex = new Regex(@"^(?<note>[A-G]#?\d+)\|f=(?<startfret>\d+)\-(?<endfret>\d+)(|)?$", 
+        private static Regex _stringRegex = new(@"^(?<note>[A-G]#?\d+)\|f=(?<startfret>\d+)\-(?<endfret>\d+)(|)?$", 
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public GuitarString(int index, string openNote, int fret, IEnumerable<GuitarStringModifier> modifiers)

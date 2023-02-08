@@ -320,7 +320,7 @@
         }
 
         string key = (Criteria.KeyName + Criteria.ScaleType).Trim();
-        NoteMapOptionsViewModel options = new NoteMapOptionsViewModel
+        NoteMapOptionsViewModel options = new()
         {
             Key = key,
             Mode = Criteria.Mode,

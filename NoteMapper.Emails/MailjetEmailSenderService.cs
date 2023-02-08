@@ -23,12 +23,22 @@ namespace NoteMapper.Emails
         {
             MailjetClient client = new(_settings.ApiKey, _settings.ApiSecret);
 
-            TransactionalEmail transactionalEmail = new TransactionalEmailBuilder()
+            TransactionalEmailBuilder builder = new TransactionalEmailBuilder()
                 .WithFrom(new SendContact(_settings.FromEmail, _settings.FromName))
                 .WithSubject(email.Subject)
-                .WithHtmlPart(email.BodyHtml)
-                .WithTo(new SendContact(email.To))
-                .Build();
+                .WithTo(new SendContact(email.To));
+
+            if (!string.IsNullOrEmpty(email.BodyHtml))
+            {
+                builder = builder.WithHtmlPart(email.BodyHtml);
+            }
+
+            if (!string.IsNullOrEmpty(email.BodyText))
+            {
+                builder = builder.WithTextPart(email.BodyText);
+            }
+
+            TransactionalEmail transactionalEmail = builder.Build();
 
             TransactionalEmailResponse response = await client.SendTransactionalEmailAsync(transactionalEmail);
             if (IsSuccess(response))
@@ -36,6 +46,19 @@ namespace NoteMapper.Emails
                 return ServiceResult.Successful();
             }
 
+            await LogUnsentEmail(email, response);
+
+            return ServiceResult.Failure("Error sending email");
+        }
+
+        private static bool IsSuccess(TransactionalEmailResponse response)
+        {
+            return response.Messages
+                .All(x => string.Equals(x.Status, "success", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task LogUnsentEmail(Email email, TransactionalEmailResponse response)
+        {
             IDictionary<string, string> data = new Dictionary<string, string>
             {
                 { "Mail.To", email.To },
@@ -53,14 +76,6 @@ namespace NoteMapper.Emails
             }
 
             await _errorLoggingService.LogErrorMessageAsync("Error sending email", data);
-
-            return ServiceResult.Failure("Error sending email");
-        }
-
-        private static bool IsSuccess(TransactionalEmailResponse response)
-        {
-            return response.Messages
-                .All(x => string.Equals(x.Status, "success", StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

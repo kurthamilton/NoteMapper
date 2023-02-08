@@ -58,7 +58,7 @@ namespace NoteMapper.Services.Web.ViewModels.Instruments
         {
             InstrumentStringViewModel? previous = _strings.LastOrDefault();
 
-            InstrumentStringViewModel @string = new InstrumentStringViewModel
+            InstrumentStringViewModel @string = new()
             {
                 Note = previous?.Note ?? Note.GetNotes().First(),
                 Octave = previous?.Octave ?? Note.GetOctaves().First()

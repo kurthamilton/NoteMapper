@@ -8,7 +8,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void ToArray_LengthShorterThanBitArray_CopiesSubset()
         {
-            BitArray bitArray = new BitArray(4);
+            BitArray bitArray = new(4);
             bitArray.Set(0, true);
             bitArray.Set(1, false);
             bitArray.Set(2, true);
@@ -25,7 +25,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void ToArray_LengthEqualToBitArrayLength_CopiesSet()
         {
-            BitArray bitArray = new BitArray(4);
+            BitArray bitArray = new(4);
             bitArray.Set(0, true);
             bitArray.Set(1, false);
             bitArray.Set(2, true);
@@ -42,7 +42,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void ToArray_LengthGreaterThanBitArrayLength_CopiesSet()
         {
-            BitArray bitArray = new BitArray(4);
+            BitArray bitArray = new(4);
             bitArray.Set(0, true);
             bitArray.Set(1, false);
             bitArray.Set(2, true);
@@ -62,7 +62,7 @@ namespace NoteMapper.Core.Tests.Extensions
         [TestCase("11110", ExpectedResult = 15)]
         public static int ToInt(string bits)
         {
-            BitArray bitArray = new BitArray(bits.Length);
+            BitArray bitArray = new(bits.Length);
             for (int i = 0; i < bits.Length; i++)
             {
                 bitArray.Set(i, bits[i] == '1');

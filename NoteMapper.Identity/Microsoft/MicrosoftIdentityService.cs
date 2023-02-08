@@ -15,7 +15,7 @@ namespace NoteMapper.Identity.Microsoft
         private readonly MicrosoftIdentityServiceSettings _settings;
         private readonly IUrlEncoder _urlEncoder;
         private readonly IUserActivationRepository _userActivationRepository;
-        private readonly IUserLoginTokenRepository _userLoginTokenRepository;        
+        private readonly IUserLoginTokenRepository _userLoginTokenRepository;
         private readonly IUserPasswordRepository _userPasswordRepository;
         private readonly IUserPasswordResetCodeRepository _userPasswordResetCodeRepository;
         private readonly IUserRegistrationCodeRepository _userRegistrationCodeRepository;
@@ -24,8 +24,8 @@ namespace NoteMapper.Identity.Microsoft
         public MicrosoftIdentityService(IUserRepository userRepository, IUserActivationRepository userActivationRepository,
             MicrosoftIdentityServiceSettings settings, IPasswordHasher passwordHasher, IUserPasswordRepository userPasswordRepository,
             IUserLoginTokenRepository userLoginTokenRepository, IEmailSenderService emailSenderService,
-            IUrlEncoder urlEncoder, IRegistrationCodeRepository registrationCodeRepository, 
-            IUserPasswordResetCodeRepository userPasswordResetCodeRepository, 
+            IUrlEncoder urlEncoder, IRegistrationCodeRepository registrationCodeRepository,
+            IUserPasswordResetCodeRepository userPasswordResetCodeRepository,
             IUserRegistrationCodeRepository userRegistrationCodeRepository)
         {
             _emailSenderService = emailSenderService;
@@ -110,7 +110,7 @@ namespace NoteMapper.Identity.Microsoft
             DateTime expiresUtc = createdUtc.AddSeconds(_settings.LoginTokenExpiresAfterSeconds);
             string token = Guid.NewGuid().ToString();
 
-            UserLoginToken loginToken = new UserLoginToken(userId, createdUtc, expiresUtc, token);
+            UserLoginToken loginToken = new(userId, createdUtc, expiresUtc, token);
 
             return _userLoginTokenRepository.CreateAsync(loginToken);
         }
@@ -149,7 +149,7 @@ namespace NoteMapper.Identity.Microsoft
             RegistrationCode? registrationCode = null;
             if (registrationType == RegistrationType.InviteOnly)
             {
-                registrationCode = !string.IsNullOrEmpty(code) 
+                registrationCode = !string.IsNullOrEmpty(code)
                     ? await _registrationCodeRepository.FindAsync(code)
                     : null;
 
@@ -164,7 +164,7 @@ namespace NoteMapper.Identity.Microsoft
             ServiceResult defaultErrorResult = ServiceResult.Failure("An error has occurred while creating your account");
 
             User? existing = await FindUserAsync(email);
-            if (existing != null && existing.ActivatedUtc != null)
+            if (existing?.ActivatedUtc != null)
             {
                 // give the appearance of some work being done before returning a result
                 Thread.Sleep(500);
@@ -187,11 +187,11 @@ namespace NoteMapper.Identity.Microsoft
                 {
                     return defaultErrorResult;
                 }
-            }            
+            }
 
             if (registrationCode != null)
             {
-                UserRegistrationCode? userRegistrationCode = new UserRegistrationCode(user.UserId,
+                UserRegistrationCode userRegistrationCode = new(user.UserId,
                     registrationCode.RegistrationCodeId, user.CreatedUtc);
                 await _userRegistrationCodeRepository.CreateAsync(userRegistrationCode);
             }
@@ -216,7 +216,7 @@ namespace NoteMapper.Identity.Microsoft
             {
                 return defaultResult;
             }
-            
+
             if (user.ActivatedUtc == null)
             {
                 // Do not allow password reset if the user has a pending activation
@@ -226,7 +226,7 @@ namespace NoteMapper.Identity.Microsoft
             DateTime createdUtc = DateTime.UtcNow;
             string code = Guid.NewGuid().ToString();
             DateTime expiresUtc = createdUtc.AddHours(_settings.PasswordResetCodeExpiresAfterHours);
-            UserPasswordResetCode userPasswordResetCode = new(user.UserId, createdUtc, expiresUtc, code);            
+            UserPasswordResetCode userPasswordResetCode = new(user.UserId, createdUtc, expiresUtc, code);
 
             UserPasswordResetCode? createResult = await _userPasswordResetCodeRepository.CreateAsync(userPasswordResetCode);
             if (createResult == null)
@@ -253,7 +253,7 @@ namespace NoteMapper.Identity.Microsoft
                 return defaultResult;
             }
 
-            UserPasswordResetCode? userPasswordResetCode = await _userPasswordResetCodeRepository.FindAsync(user.UserId, code);            
+            UserPasswordResetCode? userPasswordResetCode = await _userPasswordResetCodeRepository.FindAsync(user.UserId, code);
             if (userPasswordResetCode == null ||
                 userPasswordResetCode.Code != code ||
                 userPasswordResetCode.ExpiresUtc < DateTime.UtcNow)
@@ -292,7 +292,7 @@ namespace NoteMapper.Identity.Microsoft
             string newHash = _passwordHasher.HashPassword(newPassword, newSalt);
 
             userPassword = new(userId, newHash, newSalt);
-            
+
             ServiceResult result = await _userPasswordRepository.UpdateAsync(userPassword);
             return result.Success
                 ? ServiceResult.Successful("Password updated")
@@ -332,32 +332,36 @@ namespace NoteMapper.Identity.Microsoft
             return userPassword;
         }
 
-        private async Task<ServiceResult> SendActivationEmailAsync(User user)
+        private async Task SendActivationEmailAsync(User user)
         {
-            ServiceResult defaultErrorResult = ServiceResult.Failure("Your account has been created, but an error occurred sending the activation email");
-
             DateTime createdUtc = DateTime.UtcNow;
 
             string activationCode = Guid.NewGuid().ToString();
             DateTime activationCodeExpiresUtc = createdUtc.AddMinutes(_settings.ActivationCodeExpiresAfterMinutes);
 
-            UserActivation? userActivation = new UserActivation(user.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
+            UserActivation? userActivation = new(user.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
             userActivation = await _userActivationRepository.CreateAsync(userActivation);
             if (userActivation == null)
             {
-                return defaultErrorResult;
-            }            
+                return;
+            }
 
             string url = _settings.ActivationUrl
                 .Replace("{email}", _urlEncoder.UrlEncode(user.Email))
                 .Replace("{code}", _urlEncoder.UrlEncode(userActivation.Code));
 
-            string body = 
-                "<p>Welcome to Note Mapper</p>" +
+            string bodyHtml =
+                $"<p>Welcome to {_settings.ApplicationName}</p>" +
                 "<p>Please use the link below to activate your account.</p>" +
                 @$"<p><a href=""{url}"">{url}</a></p>";
-            Email email = new Email(user.Email, "Activate your Note Mapper account", body);
-            return await _emailSenderService.SendEmailAsync(email);
+
+            string bodyPlain =
+                $"Welcome to {_settings.ApplicationName}" + Environment.NewLine +
+                $"Please activate your account here: {url}";
+
+            Email email = new(user.Email, $"Activate your {_settings.ApplicationName} account",
+                bodyHtml, bodyPlain);
+            await _emailSenderService.SendEmailAsync(email);
         }
 
         private Task<ServiceResult> SendPasswordResetEmailAsync(User user, UserPasswordResetCode userPasswordResetCode)
@@ -366,11 +370,16 @@ namespace NoteMapper.Identity.Microsoft
                 .Replace("{code}", _urlEncoder.UrlEncode(userPasswordResetCode.Code))
                 .Replace("{email}", _urlEncoder.UrlEncode(user.Email));
 
-            string body =
-                "<p>A Note Mapper password reset request has been made for this email address.</p>" +
+            string bodyHtml =
+                $"<p>A {_settings.ApplicationName} password reset request has been made for this email address.</p>" +
                 "<p>Please click on the link below to reset your password</p>" +
                 @$"<p><a href=""{url}"">{url}</a></p>";
-            Email email = new(user.Email, "Reset your Note Mapper password", body);
+
+            string bodyPlain =
+                $"A {_settings.ApplicationName} password reset request has been made for this email address." + Environment.NewLine +
+                $"Please reset your password here: {url}";
+
+            Email email = new(user.Email, $"Reset your {_settings.ApplicationName} password", bodyHtml, bodyPlain);
             return _emailSenderService.SendEmailAsync(email);
         }
 

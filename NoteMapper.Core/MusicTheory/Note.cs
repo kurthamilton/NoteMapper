@@ -5,7 +5,7 @@ namespace NoteMapper.Core.MusicTheory
 {
     public class Note
     {
-        private static readonly Regex _noteRegex = new Regex(@"^(?<name>[A-G]#?)(?<octave>\d+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _noteRegex = new(@"^(?<name>[A-G]#?)(?<octave>\d+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static IReadOnlyCollection<string> _notes = new[]
         { 

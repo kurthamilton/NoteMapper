@@ -76,12 +76,12 @@ namespace NoteMapper.Services.Instruments
 
         public UserInstrument GetNewUserInstrument(GuitarType type)
         {
-            UserInstrument userInstrument = new UserInstrument
+            UserInstrument userInstrument = new()
             {                
                 Type = type
             };
 
-            Note defaultNote = new Note(0, 0);
+            Note defaultNote = new(0, 0);
 
             userInstrument.Strings.Add(new UserInstrumentString
             {

@@ -29,7 +29,7 @@ namespace NoteMapper.Services.Web
 
         public InstrumentEditViewModel MapUserInstrumentToEditViewModel(UserInstrument userInstrument)
         {   
-            InstrumentEditViewModel viewModel = new InstrumentEditViewModel(userInstrument.UserInstrumentId, 
+            InstrumentEditViewModel viewModel = new(userInstrument.UserInstrumentId, 
                 userInstrument.Type)
             {
                 Name = userInstrument.Name
@@ -50,7 +50,7 @@ namespace NoteMapper.Services.Web
 
             foreach (InstrumentStringViewModel @string in viewModel.Strings)
             {
-                Note note = new Note(@string.Note, @string.Octave);
+                Note note = new(@string.Note, @string.Octave);
 
                 userInstrument.Strings.Add(new UserInstrumentString
                 {
@@ -117,7 +117,7 @@ namespace NoteMapper.Services.Web
             for (int i = 0; i < userInstrument.Modifiers.Count; i++)
             {
                 UserInstrumentModifier modifier = userInstrument.Modifiers.ElementAt(i);
-                InstrumentModifierViewModel viewModel = new InstrumentModifierViewModel
+                InstrumentModifierViewModel viewModel = new()
                 {
                     Name = modifier.Name,
                     Type = modifier.Type
@@ -138,7 +138,7 @@ namespace NoteMapper.Services.Web
 
                 Note note = Note.Parse(@string.Note);
 
-                InstrumentStringViewModel viewModel = new InstrumentStringViewModel
+                InstrumentStringViewModel viewModel = new()
                 {
                     Note = note.Name,
                     Octave = note.OctaveIndex

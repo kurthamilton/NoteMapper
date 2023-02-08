@@ -43,7 +43,7 @@ namespace NoteMapper.Services
                         strings.Add(PedalSteelGuitarConfig.GetStringConfig(@string.Note, userInstrument.Frets));
                     }
 
-                    PedalSteelGuitarConfig config = new PedalSteelGuitarConfig
+                    PedalSteelGuitarConfig config = new()
                     {
                         Modifiers = modifiers,
                         MutuallyExclusiveModifiers = mutuallyExclusiveModifiers,

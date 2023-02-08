@@ -37,7 +37,7 @@ namespace NoteMapper.Infrastructure
         }
 
         private static void RegisterData(IDependencyContainer container, IConfiguration config)
-        {            
+        {
             container
                 .AddSingleton(new SqlRepositorySettings
                 {
@@ -74,6 +74,7 @@ namespace NoteMapper.Infrastructure
                 {
                     ActivationCodeExpiresAfterMinutes = config.GetInt("Account.ActivationCodeExpiresAfterMinutes"),
                     ActivationUrl = baseUrl + config.GetValue("Account.ActivationUrl"),
+                    ApplicationName = config.GetValue("Application.Name"),
                     LoginTokenExpiresAfterSeconds = config.GetInt("Account.LoginTokenExpiresAfterSeconds"),
                     PasswordResetCodeExpiresAfterHours = config.GetInt("Account.PasswordResetCodeExpiresAfterHours"),
                     PasswordResetUrl = baseUrl + config.GetValue("Account.PasswordResetUrl"),
@@ -121,6 +122,7 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IContactService, ContactService>()
                 .AddSingleton(new ContactServiceSettings
                 {
+                    ApplicationName = config.GetValue("Application.Name"),
                     ContactEmailAddress = config.GetValue("Contact.EmailAddress"),
                     Enabled = config.GetBool("Contact.Enabled")
                 })
