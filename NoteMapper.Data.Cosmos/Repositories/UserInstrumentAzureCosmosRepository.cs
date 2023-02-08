@@ -1,15 +1,15 @@
-﻿using System.Diagnostics.Metrics;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Instruments;
-using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Data.Cosmos.Repositories
 {
     public class UserInstrumentAzureCosmosRepository : AzureCosmosRepositoryBase<UserInstruments>, IUserInstrumentRepository
     {
-        public UserInstrumentAzureCosmosRepository(AzureCosmosRepositorySettings settings) 
-            : base(settings)
+        public UserInstrumentAzureCosmosRepository(AzureCosmosRepositorySettings settings,
+            IApplicationErrorRepository applicationErrorRepository)
+            : base(settings, applicationErrorRepository)
         {
         }
 
@@ -37,7 +37,7 @@ namespace NoteMapper.Data.Cosmos.Repositories
 
                 entry.Instruments.Add(instrument);
                 return await UpdateAsync(container, userId.ToString(), entry);
-            }            
+            }
         }
 
         public async Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, string userInstrumentId)
@@ -103,7 +103,7 @@ namespace NoteMapper.Data.Cosmos.Repositories
                 }
 
                 return entry.Instruments.ToArray();
-            }            
+            }
         }
 
         public async Task<ServiceResult> UpdateUserInstrumentAsync(Guid userId, UserInstrument instrument)

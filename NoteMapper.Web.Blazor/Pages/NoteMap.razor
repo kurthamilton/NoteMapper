@@ -244,9 +244,9 @@
 @inject IUserInstrumentService UserInstrumentService
 @code {
     NoteMapCriteriaViewModel? Criteria { get; set; }
-    NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }    
+    NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }
     int EndFret { get; set; }
-    GuitarBase? Instrument { get; set; }    
+    GuitarBase? Instrument { get; set; }
     List<GuitarStringModifier> SelectedModifiers { get; } = new();
     int StartFret { get; set; }
     Guid? UserId { get; set; }
@@ -261,11 +261,11 @@
         SetCriteriaFromQueryString();
 
         await LoadInstrumentAsync();
-        SetPermutations();        
+        SetPermutations();
     }
 
     async Task LoadInstrumentAsync()
-    {        
+    {
         if (Criteria == null || string.IsNullOrEmpty(Criteria.InstrumentId))
         {
             Instrument = null;
@@ -290,14 +290,14 @@
             { "intervals", Criteria.ShowIntervals ? "true" : null },
             { "key", Criteria.KeyName + Criteria.ScaleType },
             { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : null },
-        });        
+        });
     }
 
     void OnZoomChange(NoteMapZoomViewModel? zoom)
     {
         EndFret = zoom != null ? zoom.EndFret : 0;
-        StartFret = zoom != null ? zoom.StartFret : 0;                
-    }    
+        StartFret = zoom != null ? zoom.StartFret : 0;
+    }
 
     void SetCriteriaFromQueryString()
     {
@@ -306,7 +306,7 @@
         NavigationManager.TryGetQueryStringValue("key", out string key);
         NavigationManager.TryGetQueryStringValue("mode", out string mode);
 
-        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions, 
+        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions,
             instrument, key, mode, intervals);
     }
 
