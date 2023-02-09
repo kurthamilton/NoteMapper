@@ -44,13 +44,10 @@
         tooltip.show();
 
         target.setAttribute('data-tooltip-ready', 'true');
-    });
+    });    
 
-    // window size    
-    window.getWindowSize = function () {
-        return {
-            height: screen.height,
-            width: screen.width
-        };
+    /* GLOBAL FUNCTIONS */
+    window.pageLoad = function () {
+
     };
 })(bootstrap);

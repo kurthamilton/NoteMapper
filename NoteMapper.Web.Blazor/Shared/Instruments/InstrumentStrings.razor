@@ -65,7 +65,7 @@
                                 <span>
                                     @if (!ReadOnly)
                                     {
-                                        <button class="btn btn-icon" @onclick="(e => o.Offset--)">
+                                        <button class="btn btn-icon" @onclick="(e => o.Offset--)" type="button">
                                             <i class="bi bi-caret-left"></i>
                                         </button>
                                     }
@@ -88,7 +88,7 @@
                                 <span>
                                     @if (!ReadOnly)
                                     {
-                                        <button class="btn btn-icon" @onclick="(e => o.Offset++)">
+                                        <button class="btn btn-icon" @onclick="(e => o.Offset++)" type="button">
                                             <i class="bi bi-caret-right"></i>
                                         </button>
                                     }

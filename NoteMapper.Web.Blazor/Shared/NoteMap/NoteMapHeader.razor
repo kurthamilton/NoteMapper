@@ -1,10 +1,11 @@
-﻿@using NoteMapper.Core.Guitars;
+﻿@using NoteMapper.Core.Guitars
 @using NoteMapper.Services.Web.ViewModels.NoteMap
-@using NoteMapper.Web.Blazor.Models.NoteMap;
+@using NoteMapper.Web.Blazor.Models.NoteMap
+@using NoteMapper.Web.Blazor.Shared.Shared
 
 <div class="card mb-3 d-none d-md-block">
     <div class="card-body">
-        <NoteMapCriteria Inline="true" Model="@Criteria" Options="@CriteriaOptions" 
+        <NoteMapCriteria Inline="true" Model="@Criteria" Options="@CriteriaOptions"
                          OnChange="OnCriteriaChange" />
     </div>
 </div>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using NoteMapper.Core;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Services.Users;
@@ -17,6 +18,9 @@ namespace NoteMapper.Web.Blazor.Pages
         protected IIdentityService IdentityService { get; set; }
 
         [Inject]
+        protected IJSRuntime JsRuntime { get; set; }
+
+        [Inject]
         protected IUserLocator UserLocator { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
@@ -28,6 +32,16 @@ namespace NoteMapper.Web.Blazor.Pages
         protected Task<Guid?> GetCurrentUserIdAsync()
         {
             return UserLocator.GetCurrentUserIdAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JsRuntime.InvokeVoidAsync("pageLoad");
+            }
+            
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         protected void SetFeedback(ServiceResult result) 

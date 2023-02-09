@@ -1,4 +1,5 @@
 ﻿@page "/account/activate"
+@inherits NoteMapperComponentBase
 @layout ContentLayout
 @attribute [AllowAnonymous]
 @using NoteMapper.Core
@@ -36,14 +37,11 @@ else
     </EditForm>
 }
 
-@inject IIdentityService IdentityService
 @inject NavigationManager NavigationManager
 @code {
     string Code { get; set; } = "";
 
     string Email { get; set; } = "";
-
-    FeedbackViewModel? Feedback { get; set; }
 
     ActivateViewModel Model { get; set; } = new();
 

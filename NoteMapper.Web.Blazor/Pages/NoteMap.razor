@@ -9,6 +9,7 @@
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Extensions
 @using NoteMapper.Web.Blazor.Models.NoteMap
+@using NoteMapper.Web.Blazor.Models.Tour;
 @using NoteMapper.Web.Blazor.Shared.NoteMap
 @using NoteMapper.Web.Blazor.Shared.Shared
 
@@ -32,14 +33,23 @@
         totalWidth += fretViewModel?.Permutations.Count > 0 ? fretViewModel.Permutations.Count : 1;
     }
 
-    <div class="table-responsive">
-        <table class="mt-3" cellpadding="0">
-            <tbody class="fretboard">
-                @** STRING HEADER ROW **@
+    bool noteTourStepShown = false;
+    bool activeCombinationStepShown = false;
 
+    <div class="table-responsive">
+        <table class="mt-3" cellpadding="0">                
+            <tbody class="fretboard"
+                    data-nm-tour-container="note-map-fretboard"
+                    @attributes="FretboardTourStep">
+                @** STRING HEADER ROW **@
                 <tr class="fretboard__heading">
-                    <th class="string__name" style="width: 0.001%;"></th>
-                    <th class="string__name" style="width: 0.001%;"></th>
+                    <th class="string__name" style="width: 0.001%;" colspan="2">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <button class="btn btn-icon" data-nm-tour-for="note-map-fretboard" type="button">
+                                <i class="icon bi bi-question-circle"></i>
+                            </button>
+                        </div>
+                    </th>
                     @for (int i = StartFret; i <= EndFret; i++)
                     {
                         NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
@@ -52,7 +62,7 @@
                 </tr>
 
                 @for (int i = 0; i < Instrument.Strings.Count; i++)
-                {
+                {                                                
                     @** STRING ROW **@
 
                     GuitarString @string = Instrument.Strings.ElementAt(i);
@@ -70,12 +80,30 @@
                             NoteMapNotesViewModel? selectedPermutation = fretViewModel?.SelectedPermutation;
                             NoteMapNoteViewModel? note = selectedPermutation?.Notes.ElementAt(i);
 
+                            TourStepAttributes? tourStep = null;
+                            TourStepAttributes? noteStep = null;
+                            TourStepAttributes? modifierStep = null;
+                            if (!noteTourStepShown && 
+                                note != null && 
+                                !string.IsNullOrEmpty(note.Modifier))
+                            {
+                                tourStep = new TourStepAttributes(FretboardTourStep.Step + 1, FretboardTourStep.Title,
+                                    "Available notes are highlighted", true);
+                                noteStep = new TourStepAttributes(tourStep.Step + 1, FretboardTourStep.Title,
+                                    "The note or interval is shown here", true);
+                                modifierStep = new TourStepAttributes(noteStep.Step + 1, FretboardTourStep.Title,
+                                    "The modifier (pedal or lever) is shown here", true);
+                                noteTourStepShown = true;
+                            }
+                            
                             <td class="string__fret">
-                                <div class="inner @(note != null ? "enabled" : "disabled")">
+                                <div class="inner @(note != null ? "enabled" : "disabled")"
+                                        @attributes="@tourStep">
                                     @if (note != null)
                                     {
                                         <div class="d-flex align-items-center">
-                                            <span class="me-auto badge bg-light text-dark">
+                                            <span class="me-auto badge bg-light text-dark"
+                                                @attributes="@noteStep">
                                                 @if (Criteria?.ShowIntervals == true)
                                                 {
                                                     @note.Interval
@@ -88,7 +116,9 @@
                                             &nbsp;@*Force the table cell contents to filll the table cell*@
                                             @if (note.Modifier != null)
                                             {
-                                                <span class="badge bg-dark text-light">@note.Modifier</span>
+                                                <span class="badge bg-dark text-light" @attributes="@modifierStep">
+                                                    @note.Modifier
+                                                </span>
                                             }
                                         </div>
                                     }
@@ -109,18 +139,25 @@
                 </tr>
             </tbody>
 
-            @if (Criteria?.Mode == NoteMapMode.Permutations)
+            @if (Criteria?.Mode == NoteMapMode.Permutations)                
             {
-                <tbody class="modifiers">
+                <tbody class="modifiers"                        
+                        data-nm-tour-container="note-map-modifiers"
+                        @attributes="ModifiersTourStep">
                     @** MODIFIER HEADER ROW **@
 
                     <tr>
-                        <th></th>
-                        <th></th>
+                        <th class="modifier__name" colspan="2">
+                            <div class="d-flex align-items-center justify-content-end">
+                                <button class="btn btn-icon" data-nm-tour-for="note-map-modifiers" type="button">
+                                    <i class="icon bi bi-question-circle"></i>
+                                </button>
+                            </div>
+                        </th>
 
                         @for (int i = StartFret; i <= EndFret; i++)
                         {
-                            NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);
+                            NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(i);                            
 
                             <td class="modifier__fret">
                                 @if (fretViewModel != null && fretViewModel.Permutations.Count > 0)
@@ -135,9 +172,19 @@
                                                 selected ? "active" : ""
                                             };
 
+                                            TourStepAttributes? activeCombinationStep = null;
+                                            if (!activeCombinationStepShown && 
+                                                selected)
+                                            {
+                                                activeCombinationStep = new TourStepAttributes(ModifiersTourStep.Step + 1,
+                                                    ModifiersTourStep.Title, "The active combination is indicated here", true);
+                                                activeCombinationStepShown = true;
+                                            }
+
                                             <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                                                 @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
-                                                 data-hover="modifier-f-@i-p-@p">
+                                                    @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
+                                                    data-hover="modifier-f-@i-p-@p"
+                                                    @attributes="@activeCombinationStep">
                                                 @if (selected)
                                                 {
                                                     @:*
@@ -158,10 +205,9 @@
                         @** MODIFIER ROW **@
 
                         <tr class="modifiers__modifier">
-                            <th></th>
-                            <th class="modifier__name">
+                            <th class="modifier__name" colspan="2">
                                 @modifier.Name
-                            </th>
+                            </th>                            
 
                             @for (int i = StartFret; i <= EndFret; i++)
                             {
@@ -187,8 +233,8 @@
                                                     };
 
                                                     <div class="modifier__permutation @string.Join(" ", cssClasses) col"
-                                                         @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
-                                                         data-hover="modifier-f-@i-p-@p">
+                                                            @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
+                                                            data-hover="modifier-f-@i-p-@p">
                                                         &nbsp;
                                                     </div>
                                                 }
@@ -204,6 +250,7 @@
 
         </table>
     </div>
+
     if (Criteria?.Mode == NoteMapMode.Manual)
     {
         <div class="d-flex">
@@ -246,7 +293,12 @@
     NoteMapCriteriaViewModel? Criteria { get; set; }
     NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }
     int EndFret { get; set; }
+    TourStepAttributes FretboardTourStep = new(1, "Fretboard", 
+        "This is the fretboard with fret numbers along the top and string notes on the left");
     GuitarBase? Instrument { get; set; }
+    TourStepAttributes ModifiersTourStep = new(1, "Modifiers",
+        @"<p>Available combinations of modifiers (pedals and levers) are shown here for each fret.</p>
+        <p>Click on a combination to activate it and show the available notes on the fretboard.</p>");
     List<GuitarStringModifier> SelectedModifiers { get; } = new();
     int StartFret { get; set; }
     Guid? UserId { get; set; }

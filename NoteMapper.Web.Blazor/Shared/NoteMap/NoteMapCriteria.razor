@@ -16,7 +16,8 @@
 <div class="@(Inline ? "form-inline d-block d-sm-flex align-items-center" : "")">
     <div class="@formGroupClass">
         <label class="form-label" for="instrument">Instrument</label>
-        <select class="form-control" id="instrument" value="@Model.InstrumentId" @onchange="OnInstrumentChange">
+        <select class="form-control" id="instrument" value="@Model.InstrumentId" 
+                @onchange="OnInstrumentChange">
             @foreach (GuitarBase instrument in Options.DefaultInstruments)
             {
                 <option value="@instrument.Id">@instrument.Name</option>
