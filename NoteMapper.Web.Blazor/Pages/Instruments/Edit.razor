@@ -3,6 +3,7 @@
 @attribute [Authorize]
 
 @using NoteMapper.Core
+@using NoteMapper.Core.MusicTheory;
 @using NoteMapper.Data.Core.Instruments
 @using NoteMapper.Services.Instruments
 @using NoteMapper.Services.Web.ViewModels.Instruments;
@@ -76,7 +77,7 @@
             return;
         }
 
-        Model = UserInstrumentViewModelService.MapUserInstrumentToEditViewModel(UserInstrument);
+        Model = await UserInstrumentViewModelService.MapUserInstrumentToEditViewModelAsync(UserId, UserInstrument);
     }
 
     async Task UpdateInstrumentAsync()

@@ -10,15 +10,22 @@ namespace NoteMapper.Services.Web.ViewModels.Instruments
         private readonly List<InstrumentModifierViewModel> _modifiers = new();
         private readonly List<InstrumentStringViewModel> _strings = new();
 
-        public InstrumentEditViewModel(string id, GuitarType type)
+        public InstrumentEditViewModel(string id, GuitarType type, AccidentalType accidental)
         {
+            Accidental = accidental;
             Id = id;
             Type = type;
 
+            IReadOnlyCollection<string> notes = Note.GetNotes(accidental).ToArray();
+
             ModifierTypeOptions = type.ModifierTypes().ToArray();
-            NoteOptions = Note.GetNotes().ToArray();
+            NoteOptions = notes
+                .Select((x, i) => new KeyValuePair<int, string>(i, x))
+                .ToArray();
             OctaveOptions = Note.GetOctaves().ToArray();
         }
+
+        public AccidentalType Accidental { get; }
 
         public string Id { get; }
 
@@ -29,7 +36,7 @@ namespace NoteMapper.Services.Web.ViewModels.Instruments
 
         public IReadOnlyCollection<string> ModifierTypeOptions { get; }
 
-        public IReadOnlyCollection<string> NoteOptions { get; }
+        public IReadOnlyCollection<KeyValuePair<int, string>> NoteOptions { get; }
 
         public IReadOnlyCollection<int> OctaveOptions { get; }
 
@@ -58,9 +65,9 @@ namespace NoteMapper.Services.Web.ViewModels.Instruments
         {
             InstrumentStringViewModel? previous = _strings.LastOrDefault();
 
-            InstrumentStringViewModel @string = new()
+            InstrumentStringViewModel @string = new(Accidental)
             {
-                Note = previous?.Note ?? Note.GetNotes().First(),
+                NoteIndex = previous?.NoteIndex ?? 0,
                 Octave = previous?.Octave ?? Note.GetOctaves().First()
             };
 

@@ -3,6 +3,7 @@ using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Core.NoteMap;
 using NoteMapper.Data.Core.Instruments;
+using NoteMapper.Services.Users;
 using NoteMapper.Services.Web.ViewModels.NoteMap;
 
 namespace NoteMapper.Services.Web
@@ -12,17 +13,19 @@ namespace NoteMapper.Services.Web
         private readonly IInstrumentFactory _instrumentFactory;
         private readonly IMusicTheoryService _musicTheoryService;
         private readonly IUserInstrumentRepository _userInstrumentRepository;
+        private readonly IUserService _userService;
 
         public NoteMapViewModelService(IInstrumentFactory instrumentFactory, IMusicTheoryService musicTheoryService,
-            IUserInstrumentRepository userInstrumentRepository)
+            IUserInstrumentRepository userInstrumentRepository, IUserService userService)
         {
             _instrumentFactory = instrumentFactory;
             _musicTheoryService = musicTheoryService;
             _userInstrumentRepository = userInstrumentRepository;
+            _userService = userService;
         }
 
         public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options,
-            string instrument, string key, string mode, string intervals)
+            string instrument, string key, string mode, string intervals, string accidental)
         {
             if (string.IsNullOrEmpty(instrument))
             {
@@ -39,15 +42,21 @@ namespace NoteMapper.Services.Web
 
             if (!Enum.TryParse(mode, true, out NoteMapMode parsedMode))
             {
-                parsedMode = NoteMapMode.Permutations;
+                parsedMode = NoteMapCriteriaViewModel.DefaultMode;
+            }
+
+            if (!Enum.TryParse(accidental, true, out AccidentalType parsedAccidental))
+            {
+                parsedAccidental = options?.Accidentals.First().Key ?? NoteMapCriteriaViewModel.DefaultAccidental;
             }
 
             bool.TryParse(intervals, out bool parsedIntervals);
 
             return new NoteMapCriteriaViewModel
             {
+                Accidental = parsedAccidental,
                 InstrumentId = instrument,
-                KeyName = keyScale?.ElementAt(0).Name,
+                KeyName = keyScale?.ElementAt(0).GetName(parsedAccidental),
                 Mode = parsedMode,
                 ScaleType = keyScale?.Type.ShortName(),
                 ShowIntervals = parsedIntervals,
@@ -55,18 +64,20 @@ namespace NoteMapper.Services.Web
             };
         }
 
-        public async Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId)
+        public async Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaOptionsViewModelAsync(Guid? userId)
         {
             IReadOnlyCollection<UserInstrument> defaultInstruments = await _userInstrumentRepository.GetDefaultInstrumentsAsync();
             IReadOnlyCollection<UserInstrument> userInstruments = userId != null 
                 ? await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
                 : Array.Empty<UserInstrument>();
 
-            IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames();
+            UserPreferences userPreferences = await _userService.GetPreferences(userId);
+
+            IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames(userPreferences.Accidental);
             IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetScaleTypes();
             return new NoteMapCriteriaOptionsViewModel(
-                defaultInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
-                userInstruments.Select(x => _instrumentFactory.FromUserInstrument(x)), 
+                defaultInstruments.Select(_instrumentFactory.FromUserInstrument), 
+                userInstruments.Select(_instrumentFactory.FromUserInstrument), 
                 keyNames, 
                 keyTypes);
         }
@@ -109,7 +120,7 @@ namespace NoteMapper.Services.Web
 
                 foreach (IReadOnlyCollection<GuitarStringNote?> permutation in permutations)
                 {
-                    NoteMapNotesViewModel permutationViewModel = new(permutation, notes.Key);
+                    NoteMapNotesViewModel permutationViewModel = new(permutation, notes.Key, options.Accidental);
                     fretViewModel.AddPermutation(permutationViewModel);
                 }
                 

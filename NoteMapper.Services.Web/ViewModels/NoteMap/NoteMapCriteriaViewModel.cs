@@ -5,7 +5,10 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapCriteriaViewModel
     {
+        public const AccidentalType DefaultAccidental = AccidentalType.Sharp;
         public const NoteMapMode DefaultMode = NoteMapMode.Permutations;
+
+        public AccidentalType Accidental { get; set; } = DefaultAccidental;
 
         public string? InstrumentId { get; set; }
 

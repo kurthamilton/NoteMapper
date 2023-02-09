@@ -25,9 +25,9 @@
             return $"{type}|{name}|{offsetConfig}";
         }
 
-        public static string GetStringConfig(string note, int frets)
+        public static string GetStringConfig(int noteIndex, int octaveIndex, int frets)
         {
-            return $"{note}|f=0-{frets}";
+            return $"n={noteIndex}|o={octaveIndex}|f=0-{frets}";
         }
 
         private static string GetModifierOffsetConfig(int stringIndex, int offset)

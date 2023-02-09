@@ -6,9 +6,9 @@ namespace NoteMapper.Services.Web
     public interface INoteMapViewModelService
     {
         NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options, 
-            string instrument, string key, string mode, string intervals);
+            string instrument, string key, string mode, string intervals, string accidental);
 
-        Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaViewModelAsync(Guid? userId);
+        Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaOptionsViewModelAsync(Guid? userId);
 
         NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument, NoteMapOptionsViewModel options);
     }

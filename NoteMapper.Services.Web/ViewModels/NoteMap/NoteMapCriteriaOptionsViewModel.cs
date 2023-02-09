@@ -17,6 +17,12 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             KeyNames = keyNames;
             ScaleTypes = scaleTypes;
 
+            Accidentals = new[]
+            {
+                new KeyValuePair<AccidentalType, string>(AccidentalType.Sharp, "#"),
+                new KeyValuePair<AccidentalType, string>(AccidentalType.Flat, Note.Flat)
+            };
+
             Modes = new[]
             {
                 NoteMapMode.Permutations,
@@ -28,6 +34,8 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
                 NoteMapType.Chord
             };
         }
+
+        public IReadOnlyCollection<KeyValuePair<AccidentalType, string>> Accidentals { get; }
 
         public IReadOnlyCollection<GuitarBase> DefaultInstruments { get; }
 

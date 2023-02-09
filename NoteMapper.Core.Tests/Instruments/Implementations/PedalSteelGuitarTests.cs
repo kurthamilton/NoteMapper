@@ -1,8 +1,6 @@
-﻿using NoteMapper.Core.Guitars.Implementations;
-using NoteMapper.Core.Guitars;
+﻿using NoteMapper.Core.Guitars;
 using NoteMapper.Core.Guitars.Implementations;
 using NoteMapper.Core.MusicTheory;
-using NUnit.Framework;
 
 namespace NoteMapper.Core.Tests.Instruments.Implementations
 {
@@ -15,9 +13,9 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
             { 
                 Strings = new[]
                 {
-                    "C3|f=0-12",
-                    "E3|f=0-12",
-                    "G3|f=0-12"
+                    "n=0|o=3|f=0-12",
+                    "n=4|o=3|f=0-12",
+                    "n=7|o=3|f=0-12"
                 }                
             });
 
@@ -52,10 +50,10 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 },
                 Strings = new[]
                 {
-                    "C3|f=0-12",
-                    "E3|f=0-12",
-                    "G3|f=0-12",
-                    "B3|f=0-12"
+                    "n=0|o=3|f=0-12",
+                    "n=4|o=3|f=0-12",
+                    "n=7|o=3|f=0-12",
+                    "n=11|o=3|f=0-12"
                 }
             });
 
@@ -90,9 +88,9 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 },
                 Strings = new[]
                 {
-                    "C3|f=0-12",
-                    "E3|f=0-12",
-                    "G3|f=0-12"
+                    "n=0|o=3|f=0-12",
+                    "n=4|o=3|f=0-12",
+                    "n=7|o=3|f=0-12"
                 }
             });
 

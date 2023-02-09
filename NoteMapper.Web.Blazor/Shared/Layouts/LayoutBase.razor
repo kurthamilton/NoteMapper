@@ -11,7 +11,7 @@
     <main>
         <div class="@(Fluid ? "container-xl" : "container") @ContainerClass">
             <article class="content">
-                <LoggingErrorBoundary>
+                @*<LoggingErrorBoundary>
                     <ChildContent>
                         @ChildContent
                     </ChildContent>
@@ -22,8 +22,9 @@
                             The error has been logged. 
                             Any relevant information you could send via the <a href="/contact">contact</a> page would be gratefully received.
                         </p>
-                    </ErrorContent>
-                </LoggingErrorBoundary>
+                    </ErrorContent>                    
+                </LoggingErrorBoundary>*@
+                @ChildContent
             </article>
         </div>
     </main>

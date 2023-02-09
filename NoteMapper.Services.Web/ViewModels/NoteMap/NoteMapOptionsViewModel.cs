@@ -5,6 +5,8 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapOptionsViewModel
     {
+        public AccidentalType Accidental { get; set; }
+
         public string Key { get; set; } = "";
 
         public NoteMapMode Mode { get; set; }

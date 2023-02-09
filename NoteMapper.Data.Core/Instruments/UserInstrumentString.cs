@@ -2,6 +2,7 @@
 {
     public class UserInstrumentString
     {
-        public string Note { get; set; } = "";
+        public int NoteIndex { get; set; }
+        public int OctaveIndex { get; set; }
     }
 }

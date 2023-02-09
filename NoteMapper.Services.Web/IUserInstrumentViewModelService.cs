@@ -1,13 +1,15 @@
-﻿using NoteMapper.Data.Core.Instruments;
+﻿using NoteMapper.Core.MusicTheory;
+using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Services.Web.ViewModels.Instruments;
 
 namespace NoteMapper.Services.Web
 {
     public interface IUserInstrumentViewModelService
     {
-        Task<InstrumentEditViewModel?> GetInstrumentEditViewModelAsync(Guid userId, string userInstrumentId);
+        Task<InstrumentEditViewModel?> GetInstrumentEditViewModelAsync(Guid userId, string userInstrumentId,
+            AccidentalType accidental);
 
-        InstrumentEditViewModel MapUserInstrumentToEditViewModel(UserInstrument userInstrument);
+        Task<InstrumentEditViewModel> MapUserInstrumentToEditViewModelAsync(Guid? userId, UserInstrument userInstrument);
 
         void MapEditViewModelToUserInstrument(InstrumentEditViewModel viewModel, UserInstrument userInstrument);
     }

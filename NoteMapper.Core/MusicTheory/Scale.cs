@@ -52,7 +52,7 @@ namespace NoteMapper.Core.MusicTheory
             }
         }
 
-        public int GetInterval(string note)
+        public int GetInterval(Note note)
         {
             return IndexOf(note) + 1;
         }

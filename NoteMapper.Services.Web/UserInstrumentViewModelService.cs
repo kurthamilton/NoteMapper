@@ -1,8 +1,9 @@
 ﻿using NoteMapper.Core.Extensions;
-using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Data.Core.Instruments;
+using NoteMapper.Data.Core.Users;
 using NoteMapper.Services.Instruments;
+using NoteMapper.Services.Users;
 using NoteMapper.Services.Web.ViewModels.Instruments;
 
 namespace NoteMapper.Services.Web
@@ -10,13 +11,17 @@ namespace NoteMapper.Services.Web
     public class UserInstrumentViewModelService : IUserInstrumentViewModelService
     {
         private readonly IUserInstrumentService _userInstrumentService;
+        private readonly IUserService _userService;
 
-        public UserInstrumentViewModelService(IUserInstrumentService userInstrumentService)
+        public UserInstrumentViewModelService(IUserInstrumentService userInstrumentService,
+            IUserService userService)
         {
             _userInstrumentService = userInstrumentService;
+            _userService = userService;
         }
 
-        public async Task<InstrumentEditViewModel?> GetInstrumentEditViewModelAsync(Guid userId, string userInstrumentId)
+        public async Task<InstrumentEditViewModel?> GetInstrumentEditViewModelAsync(Guid userId, string userInstrumentId,
+            AccidentalType accidental)
         {
             UserInstrument? userInstrument = await _userInstrumentService.FindUserInstrumentAsync(userId, userInstrumentId);
             if (userInstrument == null)
@@ -24,18 +29,20 @@ namespace NoteMapper.Services.Web
                 return null;
             }
 
-            return MapUserInstrumentToEditViewModel(userInstrument);
+            return await MapUserInstrumentToEditViewModelAsync(userId, userInstrument);
         }
 
-        public InstrumentEditViewModel MapUserInstrumentToEditViewModel(UserInstrument userInstrument)
-        {   
+        public async Task<InstrumentEditViewModel> MapUserInstrumentToEditViewModelAsync(Guid? userId, UserInstrument userInstrument)
+        {
+            UserPreferences preferences = await _userService.GetPreferences(userId);
+
             InstrumentEditViewModel viewModel = new(userInstrument.UserInstrumentId, 
-                userInstrument.Type)
+                userInstrument.Type, preferences.Accidental)
             {
                 Name = userInstrument.Name
             };
 
-            AddStringViewModels(userInstrument, viewModel);
+            AddStringViewModels(userInstrument, viewModel, preferences.Accidental);
             AddModifierViewModels(userInstrument, viewModel);                                    
 
             return viewModel;
@@ -50,11 +57,10 @@ namespace NoteMapper.Services.Web
 
             foreach (InstrumentStringViewModel @string in viewModel.Strings)
             {
-                Note note = new(@string.Note, @string.Octave);
-
                 userInstrument.Strings.Add(new UserInstrumentString
                 {
-                    Note = note.ToString()
+                    NoteIndex = @string.NoteIndex,
+                    OctaveIndex = @string.Octave
                 });
             }
 
@@ -130,18 +136,17 @@ namespace NoteMapper.Services.Web
             SetIncompatibleViewModelModifiers(userInstrument, instrumentViewModel);
         }
 
-        private static void AddStringViewModels(UserInstrument userInstrument, InstrumentEditViewModel instrumentViewModel)
+        private static void AddStringViewModels(UserInstrument userInstrument, InstrumentEditViewModel instrumentViewModel,
+            AccidentalType accidental)
         {
             for (int i = 0; i < userInstrument.Strings.Count; i++)
             {
                 UserInstrumentString @string = userInstrument.Strings.ElementAt(i);
 
-                Note note = Note.Parse(@string.Note);
-
-                InstrumentStringViewModel viewModel = new()
+                InstrumentStringViewModel viewModel = new(accidental)
                 {
-                    Note = note.Name,
-                    Octave = note.OctaveIndex
+                    NoteIndex = @string.NoteIndex,
+                    Octave = @string.OctaveIndex
                 };
 
                 instrumentViewModel.AddString(viewModel);

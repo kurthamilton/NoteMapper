@@ -2,6 +2,7 @@
 @inherits NoteMapperComponentBase
 
 @using NoteMapper.Core
+@using NoteMapper.Core.MusicTheory;
 @using NoteMapper.Data.Core.Instruments
 @using NoteMapper.Services.Instruments
 @using NoteMapper.Services.Web.ViewModels.Instruments;
@@ -39,6 +40,8 @@
 
     InstrumentEditViewModel? Model { get; set; }
 
+    Guid? UserId { get; set; }
+
     UserInstrument? UserInstrument { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -51,6 +54,8 @@
             return;
         }
 
-        Model = UserInstrumentViewModelService.MapUserInstrumentToEditViewModel(UserInstrument);
+        UserId = await GetCurrentUserIdAsync();
+
+        Model = await UserInstrumentViewModelService.MapUserInstrumentToEditViewModelAsync(UserId, UserInstrument);
     }
 }

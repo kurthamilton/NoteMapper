@@ -71,7 +71,7 @@
                             @(i + 1)
                         </td>
                         <th class="string__name">
-                            @(@string.OpenNote.Name)
+                            @(@string.OpenNote.GetName(Criteria.Accidental))
                         </th>
 
                         @for (int j = StartFret; j <= EndFret; j++)
@@ -308,7 +308,7 @@
     {
         UserId = await GetCurrentUserIdAsync();
 
-        CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaViewModelAsync(UserId);
+        CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaOptionsViewModelAsync(UserId);
 
         SetCriteriaFromQueryString();
 
@@ -342,6 +342,7 @@
             { "intervals", Criteria.ShowIntervals ? "true" : null },
             { "key", Criteria.KeyName + Criteria.ScaleType },
             { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : null },
+            { "accidental", Criteria.Accidental != NoteMapCriteriaViewModel.DefaultAccidental ? Criteria.Accidental.ToString() : null }
         });
     }
 
@@ -357,9 +358,10 @@
         NavigationManager.TryGetQueryStringValue("intervals", out string intervals);
         NavigationManager.TryGetQueryStringValue("key", out string key);
         NavigationManager.TryGetQueryStringValue("mode", out string mode);
+        NavigationManager.TryGetQueryStringValue("accidental", out string accidental);
 
         Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions,
-            instrument, key, mode, intervals);
+            instrument, key, mode, intervals, accidental);
     }
 
     void SetPermutations()
@@ -374,6 +376,7 @@
         string key = (Criteria.KeyName + Criteria.ScaleType).Trim();
         NoteMapOptionsViewModel options = new()
         {
+            Accidental = Criteria.Accidental,
             Key = key,
             Mode = Criteria.Mode,
             Modifiers = SelectedModifiers.Select(x => x.Name).ToArray(),

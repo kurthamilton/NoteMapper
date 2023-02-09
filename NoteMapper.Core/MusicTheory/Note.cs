@@ -5,12 +5,16 @@ namespace NoteMapper.Core.MusicTheory
 {
     public class Note
     {
-        private static readonly Regex _noteRegex = new(@"^(?<name>[A-G]#?)(?<octave>\d+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public const string Flat = "♭";
+
+        private static readonly Regex _noteRegex = new(@"^(?<natural>[A-G])(?<accidental>#|♭)?(?<octave>\d+)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static IReadOnlyCollection<string> _notes = new[]
         { 
             // start at C to align with octave indexes incrementing at C
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B",
+            // skip the accidental notes - their formatting depends on which
+            // accidental is preferred
+            "C", "", "D", "", "E", "F", "", "G", "", "A", "", "B",
         };
 
         public Note(int index)
@@ -23,16 +27,10 @@ namespace NoteMapper.Core.MusicTheory
             Index = index;
             NoteIndex = index % _notes.Count;
             OctaveIndex = (int)Math.Floor((double)index / _notes.Count);
-            Name = _notes.ElementAt(NoteIndex);
         }
 
         public Note(int noteIndex, int octaveIndex)
             : this(octaveIndex * _notes.Count + noteIndex)
-        {
-        }
-
-        public Note(string noteName, int octaveIndex)
-            : this(_notes.IndexOf(noteName), octaveIndex)
         {
         }
 
@@ -46,14 +44,18 @@ namespace NoteMapper.Core.MusicTheory
         /// </summary>
         public int NoteIndex { get; }
 
-        public string Name { get; }
-
         public int OctaveIndex { get; }
 
-        public static IReadOnlyCollection<string> GetNotes()
+        public static IReadOnlyCollection<string> GetNotes(AccidentalType accidental)
         {
-            return _notes
-                .ToArray();
+            string[] notes = new string[_notes.Count];
+            for (int i = 0; i < _notes.Count; i++)
+            {
+                string name = new Note(i).GetName(accidental);
+                notes[i] = name;
+            }
+
+            return notes;
         }
 
         public static INoteCollection GetNotes(NoteMapType type, string key)
@@ -90,13 +92,29 @@ namespace NoteMapper.Core.MusicTheory
                 throw new ArgumentException("Incorrect format", nameof(name));
             }
 
-            name = match.Groups["name"].Value;
+            string natural = match.Groups["natural"].Value;
+            string accidental = match.Groups["accidental"].Success
+                ? match.Groups["accidental"].Value
+                : "";
             int octave = match.Groups["octave"].Success
                 ? int.Parse(match.Groups["octave"].Value)
                 : 0;
 
-            int index = _notes.IndexOf(name);
-            if (index < 0)
+            int index = _notes.IndexOf(natural);
+
+            if (!string.IsNullOrEmpty(accidental))
+            {
+                if (accidental == "#")
+                {
+                    index++;
+                }
+                else if (accidental == Flat)
+                {
+                    index--;
+                }
+            }
+
+            if (index < 0 || index >= _notes.Count)
             {
                 throw new ArgumentException($"Note '{name}' not found", nameof(name));
             }
@@ -106,6 +124,27 @@ namespace NoteMapper.Core.MusicTheory
             return new Note(index);
         }
 
+        public string GetName(AccidentalType accidental)
+        {
+            string name = _notes.ElementAt(NoteIndex);
+            if (!string.IsNullOrEmpty(name))
+            {
+                return name;
+            }
+                        
+            switch (accidental)
+            {
+                case AccidentalType.Sharp:
+                    int previousIndex = (NoteIndex - 1) % _notes.Count;
+                    return $"{_notes.ElementAt(previousIndex)}#";
+                case AccidentalType.Flat:
+                    int nextIndex = (NoteIndex + 1) % _notes.Count;
+                    return $"{_notes.ElementAt(nextIndex)}{Flat}";
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         public Note Next(int offset)
         {
             return new Note(Index + offset);
@@ -113,7 +152,8 @@ namespace NoteMapper.Core.MusicTheory
 
         public override string ToString()
         {
-            return Name + OctaveIndex;
+            // this method should not be called directly, so it is OK to hard code the accidental type
+            return GetName(AccidentalType.Sharp) + OctaveIndex;
         }
     }
 }

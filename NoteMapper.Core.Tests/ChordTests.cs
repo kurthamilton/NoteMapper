@@ -17,7 +17,7 @@ namespace NoteMapper.Core.Tests
         public static string Parse(string key)
         {            
             Chord chord = Chord.Parse(key);
-            return string.Join(",", chord.Select(x => x.Name));
+            return string.Join(",", chord.Select(x => x.GetName(AccidentalType.Sharp)));
         }        
     }
 }

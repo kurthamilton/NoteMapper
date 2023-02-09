@@ -1,4 +1,5 @@
 using NoteMapper.Core.Guitars;
+using NoteMapper.Core.MusicTheory;
 using NoteMapper.Services.Web.ViewModels.Instruments;
 
 namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
@@ -119,7 +120,7 @@ namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
         public static void MoveModifier_MovesStringOffsets()
         {
             InstrumentEditViewModel viewModel = CreateViewModel(modifiers: new[] { "A", "B" },
-                strings: new[] { "A", "B" });
+                strings: new[] { 9, 11 });
 
             // set up a 2 string instrument with 2 modifiers
             // modifier 0 has offset of +1, modifier 1 has offset of -1
@@ -168,9 +169,9 @@ namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
         }
 
         private static InstrumentEditViewModel CreateViewModel(string id = DefaultUserInstrumentId,
-            IEnumerable<string>? modifiers = null, IEnumerable<string>? strings = null)
+            IEnumerable<string>? modifiers = null, IEnumerable<int>? strings = null)
         {
-            InstrumentEditViewModel viewModel = new(id, GuitarType.PedalSteelGuitar);
+            InstrumentEditViewModel viewModel = new(id, GuitarType.PedalSteelGuitar, AccidentalType.Sharp);
 
             if (modifiers != null)
             {
@@ -185,11 +186,11 @@ namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
 
             if (strings != null)
             {
-                foreach (string @string in strings)
+                foreach (int @string in strings)
                 {
-                    viewModel.AddString(new InstrumentStringViewModel
+                    viewModel.AddString(new InstrumentStringViewModel(AccidentalType.Sharp)
                     {
-                        Note = @string
+                        NoteIndex = @string
                     });
                 }
             }

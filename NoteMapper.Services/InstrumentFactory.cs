@@ -40,7 +40,8 @@ namespace NoteMapper.Services
 
                     foreach (UserInstrumentString @string in userInstrument.Strings)
                     {
-                        strings.Add(PedalSteelGuitarConfig.GetStringConfig(@string.Note, userInstrument.Frets));
+                        string stringConfig = PedalSteelGuitarConfig.GetStringConfig(@string.NoteIndex, @string.OctaveIndex, userInstrument.Frets);
+                        strings.Add(stringConfig);
                     }
 
                     PedalSteelGuitarConfig config = new()

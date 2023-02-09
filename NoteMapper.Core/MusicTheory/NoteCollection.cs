@@ -25,12 +25,12 @@ namespace NoteMapper.Core.MusicTheory
             return Contains(note.NoteIndex);
         }
 
-        public int IndexOf(string name)
+        public int IndexOf(Note note)
         {
             for (int i = 0; i < _notes.Count; i++)
             {
-                Note note = _notes.ElementAt(i);
-                if (string.Equals(note.Name, name, StringComparison.InvariantCultureIgnoreCase))
+                Note currentNote = _notes.ElementAt(i);
+                if (note.NoteIndex == currentNote.NoteIndex)
                 {
                     return i;
                 }

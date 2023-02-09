@@ -5,6 +5,7 @@
 
 @using NoteMapper.Core.Guitars;
 @using NoteMapper.Core;
+@using NoteMapper.Core.MusicTheory;
 @using NoteMapper.Data.Core.Instruments;
 @using NoteMapper.Services.Instruments;
 @using NoteMapper.Services.Web.StateManagement;
@@ -85,8 +86,8 @@
         {
             Template.Name += " (Copy)";
         }
-
-        Model = UserInstrumentViewModelService.MapUserInstrumentToEditViewModel(Template);
+        
+        Model = await UserInstrumentViewModelService.MapUserInstrumentToEditViewModelAsync(UserId, Template);
     }
 
     async Task CreateInstrumentAsync()

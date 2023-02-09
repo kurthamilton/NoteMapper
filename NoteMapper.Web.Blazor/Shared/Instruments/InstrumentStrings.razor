@@ -36,10 +36,10 @@
                         @if (!ReadOnly)
                         {
                             <div class="d-flex">
-                                <InputSelect @bind-Value="s.Note" class="form-control form-control-sm select--notes">
-                                    @foreach (string note in Model.NoteOptions)
+                                <InputSelect @bind-Value="s.NoteIndex" class="form-control form-control-sm select--notes">
+                                    @foreach (KeyValuePair<int, string> noteOption in Model.NoteOptions)
                                     {
-                                        <option>@note</option>
+                                        <option value="@noteOption.Key">@noteOption.Value</option>
                                     }
                                 </InputSelect>
                                 <InputSelect @bind-Value="s.Octave" class="form-control form-control-sm select--octaves">

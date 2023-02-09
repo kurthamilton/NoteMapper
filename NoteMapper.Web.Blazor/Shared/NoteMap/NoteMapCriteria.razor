@@ -85,6 +85,25 @@
             <label class="form-check-label" for="show-intervals">Show intervals</label>
         </div>
     </div>
+
+    <div class="@formGroupClass">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="accidental-@(Inline ? "inline" : "block")" id="accidental-sharp" 
+                   checked="@(Model.Accidental == AccidentalType.Sharp)" @onchange="OnAccidentalChange"
+                   value="@AccidentalType.Sharp">
+            <label class="form-check-label" for="accidental-sharp">
+                #
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="accidental-@(Inline ? "inline" : "block")" id="accidental-flat"
+                   checked="@(Model.Accidental == AccidentalType.Flat)" @onchange="OnAccidentalChange"
+                   value="@AccidentalType.Flat">
+            <label class="form-check-label" for="accidental-flat">
+                @Note.Flat
+            </label>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -103,6 +122,20 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+    }
+
+    Task OnAccidentalChange(ChangeEventArgs e)
+    {        
+        if (Enum.TryParse<AccidentalType>((string?)e.Value, true, out AccidentalType parsed))
+        {
+            Model.Accidental = parsed;
+        }
+        else
+        {
+            Model.Accidental = NoteMapCriteriaViewModel.DefaultAccidental;
+        }
+
+        return EmitChange();
     }
 
     Task OnInstrumentChange(ChangeEventArgs e)

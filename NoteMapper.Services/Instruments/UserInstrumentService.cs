@@ -1,6 +1,5 @@
 ﻿using NoteMapper.Core;
 using NoteMapper.Core.Guitars;
-using NoteMapper.Core.MusicTheory;
 using NoteMapper.Data.Core.Instruments;
 
 namespace NoteMapper.Services.Instruments
@@ -81,11 +80,10 @@ namespace NoteMapper.Services.Instruments
                 Type = type
             };
 
-            Note defaultNote = new(0, 0);
-
             userInstrument.Strings.Add(new UserInstrumentString
             {
-                Note = defaultNote.ToString()
+                NoteIndex = 0,
+                OctaveIndex = 0
             });
 
             return userInstrument;

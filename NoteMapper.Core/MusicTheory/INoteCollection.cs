@@ -6,6 +6,6 @@
 
         bool Contains(Note note);
 
-        int IndexOf(string note);
+        int IndexOf(Note note);
     }
 }

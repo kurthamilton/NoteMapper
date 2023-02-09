@@ -50,6 +50,7 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
                 .AddScoped<IUserPasswordRepository, UserPasswordSqlRepository>()
                 .AddScoped<IUserPasswordResetCodeRepository, UserPasswordResetCodeSqlRepository>()
+                .AddScoped<IUserPreferenceRepository, UserPreferenceSqlRepository>()
                 .AddScoped<IUserRegistrationCodeRepository, UserRegistrationCodeSqlRepository>()
                 .AddScoped<IUserRepository, UserSqlRepository>();
 
@@ -107,7 +108,8 @@ namespace NoteMapper.Infrastructure
                 .AddSingleton(new ErrorLoggingServiceSettings
                 {
                     Enabled = config.GetBool("Logging.Enabled")
-                });
+                })
+                .AddScoped<IUserService, UserService>();
 
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
