@@ -26,7 +26,7 @@ namespace NoteMapper.Services.Web
 
         public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(UserPreferences preferences, 
             NoteMapCriteriaOptionsViewModel options,
-            string instrument, string note, string key, string mode, string intervals, string flats)
+            string instrument, string note, string key, string type, string mode, string intervals, string flats)
         {
             if (string.IsNullOrEmpty(instrument))
             {
@@ -36,7 +36,12 @@ namespace NoteMapper.Services.Web
             int.TryParse(note, out int noteIndex);
 
             Scale? keyScale = Scale.TryParse(noteIndex, key);
-            
+
+            if (!Enum.TryParse(type, true, out NoteCollectionType parsedType))
+            {
+                parsedType = NoteMapCriteriaViewModel.DefaultType;
+            }
+
             if (!Enum.TryParse(mode, true, out NoteMapMode parsedMode))
             {
                 parsedMode = NoteMapCriteriaViewModel.DefaultMode;
@@ -60,7 +65,7 @@ namespace NoteMapper.Services.Web
                 NoteIndex = noteIndex,
                 ScaleType = keyScale?.Type.ShortName(),
                 ShowIntervals = parsedIntervals,
-                Type = NoteCollectionType.Chord
+                Type = parsedType
             };
         }
 

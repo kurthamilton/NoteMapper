@@ -7,6 +7,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
     {
         public const AccidentalType DefaultAccidental = AccidentalType.Sharp;
         public const NoteMapMode DefaultMode = NoteMapMode.Combinations;
+        public const NoteCollectionType DefaultType = NoteCollectionType.Chord;
 
         public AccidentalType Accidental { get; set; } = DefaultAccidental;
 
@@ -20,6 +21,6 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public bool ShowIntervals { get; set; }
 
-        public NoteCollectionType Type { get; set; } = NoteCollectionType.Chord;
+        public NoteCollectionType Type { get; set; } = DefaultType;
     }
 }

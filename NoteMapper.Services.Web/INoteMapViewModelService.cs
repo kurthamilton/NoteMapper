@@ -8,7 +8,7 @@ namespace NoteMapper.Services.Web
     {
         NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(UserPreferences preferences, 
             NoteMapCriteriaOptionsViewModel options, 
-            string instrument, string note, string key, string mode, string intervals, string flats);
+            string instrument, string note, string key, string type, string mode, string intervals, string flats);
 
         Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaOptionsViewModelAsync(Guid? userId);
 

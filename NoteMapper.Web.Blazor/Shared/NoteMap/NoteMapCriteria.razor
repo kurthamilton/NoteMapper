@@ -65,14 +65,14 @@
         </div>
 
         <div class="@formGroupClass">
-            @foreach (NoteCollectionType type in Options.Types)
+            @foreach (KeyValuePair<string, string?> option in Options.TypeOptions)
             {
                 <div class="form-check @(Inline ? null : "form-check-inline")">
-                    <input class="form-check-input" type="radio" name="type-@(Inline ? "inline" : "block")" id="type-@type"
-                       checked="@(Model.Type == type)" @onchange="OnTypeChange"
-                       value="@type.ToString()">
-                    <label class="form-check-label" for="type-@type">
-                        @type.ToString()
+                    <input class="form-check-input" type="radio" name="type-@(Inline ? "inline" : "block")" id="type-@option.Key"
+                       checked="@(Model.Type.ToString() == option.Key)" @onchange="OnTypeChange"
+                       value="@option.Key">
+                    <label class="form-check-label" for="type-@option.Key">
+                        @(option.Value ?? option.Key)
                     </label>
                 </div>
             }

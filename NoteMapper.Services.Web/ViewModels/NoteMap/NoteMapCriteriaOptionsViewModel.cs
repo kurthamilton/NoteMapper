@@ -29,10 +29,10 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
                 NoteMapMode.Manual
             };
 
-            Types = new[]
+            TypeOptions = new[]
             {
-                NoteCollectionType.Chord,
-                NoteCollectionType.Scale
+                new KeyValuePair<string, string?>(NoteCollectionType.Chord.ToString(), null),
+                new KeyValuePair<string, string?>(NoteCollectionType.Scale.ToString(), null)
             };
         }
 
@@ -46,7 +46,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public IReadOnlyCollection<string> ScaleTypes { get; }
 
-        public IReadOnlyCollection<NoteCollectionType> Types { get; }
+        public IReadOnlyCollection<KeyValuePair<string, string?>> TypeOptions { get; }
 
         public IReadOnlyCollection<GuitarBase> UserInstruments { get; }
     }
