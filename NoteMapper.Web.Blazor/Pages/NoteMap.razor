@@ -6,6 +6,7 @@
 @using NoteMapper.Core.NoteMap
 @using NoteMapper.Services
 @using NoteMapper.Services.Instruments
+@using NoteMapper.Services.Users;
 @using NoteMapper.Services.Web
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Extensions
@@ -294,6 +295,7 @@
 @inject NavigationManager NavigationManager
 @inject INoteMapViewModelService NoteMapViewModelService
 @inject IUserInstrumentService UserInstrumentService
+@inject IUserService UserService
 @code {
     NoteMapCriteriaViewModel? Criteria { get; set; }
     NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }
@@ -307,12 +309,13 @@
     List<GuitarStringModifier> SelectedModifiers { get; } = new();
     int StartFret { get; set; }
     Guid? UserId { get; set; }
+    UserPreferences? UserPreferences { get; set; }
     NoteMapViewModel? ViewModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         UserId = await GetCurrentUserIdAsync();
-
+        UserPreferences = await UserService.GetPreferences(UserId);
         CriteriaOptions = await NoteMapViewModelService.GetNoteMapCriteriaOptionsViewModelAsync(UserId);
 
         SetCriteriaFromQueryString();
@@ -350,16 +353,28 @@
             { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : null },
             { "flats", Criteria.Accidental == AccidentalType.Flat ? "true" : null }
         });
+
+        UserPreferences userPreferences = new UserPreferences(criteria.Accidental, criteria.ShowIntervals);
+        if (UserId != null && UserPreferences != null && !userPreferences.Equals(UserPreferences))
+        {
+            UserPreferences = userPreferences;
+            await UserService.UpdateUserPreferences(UserId.Value, userPreferences);
+        }
     }
 
     void OnZoomChange(NoteMapZoomViewModel? zoom)
     {
         EndFret = zoom != null ? zoom.EndFret : 0;
         StartFret = zoom != null ? zoom.StartFret : 0;
-    }
+    }    
 
     void SetCriteriaFromQueryString()
     {
+        if (UserPreferences == null || CriteriaOptions == null)
+        {
+            return;
+        }
+
         NavigationManager.TryGetQueryStringValue("instrument", out string instrument);
         NavigationManager.TryGetQueryStringValue("intervals", out string intervals);
         NavigationManager.TryGetQueryStringValue("note", out string note);
@@ -367,7 +382,7 @@
         NavigationManager.TryGetQueryStringValue("mode", out string mode);
         NavigationManager.TryGetQueryStringValue("flats", out string flats);
 
-        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(CriteriaOptions,
+        Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(UserPreferences, CriteriaOptions,            
             instrument, note, key, mode, intervals, flats);
     }
 

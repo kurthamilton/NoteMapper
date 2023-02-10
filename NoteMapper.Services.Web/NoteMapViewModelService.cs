@@ -24,7 +24,8 @@ namespace NoteMapper.Services.Web
             _userService = userService;
         }
 
-        public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options,
+        public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(UserPreferences preferences, 
+            NoteMapCriteriaOptionsViewModel options,
             string instrument, string note, string key, string mode, string intervals, string flats)
         {
             if (string.IsNullOrEmpty(instrument))
@@ -41,9 +42,15 @@ namespace NoteMapper.Services.Web
                 parsedMode = NoteMapCriteriaViewModel.DefaultMode;
             }
 
-            bool.TryParse(flats, out bool parsedFlats);
+            if (!bool.TryParse(flats, out bool parsedFlats))
+            {
+                parsedFlats = preferences.Accidental == AccidentalType.Flat;
+            }
 
-            bool.TryParse(intervals, out bool parsedIntervals);            
+            if (!bool.TryParse(intervals, out bool parsedIntervals))
+            {
+                parsedIntervals = preferences.Intervals;
+            }
 
             return new NoteMapCriteriaViewModel
             {

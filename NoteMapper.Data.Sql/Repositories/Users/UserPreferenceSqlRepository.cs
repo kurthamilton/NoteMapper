@@ -38,7 +38,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
             for (int i = 0; i < preferences.Count; i++)
             {
-                UserPreference preference = preferences.ElementAt(0);
+                UserPreference preference = preferences.ElementAt(i);
 
                 sql += "IF NOT EXISTS( " +
                        "    SELECT * " +
@@ -52,7 +52,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
                        "BEGIN " +
                        $"    UPDATE UserPreferences SET Value = @Value{i} " +
                        $"    WHERE UserId = @UserId AND UserPreferenceTypeId = @Type{i} " +
-                       "END ";
+                       "END; ";
 
                 parameters.AddRange(new[]
                 {

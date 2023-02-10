@@ -1,5 +1,4 @@
-﻿using NoteMapper.Core.MusicTheory;
-using NoteMapper.Data.Core.Users;
+﻿using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Services.Users
 {
@@ -17,26 +16,13 @@ namespace NoteMapper.Services.Users
             IReadOnlyCollection<UserPreference> userPreferences = userId != null 
                 ? await _userPreferenceRepository.GetAsync(userId.Value)
                 : Array.Empty<UserPreference>();
-            IDictionary<UserPreferenceType, string> userPreferenceDictionary = userPreferences
-                .ToDictionary(x => x.Type, x => x.Value);
 
-            return new UserPreferences
-            {
-                Accidental = GetPreferenceValue(userPreferenceDictionary, UserPreferenceType.Accidental, 
-                    Enum.Parse<AccidentalType>, AccidentalType.Sharp)
-            };
+            return UserPreferences.FromCollection(userPreferences);
         }
 
-        private T? GetPreferenceValue<T>(IDictionary<UserPreferenceType, string> userPreferences, UserPreferenceType type, 
-            Func<string, T> map, T @default)
+        public async Task UpdateUserPreferences(Guid userId, UserPreferences preferences)
         {
-            if (!userPreferences.ContainsKey(type))
-            {
-                return @default;
-            }
-
-            string value = userPreferences[type];
-            return map(value);
+            await _userPreferenceRepository.UpdateAsync(userId, preferences.ToCollection());
         }
     }
 }

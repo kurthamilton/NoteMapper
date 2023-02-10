@@ -26,6 +26,8 @@ namespace NoteMapper.Data.Sql
             {
                 using (SqlCommand cmd = GetCommand(conn, sql, parameters))
                 {
+                    cmd.CommandType = CommandType.Text;
+
                     await conn.OpenAsync();
 
                     try
