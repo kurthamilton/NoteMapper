@@ -3,51 +3,45 @@
     const attrs = {
         trigger: `${attrPrefix}-for`,
         container: `${attrPrefix}-container`,
+        title: `${attrPrefix}-title`,
         step: `${attrPrefix}-step`,
         stepArrow: `${attrPrefix}-step-arrow`,
+        stepSelector: `${attrPrefix}-step-selector`,
+        stepTarget: `${attrPrefix}-step-target`,
         stepTitle: `${attrPrefix}-step-title`,
         stepMessage: `${attrPrefix}-step-message`
     };
 
     // Returns a step object for a given DOM element.
     // A step is not returned if it does not have a step attribute, or if its step number < 0
-    function getStep(el) {
-        if (!el.matches(`[${attrs.step}]`)) {
-            return;
-        }
+    function getStep(el, container) {
+        const filterSelector = el.getAttribute(attrs.stepSelector);
 
-        const number = el.getAttribute(attrs.step);
-        if (number < 0) {
-            return;
-        }
-
+        const targetSelector = `[${attrs.step}="${el.getAttribute(attrs.stepTarget)}"]`;
+        const targets = Array.from(document.querySelectorAll(targetSelector));
+        
         return {
             arrow: el.getAttribute(attrs.stepArrow) !== 'false',
-            el: el,
-            number: number,
-            title: el.getAttribute(attrs.stepTitle),
-            message: el.getAttribute(attrs.stepMessage)
+            el: () => targets.find(target => !filterSelector || target.matches(filterSelector)),
+            selector: el.getAttribute(attrs.stepSelector),
+            title: el.getAttribute(attrs.stepTitle) || container.getAttribute(attrs.title),
+            message: el.getAttribute(attrs.stepMessage) || el.innerHTML
         };
     }
 
     // Returns the valid step objects for the given DOM container.
     // The container itself can be a step.
     function getSteps(container) {
-        const stepElements = container.querySelectorAll(`[${attrs.step}]`);
+        const stepElements = container.querySelectorAll(`[${attrs.stepTarget}]`);
         
-        const steps = [
-            getStep(container)
-        ];
+        const steps = [];
         
         stepElements.forEach(el => {
-            const step = getStep(el);
+            const step = getStep(el, container);
             steps.push(step);
         });
 
-        // Sort steps in ascending order
-        return steps
-            .filter(x => !!x)
-            .sort((a, b) => a.number > b.number);
+        return steps;
     }
 
     // Listen to click events. 
@@ -111,7 +105,7 @@
                 attachTo: {
                     element: step.el,
                     on: 'bottom'
-                },                
+                },
                 buttons: buttons,
                 title: step.title,
                 text: step.message

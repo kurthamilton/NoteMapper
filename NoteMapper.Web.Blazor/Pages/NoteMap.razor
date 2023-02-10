@@ -14,6 +14,7 @@
 @using NoteMapper.Web.Blazor.Models.Tour;
 @using NoteMapper.Web.Blazor.Shared.NoteMap
 @using NoteMapper.Web.Blazor.Shared.Shared
+@using NoteMapper.Web.Blazor.Shared.Tour
 
 @if (CriteriaOptions == null)
 {
@@ -36,14 +37,9 @@
         totalWidth += fretViewModel?.Permutations.Count > 0 ? fretViewModel.Permutations.Count : 1;
     }
 
-    bool noteTourStepShown = false;
-    bool activeCombinationStepShown = false;
-
     <div class="table-responsive">
         <table class="mt-3" cellpadding="0">                
-            <tbody class="fretboard"
-                    data-nm-tour-container="note-map-fretboard"
-                    @attributes="FretboardTourStep">
+            <tbody class="fretboard" data-nm-tour-step="fretboard">
                 @** STRING HEADER ROW **@
                 <tr class="fretboard__heading">
                     <th class="string__name" style="width: 0.001%;" colspan="2">
@@ -86,30 +82,16 @@
                             NoteMapNotesViewModel? selectedPermutation = fretViewModel?.SelectedPermutation;
                             NoteMapNoteViewModel? note = selectedPermutation?.Notes.ElementAt(i);
 
-                            TourStepAttributes? tourStep = null;
-                            TourStepAttributes? noteStep = null;
-                            TourStepAttributes? modifierStep = null;
-                            if (!noteTourStepShown && 
-                                note != null && 
-                                !string.IsNullOrEmpty(note.Modifier))
-                            {
-                                tourStep = new TourStepAttributes(FretboardTourStep.Step + 1, FretboardTourStep.Title,
-                                    "Available notes are highlighted", true);
-                                noteStep = new TourStepAttributes(tourStep.Step + 1, FretboardTourStep.Title,
-                                    "The note or interval is shown here", true);
-                                modifierStep = new TourStepAttributes(noteStep.Step + 1, FretboardTourStep.Title,
-                                    "The modifier (pedal or lever) is shown here", true);
-                                noteTourStepShown = true;
-                            }
-                            
+                            bool tour = note?.Modifier != null;
+
                             <td class="string__fret">
                                 <div class="inner @(note != null ? "enabled" : "disabled")"
-                                        @attributes="@tourStep">
+                                     data-nm-tour-step="@(tour ? "fretboard-fret" : null)">
                                     @if (note != null)
                                     {
                                         <div class="d-flex align-items-center">
                                             <span class="me-auto badge bg-light text-dark"
-                                                @attributes="@noteStep">
+                                                  data-nm-tour-step="@(tour ? "fretboard-note" : null)">
                                                 @if (Criteria?.ShowIntervals == true)
                                                 {
                                                     @note.Interval
@@ -122,7 +104,7 @@
                                             &nbsp;@*Force the table cell contents to filll the table cell*@
                                             @if (note.Modifier != null)
                                             {
-                                                <span class="badge bg-dark text-light" @attributes="@modifierStep">
+                                                <span class="badge bg-dark text-light" data-nm-tour-step="fretboard-modifier">
                                                     @note.Modifier
                                                 </span>
                                             }
@@ -147,9 +129,7 @@
 
             @if (Criteria?.Mode == NoteMapMode.Permutations)                
             {
-                <tbody class="modifiers"                        
-                        data-nm-tour-container="note-map-modifiers"
-                        @attributes="ModifiersTourStep">
+                <tbody class="modifiers" data-nm-tour-step="modifiers">
                     @** MODIFIER HEADER ROW **@
 
                     <tr>
@@ -178,19 +158,10 @@
                                                 selected ? "active" : ""
                                             };
 
-                                            TourStepAttributes? activeCombinationStep = null;
-                                            if (!activeCombinationStepShown && 
-                                                selected)
-                                            {
-                                                activeCombinationStep = new TourStepAttributes(ModifiersTourStep.Step + 1,
-                                                    ModifiersTourStep.Title, "The active combination is indicated here", true);
-                                                activeCombinationStepShown = true;
-                                            }
-
                                             <div class="modifier__permutation @string.Join(" ", cssClasses) col"
                                                     @onclick="e => fretViewModel.SetSelectedPermutation(permutation)"
                                                     data-hover="modifier-f-@i-p-@p"
-                                                    @attributes="@activeCombinationStep">
+                                                    data-nm-tour-step="modifiers-active">
                                                 @if (selected)
                                                 {
                                                     @:*
@@ -290,6 +261,31 @@
     }
 }
 
+<TourContainer TourId="note-map-fretboard" Title="Fretboard">
+    <TourStep Target="fretboard">
+        <p>This is the fretboard with fret numbers along the top and string notes on the left</p>
+    </TourStep>
+    <TourStep Target="fretboard-fret" HideArrow="@true">
+        <p>Available notes are highlighted</p>
+    </TourStep>
+    <TourStep Target="fretboard-note" HideArrow="@true">
+        <p>The note or interval is shown here</p>
+    </TourStep>
+    <TourStep Target="fretboard-modifier" HideArrow="@true">
+        <p>The modifier (pedal or lever) is shown here</p>
+    </TourStep>
+</TourContainer>
+
+<TourContainer TourId="note-map-modifiers" Title="Modifiers">
+    <TourStep Target="modifiers">
+        <p>Available combinations of modifiers (pedals and levers) are shown here for each fret.</p>
+        <p>Click on a combination to activate it and show the available notes on the fretboard.</p>
+    </TourStep>
+    <TourStep Target="modifiers-active" HideArrow="@true" Selector=".active">
+        <p>The active combination is indicated with a *</p>
+    </TourStep>
+</TourContainer>
+
 @inject IInstrumentFactory InstrumentFactory
 @inject IMusicTheoryService MusicTheoryService
 @inject NavigationManager NavigationManager
@@ -299,13 +295,8 @@
 @code {
     NoteMapCriteriaViewModel? Criteria { get; set; }
     NoteMapCriteriaOptionsViewModel? CriteriaOptions { get; set; }
-    int EndFret { get; set; }
-    TourStepAttributes FretboardTourStep = new(1, "Fretboard", 
-        "This is the fretboard with fret numbers along the top and string notes on the left");
+    int EndFret { get; set; }    
     GuitarBase? Instrument { get; set; }
-    TourStepAttributes ModifiersTourStep = new(1, "Modifiers",
-        @"<p>Available combinations of modifiers (pedals and levers) are shown here for each fret.</p>
-        <p>Click on a combination to activate it and show the available notes on the fretboard.</p>");
     List<GuitarStringModifier> SelectedModifiers { get; } = new();
     int StartFret { get; set; }
     Guid? UserId { get; set; }
