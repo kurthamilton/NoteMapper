@@ -8,19 +8,19 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
     {
         public NoteMapCriteriaOptionsViewModel(IEnumerable<GuitarBase> defaultInstruments, 
             IEnumerable<GuitarBase> userInstruments,
-            IReadOnlyCollection<string> keyNames,
+            IReadOnlyCollection<int> noteIndexes,
             IReadOnlyCollection<string> scaleTypes)
         {
             DefaultInstruments = defaultInstruments.ToArray();
             UserInstruments = userInstruments.ToArray();
 
-            KeyNames = keyNames;
+            NoteIndexes = noteIndexes;
             ScaleTypes = scaleTypes;
 
             Accidentals = new[]
             {
-                new KeyValuePair<AccidentalType, string>(AccidentalType.Sharp, "#"),
-                new KeyValuePair<AccidentalType, string>(AccidentalType.Flat, Note.Flat)
+                Accidental.ToString(AccidentalType.Sharp),
+                Accidental.ToString(AccidentalType.Flat)
             };
 
             Modes = new[]
@@ -35,13 +35,13 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             };
         }
 
-        public IReadOnlyCollection<KeyValuePair<AccidentalType, string>> Accidentals { get; }
+        public IReadOnlyCollection<string> Accidentals { get; }
 
         public IReadOnlyCollection<GuitarBase> DefaultInstruments { get; }
 
-        public IReadOnlyCollection<string> KeyNames { get; }
-
         public IReadOnlyCollection<NoteMapMode> Modes { get; }
+
+        public IReadOnlyCollection<int> NoteIndexes { get; }
 
         public IReadOnlyCollection<string> ScaleTypes { get; }
 

@@ -4,6 +4,16 @@ namespace NoteMapper.Core.Tests
 {
     public static class NoteTests
     {
+        [TestCase(-1, ExpectedResult = 11)]
+        [TestCase(-2, ExpectedResult = 10)]
+        [TestCase(-3, ExpectedResult = 9)]
+        [TestCase(-12, ExpectedResult = 0)]
+        public static int Constructor_IndexLessThanZero_SetsIndexToPositiveValue(int index)
+        {
+            Note note = new Note(index);
+            return note.Index;
+        }
+
         [TestCase(0, ExpectedResult = "C")]
         [TestCase(2, ExpectedResult = "D")]
         [TestCase(4, ExpectedResult = "E")]
@@ -41,29 +51,6 @@ namespace NoteMapper.Core.Tests
             Note note = new(noteIndex, octaveIndex);
             Note next = note.Next(offset);
             return $"{next.NoteIndex}{next.OctaveIndex}";
-        }
-
-        [TestCase("C", ExpectedResult = 0)]
-        [TestCase("C#", ExpectedResult = 1)]
-        [TestCase("D♭", ExpectedResult = 1)]
-        [TestCase("D", ExpectedResult = 2)]
-        [TestCase("D#", ExpectedResult = 3)]
-        [TestCase("E♭", ExpectedResult = 3)]
-        [TestCase("E", ExpectedResult = 4)]
-        [TestCase("F", ExpectedResult = 5)]
-        [TestCase("F#", ExpectedResult = 6)]
-        [TestCase("G♭", ExpectedResult = 6)]
-        [TestCase("G", ExpectedResult = 7)]
-        [TestCase("G#", ExpectedResult = 8)]
-        [TestCase("A♭", ExpectedResult = 8)]
-        [TestCase("A", ExpectedResult = 9)]
-        [TestCase("A#", ExpectedResult = 10)]
-        [TestCase("B♭", ExpectedResult = 10)]
-        [TestCase("B", ExpectedResult = 11)]
-        public static int Parse(string note)
-        {
-            Note result = Note.Parse(note);
-            return result.NoteIndex;
         }
     }
 }

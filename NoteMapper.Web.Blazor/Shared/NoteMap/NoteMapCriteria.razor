@@ -4,12 +4,12 @@
 @using NoteMapper.Core.NoteMap;
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 
-@if (Options == null)
-{
-    return;
-}
-
 @{
+    if (Options == null)
+    {
+        return;
+    }
+
     string formGroupClass = Inline ? "form-group" : "mb-3";
 }
 
@@ -38,10 +38,10 @@
     <div class="@formGroupClass">
         <label class="form-label" for="key">Key</label>
         <div class="d-flex">
-            <select class="form-control" id="key" value="@Model.KeyName" @onchange="OnKeyNameChange">
-                @foreach (string name in Options.KeyNames)
+            <select class="form-control" id="key" value="@Model.NoteIndex" @onchange="OnKeyNameChange">
+                @foreach (int noteIndex in Options.NoteIndexes)
                 {
-                    <option>@name</option>
+                    <option value="@noteIndex">@(Note.GetName(noteIndex, Model.Accidental))</option>
                 }
             </select>
             <select class="form-control" id="key" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
@@ -82,27 +82,23 @@
         <div class="form-check">
             <input type="checkbox" class="form-check-input" id="show-intervals"
                    checked="@Model.ShowIntervals" @onchange="OnShowIntervalsChange">
-            <label class="form-check-label" for="show-intervals">Show intervals</label>
+            <label class="form-check-label" for="show-intervals">Intervals</label>
         </div>
     </div>
 
     <div class="@formGroupClass">
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="accidental-@(Inline ? "inline" : "block")" id="accidental-sharp" 
-                   checked="@(Model.Accidental == AccidentalType.Sharp)" @onchange="OnAccidentalChange"
-                   value="@AccidentalType.Sharp">
-            <label class="form-check-label" for="accidental-sharp">
-                #
-            </label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="accidental-@(Inline ? "inline" : "block")" id="accidental-flat"
-                   checked="@(Model.Accidental == AccidentalType.Flat)" @onchange="OnAccidentalChange"
-                   value="@AccidentalType.Flat">
-            <label class="form-check-label" for="accidental-flat">
-                @Note.Flat
-            </label>
-        </div>
+        @foreach (string option in Options.Accidentals)
+        {
+            AccidentalType type = Accidental.Parse(option);
+            <div class="form-check @(Inline ? null : "form-check-inline")">
+                <input class="form-check-input" type="radio" name="accidental-@(Inline ? "inline" : "block")" id="accidental-@type"
+                   checked="@(Model.Accidental == type)" @onchange="OnAccidentalChange"
+                   value="@option">
+                <label class="form-check-label" for="accidental-@type">
+                    @option
+                </label>
+            </div>
+        }        
     </div>
 </div>
 
@@ -125,16 +121,14 @@
     }
 
     Task OnAccidentalChange(ChangeEventArgs e)
-    {        
-        if (Enum.TryParse<AccidentalType>((string?)e.Value, true, out AccidentalType parsed))
+    {
+        string? value = (string?)e.Value;
+        if (value == null)
         {
-            Model.Accidental = parsed;
+            return Task.CompletedTask;
         }
-        else
-        {
-            Model.Accidental = NoteMapCriteriaViewModel.DefaultAccidental;
-        }
-
+        
+        Model.Accidental = Accidental.Parse(value);
         return EmitChange();
     }
 
@@ -146,7 +140,7 @@
 
     Task OnKeyNameChange(ChangeEventArgs e)
     {
-        Model.KeyName = (string?)e.Value;
+        Model.NoteIndex = int.Parse((string?)e.Value ?? "0");
         return EmitChange();
     }
 

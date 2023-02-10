@@ -9,9 +9,9 @@ namespace NoteMapper.Services
             .Select(x => x.ShortName())
             .ToArray();
 
-        public IReadOnlyCollection<string> GetKeyNames(AccidentalType accidental)
+        public IReadOnlyCollection<int> GetNoteIndexes()
         {
-            return Note.GetNotes(accidental);
+            return Note.GetNoteIndexes();
         }
 
         public IReadOnlyCollection<string> GetScaleTypes()

@@ -10,9 +10,9 @@
 
         public override Scale Key { get; }
 
-        public static Chord Parse(string key)
+        public static Chord Parse(int noteIndex, string key)
         {
-            Scale scale = Scale.Parse(key);
+            Scale scale = Scale.Parse(noteIndex, key);
 
             IEnumerable<int> notes = GetChordNotes(scale.Type);
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.ObjectModel;
 using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core.MusicTheory
@@ -12,8 +11,9 @@ namespace NoteMapper.Core.MusicTheory
         protected NoteCollection(IEnumerable<Note> notes)
         {
             _notes = notes.ToArray();
-            _noteDictionary = new Lazy<IReadOnlyDictionary<int, Note>>(() =>
-                new ReadOnlyDictionary<int, Note>(_notes.ToDictionary(x => x.NoteIndex)));
+            _noteDictionary = new Lazy<IReadOnlyDictionary<int, Note>>(() => _notes
+                .ToDictionary(x => x.NoteIndex)
+                .AsReadOnly());
         }
 
         public int Count => _notes.Count;

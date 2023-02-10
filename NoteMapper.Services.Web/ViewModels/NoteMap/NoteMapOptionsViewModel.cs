@@ -13,6 +13,8 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public IReadOnlyCollection<string> Modifiers { get; set; } = Array.Empty<string>();
 
+        public int NoteIndex { get; set; }
+
         public NoteMapType Type { get; set; }
     }
 }

@@ -12,9 +12,9 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public string? InstrumentId { get; set; }
 
-        public string? KeyName { get; set; }
-
         public NoteMapMode Mode { get; set; } = DefaultMode;
+
+        public int NoteIndex { get; set; }
 
         public string? ScaleType { get; set; }
 

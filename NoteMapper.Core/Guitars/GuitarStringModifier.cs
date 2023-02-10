@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using NoteMapper.Core.Permutations;
 
 namespace NoteMapper.Core.Guitars
@@ -12,7 +11,7 @@ namespace NoteMapper.Core.Guitars
         private GuitarStringModifier(string type, string name, IDictionary<int, int> offsets)
         {
             Name = name;
-            Offsets = new ReadOnlyDictionary<int, int>(offsets);
+            Offsets = offsets.AsReadOnly();
             Type = type;
         }
 

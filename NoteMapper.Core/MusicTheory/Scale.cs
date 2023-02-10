@@ -1,13 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
-using NoteMapper.Core.Extensions;
+﻿using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core.MusicTheory
 {
     public class Scale : NoteCollection
-    {
-        private static readonly Regex KeyRegex = new(@"^(?<note>[A-Ga-g]#?)\s*?(?<type>.*)$", RegexOptions.Compiled);
-
+    {        
         private static readonly IReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>> KeyIntervals = CreateKeyIntervals();
 
         private static readonly IReadOnlyDictionary<ScaleType, string> KeyShortNames = CreateKeyShortNames();
@@ -22,33 +18,25 @@ namespace NoteMapper.Core.MusicTheory
 
         public ScaleType Type { get; }
 
-        public static Scale Parse(string key)
+        public static Scale Parse(int noteIndex, string keyType)
         {
-            Match match = KeyRegex.Match(key);
-            if (!match.Success)
-            {
-                throw new ArgumentException();
-            }
-
-            Note note = Note.Parse(match.Groups["note"].Value);
-            Group typeGroup = match.Groups["type"];
-            ScaleType type = ParseScaleType(typeGroup.Success ? typeGroup.Value : "");
+            Note note = new Note(noteIndex);
+            
+            ScaleType type = ParseScaleType(keyType);
             IReadOnlyCollection<byte> intervals = GetIntervals(type);
             IEnumerable<Note> notes = GetNotes(note, intervals);
             return new(notes, type);
         }
 
-        public static bool TryParse(string key, out Scale? scale)
+        public static Scale? TryParse(int noteIndex, string key)
         {
             try
             {
-                scale = Parse(key);
-                return true;
+                return Parse(noteIndex, key);
             }
             catch
             {
-                scale = null;
-                return false;
+                return default;
             }
         }
 
@@ -84,22 +72,19 @@ namespace NoteMapper.Core.MusicTheory
 
         private static IReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>> CreateKeyIntervals()
         {
-            IDictionary<ScaleType, IReadOnlyCollection<byte>> intervals = new Dictionary<ScaleType, IReadOnlyCollection<byte>>
+            return new Dictionary<ScaleType, IReadOnlyCollection<byte>>
             {
                 { ScaleType.DominantSeven, new byte[] { 2, 2, 1, 2, 2, 1 } },
                 { ScaleType.Major, new byte[] { 2, 2, 1, 2, 2, 2 } },
                 { ScaleType.Minor, new byte[] { 2, 1, 2, 2, 1, 2 } }
-            };
-
-            return new ReadOnlyDictionary<ScaleType, IReadOnlyCollection<byte>>(intervals);
+            }.AsReadOnly();
         }
 
         private static IReadOnlyDictionary<ScaleType, string> CreateKeyShortNames()
         {
-            IDictionary<ScaleType, string> keyShortNames = Enum.GetValues<ScaleType>()
-                .ToDictionary(x => x, x => x.ShortName());
-
-            return new ReadOnlyDictionary<ScaleType, string>(keyShortNames);
+            return Enum.GetValues<ScaleType>()
+                .ToDictionary(x => x, x => x.ShortName())
+                .AsReadOnly();
         }
 
         private static IReadOnlyCollection<byte> GetIntervals(ScaleType type)

@@ -25,11 +25,11 @@ namespace NoteMapper.Services.Web.ViewModels.Instruments
 
         public int Frets { get; set; }
 
-        public IReadOnlyCollection<StringOffsetViewModel> ModifierOffsets => _modifierOffsets;
-
-        public string Note => new Note(NoteIndex, 0).GetName(Accidental);
+        public IReadOnlyCollection<StringOffsetViewModel> ModifierOffsets => _modifierOffsets;        
 
         public int NoteIndex { get; set; }
+
+        public string NoteName => Note.GetName(NoteIndex, Accidental);
 
         public int Octave { get; set; }
 

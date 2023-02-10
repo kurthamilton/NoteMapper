@@ -25,39 +25,32 @@ namespace NoteMapper.Services.Web
         }
 
         public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(NoteMapCriteriaOptionsViewModel? options,
-            string instrument, string key, string mode, string intervals, string accidental)
+            string instrument, string note, string key, string mode, string intervals, string flats)
         {
             if (string.IsNullOrEmpty(instrument))
             {
                 instrument = options?.DefaultInstruments.FirstOrDefault()?.Id ?? "";
-            }            
-
-            Scale.TryParse(key, out Scale? keyScale);
-
-            if (keyScale == null)
-            {
-                key = options?.KeyNames.FirstOrDefault() ?? "";
-                Scale.TryParse(key, out keyScale);
             }
 
+            int.TryParse(note, out int noteIndex);
+
+            Scale? keyScale = Scale.TryParse(noteIndex, key);
+            
             if (!Enum.TryParse(mode, true, out NoteMapMode parsedMode))
             {
                 parsedMode = NoteMapCriteriaViewModel.DefaultMode;
             }
 
-            if (!Enum.TryParse(accidental, true, out AccidentalType parsedAccidental))
-            {
-                parsedAccidental = options?.Accidentals.First().Key ?? NoteMapCriteriaViewModel.DefaultAccidental;
-            }
+            bool.TryParse(flats, out bool parsedFlats);
 
-            bool.TryParse(intervals, out bool parsedIntervals);
+            bool.TryParse(intervals, out bool parsedIntervals);            
 
             return new NoteMapCriteriaViewModel
             {
-                Accidental = parsedAccidental,
+                Accidental = parsedFlats ? AccidentalType.Flat : AccidentalType.Sharp,
                 InstrumentId = instrument,
-                KeyName = keyScale?.ElementAt(0).GetName(parsedAccidental),
                 Mode = parsedMode,
+                NoteIndex = noteIndex,
                 ScaleType = keyScale?.Type.ShortName(),
                 ShowIntervals = parsedIntervals,
                 Type = NoteMapType.Chord
@@ -71,14 +64,12 @@ namespace NoteMapper.Services.Web
                 ? await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
                 : Array.Empty<UserInstrument>();
 
-            UserPreferences userPreferences = await _userService.GetPreferences(userId);
-
-            IReadOnlyCollection<string> keyNames = _musicTheoryService.GetKeyNames(userPreferences.Accidental);
+            IReadOnlyCollection<int> noteIndexes = _musicTheoryService.GetNoteIndexes();
             IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetScaleTypes();
             return new NoteMapCriteriaOptionsViewModel(
                 defaultInstruments.Select(_instrumentFactory.FromUserInstrument), 
                 userInstruments.Select(_instrumentFactory.FromUserInstrument), 
-                keyNames, 
+                noteIndexes, 
                 keyTypes);
         }
 
@@ -89,7 +80,7 @@ namespace NoteMapper.Services.Web
                 return default;
             }
 
-            INoteCollection notes = Note.GetNotes(options.Type, options.Key);
+            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.Key, options.Type);
 
             int frets = instrument.Strings.Max(x => x.Frets);
 
