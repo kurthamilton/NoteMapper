@@ -33,7 +33,7 @@ namespace NoteMapper.Core.Guitars
 
         public IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> GetPermutations(StringPermutationOptions options)
         {
-            INoteCollection notes = options.Notes;
+            int threshold = 2;
 
             List<IReadOnlyCollection<GuitarStringNote?>> notePermutations = new();
             
@@ -108,9 +108,9 @@ namespace NoteMapper.Core.Guitars
                 stringNotes.Add(stringNote);
             }
 
-            if (options.Notes.Any(x => !usedNotes.Contains(x.NoteIndex)))
+            if (options.Notes.Count(x => usedNotes.Contains(x.NoteIndex)) < options.Threshold)
             {
-                // not all of the notes were found, do not use this permutation
+                // not enough notes were found, do not use this permutation
                 return Enumerable.Empty<GuitarStringNote?>();
             }
 

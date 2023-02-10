@@ -15,6 +15,6 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public int NoteIndex { get; set; }
 
-        public NoteMapType Type { get; set; }
+        public NoteCollectionType Type { get; set; }
     }
 }

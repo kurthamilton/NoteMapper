@@ -79,13 +79,13 @@ namespace NoteMapper.Core.MusicTheory
                 .ToArray();
         }
 
-        public static INoteCollection GetNotes(int noteIndex, string key, NoteMapType type)
+        public static INoteCollection GetNotes(int noteIndex, string key, NoteCollectionType type)
         {
             switch (type)
             {
-                case NoteMapType.Chord:
+                case NoteCollectionType.Chord:
                     return Chord.Parse(noteIndex, key);
-                case NoteMapType.Scale:
+                case NoteCollectionType.Scale:
                     return Scale.Parse(noteIndex, key);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

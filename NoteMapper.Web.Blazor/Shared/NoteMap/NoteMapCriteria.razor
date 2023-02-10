@@ -65,13 +65,17 @@
         </div>
 
         <div class="@formGroupClass">
-            <label class="form-label" for="type">Type</label>
-            <select class="form-control" id="type" value="@Model.Type.ToString()" @onchange="OnTypeChange">
-                @foreach (NoteMapType type in Options.Types)
-                {
-                    <option>@type.ToString()</option>
-                }
-            </select>
+            @foreach (NoteCollectionType type in Options.Types)
+            {
+                <div class="form-check @(Inline ? null : "form-check-inline")">
+                    <input class="form-check-input" type="radio" name="type-@(Inline ? "inline" : "block")" id="type-@type"
+                       checked="@(Model.Type == type)" @onchange="OnTypeChange"
+                       value="@type.ToString()">
+                    <label class="form-check-label" for="type-@type">
+                        @type.ToString()
+                    </label>
+                </div>
+            }
         </div>
 
         <div class="@formGroupClass" data-nm-tour-step="criteria-mode">
@@ -200,8 +204,8 @@
     Task OnTypeChange(ChangeEventArgs e)
     {
         string value = (string?)e.Value ?? "";
-        NoteMapType type = Enum.Parse<NoteMapType>(value, true);
-        Model.Type = Enum.IsDefined<NoteMapType>(type) ? type : default;
+        NoteCollectionType type = Enum.Parse<NoteCollectionType>(value, true);
+        Model.Type = Enum.IsDefined<NoteCollectionType>(type) ? type : default;
         return EmitChange();
     }
 

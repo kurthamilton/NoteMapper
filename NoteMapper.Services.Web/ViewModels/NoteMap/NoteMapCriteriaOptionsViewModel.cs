@@ -25,13 +25,14 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
             Modes = new[]
             {
-                NoteMapMode.Permutations,
+                NoteMapMode.Combinations,
                 NoteMapMode.Manual
             };
 
             Types = new[]
             {
-                NoteMapType.Chord
+                NoteCollectionType.Chord,
+                NoteCollectionType.Scale
             };
         }
 
@@ -45,7 +46,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public IReadOnlyCollection<string> ScaleTypes { get; }
 
-        public IReadOnlyCollection<NoteMapType> Types { get; }
+        public IReadOnlyCollection<NoteCollectionType> Types { get; }
 
         public IReadOnlyCollection<GuitarBase> UserInstruments { get; }
     }

@@ -60,7 +60,7 @@ namespace NoteMapper.Services.Web
                 NoteIndex = noteIndex,
                 ScaleType = keyScale?.Type.ShortName(),
                 ShowIntervals = parsedIntervals,
-                Type = NoteMapType.Chord
+                Type = NoteCollectionType.Chord
             };
         }
 
@@ -97,7 +97,10 @@ namespace NoteMapper.Services.Web
             {
                 NoteMapFretViewModel fretViewModel = new(fret);
 
-                StringPermutationOptions permutationOptions = new(notes, fret);
+                int threshold = options.Type == NoteCollectionType.Chord
+                    ? notes.Count
+                    : 1;
+                StringPermutationOptions permutationOptions = new(notes, fret, threshold);
 
                 List<IReadOnlyCollection<GuitarStringNote?>> permutations = new();                
 
@@ -111,7 +114,7 @@ namespace NoteMapper.Services.Web
                         permutations.Add(singlePermutation);
                     }                    
                 }
-                else if (options.Mode == NoteMapMode.Permutations)
+                else if (options.Mode == NoteMapMode.Combinations)
                 {
                     permutations.AddRange(instrument.GetPermutations(permutationOptions));
                 }

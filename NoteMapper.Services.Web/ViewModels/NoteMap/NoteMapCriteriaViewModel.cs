@@ -6,7 +6,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
     public class NoteMapCriteriaViewModel
     {
         public const AccidentalType DefaultAccidental = AccidentalType.Sharp;
-        public const NoteMapMode DefaultMode = NoteMapMode.Permutations;
+        public const NoteMapMode DefaultMode = NoteMapMode.Combinations;
 
         public AccidentalType Accidental { get; set; } = DefaultAccidental;
 
@@ -20,6 +20,6 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public bool ShowIntervals { get; set; }
 
-        public NoteMapType Type { get; set; } = NoteMapType.Chord;
+        public NoteCollectionType Type { get; set; } = NoteCollectionType.Chord;
     }
 }

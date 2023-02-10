@@ -3,7 +3,7 @@
     public enum NoteMapMode
     {
         None,
-        Permutations,
+        Combinations,
         Manual
     }
 }

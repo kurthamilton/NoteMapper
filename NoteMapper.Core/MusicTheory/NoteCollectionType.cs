@@ -1,6 +1,6 @@
 ﻿namespace NoteMapper.Core.MusicTheory
 {
-    public enum NoteMapType
+    public enum NoteCollectionType
     {
         None,
         Chord,
