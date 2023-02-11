@@ -10,3 +10,12 @@
         }
     }
 }
+
+.table-column--sticky {
+    position: sticky;
+    left: 0;
+    // ensure the content obscures the content behind
+    z-index: 2;
+    background-color: #fff;
+    background-clip: padding-box;
+}

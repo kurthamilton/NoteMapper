@@ -1,6 +1,7 @@
 ﻿:root {
     --fretboard-backgroundcolor-disabled: #ddd;
     --fretboard-backgroundcolor-enabled: #74A474;
+    --fretboard-border: 1px solid var(--fretboard-bordercolor-strings);
     --fretboard-border-hover: 1px solid #f00;
     --fretboard-border-permutation: 1px solid #bbb;
     --fretboard-border-fret: 3px double #999;
@@ -19,12 +20,12 @@
     font-size: var(--fretboard-fontsize-smaller);    
 }
 
-.modifiers__modifier,
-.fretboard__string {
-    border-top: 1px solid var(--fretboard-bordercolor-strings);
+.fretboard__string,
+.modifiers__modifier {
+    border-top: var(--fretboard-border);
 
     &:last-child {
-        border-bottom: 1px solid var(--fretboard-bordercolor-strings);
+        border-bottom: var(--fretboard-border);
     }
 }
 
@@ -37,6 +38,13 @@
 
 .string__name {
     white-space: nowrap;
+    display: flex;
+    justify-content: start;
+
+    .string__index {
+        margin-right: auto;
+        padding-right: var(--fretboard-padding);
+    }
 }
 
 .modifier__fret,

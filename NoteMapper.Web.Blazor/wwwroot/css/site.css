@@ -10885,6 +10885,14 @@ label.required:after {
   border-width: 1px;
 }
 
+.table-column--sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: #fff;
+  background-clip: padding-box;
+}
+
 h1,
 .h1 {
   font-size: 2rem;
@@ -10904,6 +10912,7 @@ h3,
 :root {
   --fretboard-backgroundcolor-disabled: #ddd;
   --fretboard-backgroundcolor-enabled: #74A474;
+  --fretboard-border: 1px solid var(--fretboard-bordercolor-strings);
   --fretboard-border-hover: 1px solid #f00;
   --fretboard-border-permutation: 1px solid #bbb;
   --fretboard-border-fret: 3px double #999;
@@ -10922,13 +10931,13 @@ h3,
   font-size: var(--fretboard-fontsize-smaller);
 }
 
-.modifiers__modifier,
-.fretboard__string {
-  border-top: 1px solid var(--fretboard-bordercolor-strings);
+.fretboard__string,
+.modifiers__modifier {
+  border-top: var(--fretboard-border);
 }
-.modifiers__modifier:last-child,
-.fretboard__string:last-child {
-  border-bottom: 1px solid var(--fretboard-bordercolor-strings);
+.fretboard__string:last-child,
+.modifiers__modifier:last-child {
+  border-bottom: var(--fretboard-border);
 }
 
 .modifier__name,
@@ -10940,6 +10949,12 @@ h3,
 
 .string__name {
   white-space: nowrap;
+  display: flex;
+  justify-content: start;
+}
+.string__name .string__index {
+  margin-right: auto;
+  padding-right: var(--fretboard-padding);
 }
 
 .modifier__fret,

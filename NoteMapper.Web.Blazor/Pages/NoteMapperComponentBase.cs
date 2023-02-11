@@ -42,7 +42,7 @@ namespace NoteMapper.Web.Blazor.Pages
             }
             
             await base.OnAfterRenderAsync(firstRender);
-        }
+        }        
 
         protected void SetFeedback(ServiceResult result) 
         {

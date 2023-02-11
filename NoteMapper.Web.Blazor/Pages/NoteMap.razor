@@ -42,9 +42,9 @@
             <tbody class="fretboard" data-nm-tour-step="fretboard">
                 @** STRING HEADER ROW **@
                 <tr class="fretboard__heading">
-                    <th class="string__name" style="width: 0.001%;" colspan="2">
+                    <th class="table-column--sticky" style="width: 0.001%;">
                         <div class="d-flex align-items-center justify-content-end">
-                            <button class="btn btn-icon" data-nm-tour-for="note-map-fretboard" type="button">
+                            <button class="btn btn-icon me-1" data-nm-tour-for="note-map-fretboard" type="button">
                                 <i class="icon bi bi-question-circle"></i>
                             </button>
                         </div>
@@ -66,16 +66,18 @@
 
                     GuitarString @string = Instrument.Strings.ElementAt(i);
                     <tr class="fretboard__string">
-                        <td class="string__name">
-                            @(i + 1)
+                        <td class="table-column--sticky">
+                            <div class="string__name">
+                                <span class="string__index">@(i + 1)</span>
+                                @if (Criteria != null)
+                                {
+                                    <strong>
+                                        @(@string.OpenNote.GetName(Criteria.Accidental))
+                                    </strong>
+                                }
+                            </div>                            
                         </td>
-                        <th class="string__name">
-                            @if (Criteria != null)
-                            {
-                                @(@string.OpenNote.GetName(Criteria.Accidental))
-                            }                            
-                        </th>
-
+                        
                         @for (int j = StartFret; j <= EndFret; j++)
                         {
                             NoteMapFretViewModel? fretViewModel = ViewModel?.Frets.ElementAt(j);
@@ -118,7 +120,7 @@
 
             <tbody class="separator">
                 <tr>
-                    <td colspan="@((EndFret - StartFret) + 3)">
+                    <td colspan="@((EndFret - StartFret) + 2)">
                         &nbsp;
                     </td>
                 </tr>
@@ -130,9 +132,9 @@
                     @** MODIFIER HEADER ROW **@
 
                     <tr>
-                        <th class="modifier__name" colspan="2">
+                        <th class="table-column--sticky">
                             <div class="d-flex align-items-center justify-content-end">
-                                <button class="btn btn-icon" data-nm-tour-for="note-map-modifiers" type="button">
+                                <button class="btn btn-icon me-1" data-nm-tour-for="note-map-modifiers" type="button">
                                     <i class="icon bi bi-question-circle"></i>
                                 </button>
                             </div>
@@ -179,7 +181,7 @@
                         @** MODIFIER ROW **@
 
                         <tr class="modifiers__modifier">
-                            <th class="modifier__name" colspan="2">
+                            <th class="modifier__name table-column--sticky">
                                 @modifier.Name
                             </th>                            
 
@@ -387,7 +389,6 @@
         if (Instrument == null || Criteria == null)
         {
             ViewModel = null;
-            StateHasChanged();
             return;
         }
 
@@ -402,7 +403,6 @@
         };
 
         ViewModel = NoteMapViewModelService.GetNoteMapPermutationsViewModel(Instrument, options);
-        StateHasChanged();
     }
 
     void ToggleSelectedModifier(GuitarStringModifier modifier)
