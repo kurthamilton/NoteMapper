@@ -10959,11 +10959,13 @@ h3,
 }
 
 .string__fret .inner {
-  padding-left: calc(var(--fretboard-padding) / 2);
+  display: flex;
+  align-items: center;
   padding-right: calc(var(--fretboard-padding) / 2);
 }
 .string__fret .inner.enabled {
   background-color: var(--fretboard-backgroundcolor-enabled);
+  padding-left: calc(var(--fretboard-padding) / 2);
 }
 
 .modifier__permutations {
@@ -10973,6 +10975,7 @@ h3,
 .modifier__permutation {
   border-right: var(--fretboard-border-permutation);
   border-left: 1px solid transparent;
+  min-width: 1rem;
 }
 .modifier__permutation:last-child {
   border-right: 1px solid transparent;

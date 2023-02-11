@@ -89,26 +89,23 @@
                                      data-nm-tour-step="@(tour ? "fretboard-fret" : null)">
                                     @if (note != null)
                                     {
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-auto badge bg-light text-dark"
-                                                  data-nm-tour-step="@(tour ? "fretboard-note" : null)">
-                                                @if (Criteria?.ShowIntervals == true)
-                                                {
-                                                    @note.Interval
-                                                }
-                                                else
-                                                {
-                                                    @note.Note
-                                                }
-                                            </span>
-                                            &nbsp;@*Force the table cell contents to filll the table cell*@
-                                            @if (note.Modifier != null)
+                                        <span class="fret__note badge bg-light text-dark"
+                                                data-nm-tour-step="@(tour ? "fretboard-note" : null)">
+                                            @if (Criteria?.ShowIntervals == true)
                                             {
-                                                <span class="badge bg-dark text-light" data-nm-tour-step="fretboard-modifier">
-                                                    @note.Modifier
-                                                </span>
+                                                @note.Interval
                                             }
-                                        </div>
+                                            else
+                                            {
+                                                @note.Note
+                                            }
+                                        </span>
+                                        @:&nbsp;@*Force the table cell contents to filll the table cell*@
+                                        <span class="fret__modifier badge bg-dark text-light" 
+                                              data-nm-tour-step="@(tour ? "fretboard-modifier" : "")">
+                                            @note.Modifier
+                                        </span>
+                                            
                                     }
                                 </div>
                             </td>
