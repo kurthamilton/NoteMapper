@@ -1,13 +1,16 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
+using Microsoft.JSInterop;
 
 namespace NoteMapper.Web.Blazor.Extensions
 {
     public static class NavigationManagerExtensions
     {
-        public static void SetQueryStringValues(this NavigationManager navigationManager, IDictionary<string, string?> values)
+        public static async Task SetQueryStringValuesAsync(this NavigationManager navigationManager, IDictionary<string, string?> values,
+            IJSRuntime jsRuntime)
         {
             Uri uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
 
@@ -19,6 +22,17 @@ namespace NoteMapper.Web.Blazor.Extensions
 
             string path = uri.GetLeftPart(UriPartial.Path);            
             string updatedUrl = QueryHelpers.AddQueryString(path, queryString);
+
+            try
+            {
+                // NavigationManager.NavigateTo triggers a scroll to top of page
+                // Temporarily disable the next scroll in javascript
+                await jsRuntime.InvokeVoidAsync("disableNextScroll");
+            }            
+            catch
+            {
+
+            }
 
             navigationManager.NavigateTo(updatedUrl);
         }

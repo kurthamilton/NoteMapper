@@ -38,7 +38,7 @@
     }
 
     <div class="table-responsive">
-        <table class="mt-3" cellpadding="0">                
+        <table class="my-3" cellpadding="0">
             <tbody class="fretboard" data-nm-tour-step="fretboard">
                 @** STRING HEADER ROW **@
                 <tr class="fretboard__heading">
@@ -338,9 +338,9 @@
         Criteria = criteria;
 
         await LoadInstrumentAsync();
-        SetPermutations();
+        SetPermutations();        
 
-        NavigationManager.SetQueryStringValues(new Dictionary<string, string?>
+        await NavigationManager.SetQueryStringValuesAsync(new Dictionary<string, string?>
         {
             { "instrument", Criteria.InstrumentId != CriteriaOptions?.DefaultInstruments.FirstOrDefault()?.Id ? Criteria.InstrumentId : null },
             { "intervals", Criteria.ShowIntervals ? "true" : null },
@@ -349,7 +349,7 @@
             { "type", Criteria.Type != NoteMapCriteriaViewModel.DefaultType ? Criteria.Type.ToString() : null },
             { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : null },
             { "flats", Criteria.Accidental == AccidentalType.Flat ? "true" : null }
-        });
+        }, JsRuntime);
 
         UserPreferences userPreferences = new UserPreferences(criteria.Accidental, criteria.ShowIntervals);
         if (UserId != null && UserPreferences != null && !userPreferences.Equals(UserPreferences))

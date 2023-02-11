@@ -1,4 +1,4 @@
-﻿(function (bootstrap) {
+﻿(function (bootstrap) {    
     // apply hover state to linked elements
     document.addEventListener('mouseover', e => {
         const target = e.target;
