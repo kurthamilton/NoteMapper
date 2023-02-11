@@ -1,4 +1,8 @@
-﻿(function (bootstrap) {    
+﻿(function (bootstrap) {
+    document.querySelectorAll('[data-js-remove]').forEach(el => {
+        el.remove();
+    });
+        
     // apply hover state to linked elements
     document.addEventListener('mouseover', e => {
         const target = e.target;
