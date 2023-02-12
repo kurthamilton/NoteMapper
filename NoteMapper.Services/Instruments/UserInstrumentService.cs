@@ -1,6 +1,7 @@
 ﻿using NoteMapper.Core;
 using NoteMapper.Core.Guitars;
 using NoteMapper.Data.Core.Instruments;
+using NoteMapper.Data.Core.Users;
 
 namespace NoteMapper.Services.Instruments
 {
@@ -16,18 +17,35 @@ namespace NoteMapper.Services.Instruments
             _userInstrumentRepository = userInstrumentRepository;
         }
 
-        public async Task<ServiceResult> CreateInstrumentAsync(Guid userId, UserInstrument instrument)
+        public async Task<ServiceResult> ConvertToDefaultAsync(Guid userId, UserInstrument userInstrument)
         {
-            ServiceResult validationResult = await ValidateInstrumentAsync(userId, instrument);
+            ServiceResult validationResult = await ValidateInstrumentAsync(userId, userInstrument);
             if (!validationResult.Success)
             {
                 return validationResult;
             }
 
-            instrument.UserInstrumentId = Guid.NewGuid().ToString();
-
-            ServiceResult result = await _userInstrumentRepository.CreateUserInstrumentAsync(userId, instrument);
+            ServiceResult result = await _userInstrumentRepository.CreateDefaultInstrumentAsync(userInstrument);
             return result;
+        }
+
+        public async Task<ServiceResult> CreateInstrumentAsync(Guid userId, UserInstrument userInstrument)
+        {
+            ServiceResult validationResult = await ValidateInstrumentAsync(userId, userInstrument);
+            if (!validationResult.Success)
+            {
+                return validationResult;
+            }
+
+            userInstrument.UserInstrumentId = Guid.NewGuid().ToString();
+
+            ServiceResult result = await _userInstrumentRepository.CreateUserInstrumentAsync(userId, userInstrument);
+            return result;
+        }
+
+        public Task<ServiceResult> DeleteDefaultInstrumentAsync(string userInstrumentId)
+        {
+            return _userInstrumentRepository.DeleteDefaultInstrumentAsync(userInstrumentId);
         }
 
         public Task<ServiceResult> DeleteInstrumentAsync(Guid userId, string userInstrumentId)

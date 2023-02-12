@@ -58,7 +58,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<User?> FindAsync(Guid userId)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc, PreventEmails " +
+            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc, PreventEmails, IsAdmin " +
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId";
 
@@ -70,7 +70,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<User?> FindByEmailAsync(string email)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc, PreventEmails " +
+            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc, PreventEmails, IsAdmin " +
                          $"FROM {TableName} " +
                          $"WHERE Email = @Email";
 
@@ -86,7 +86,8 @@ namespace NoteMapper.Data.Sql.Repositories.Users
                 reader.GetDateTime(1),
                 reader.GetString(2),
                 reader.GetDateTimeOrNull(3),
-                reader.GetBoolean(4));
+                reader.GetBoolean(4),
+                reader.GetBoolean(5));
         }
     }
 }

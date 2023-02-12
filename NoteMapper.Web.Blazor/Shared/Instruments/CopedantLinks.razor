@@ -1,0 +1,20 @@
+﻿<section class="pt-4">
+    <p>
+        Links to some common copedants:
+    </p>
+    <p>
+        @foreach (string link in Links)
+        {
+            <a href="@link" target="_blank" class="d-block">@link</a>
+        }
+    </p>
+</section>
+
+@code {
+    IReadOnlyCollection<string> Links = new[]
+    {
+        "https://b0b.com/wp/copedents/e9th",
+        "https://b0b.com/wp/copedents/c6th",
+        "https://b0b.com/wp/copedents/universal"
+    };
+}

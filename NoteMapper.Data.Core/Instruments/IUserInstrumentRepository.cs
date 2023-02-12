@@ -4,7 +4,11 @@ namespace NoteMapper.Data.Core.Instruments
 {
     public interface IUserInstrumentRepository
     {
-        Task<ServiceResult> CreateUserInstrumentAsync(Guid userId, UserInstrument instrument);
+        Task<ServiceResult> CreateDefaultInstrumentAsync(UserInstrument userInstrument);
+
+        Task<ServiceResult> CreateUserInstrumentAsync(Guid userId, UserInstrument userInstrument);
+
+        Task<ServiceResult> DeleteDefaultInstrumentAsync(string userInstrumentId);
 
         Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, string userInstrumentId);
 
@@ -16,6 +20,6 @@ namespace NoteMapper.Data.Core.Instruments
 
         Task<IReadOnlyCollection<UserInstrument>> GetUserInstrumentsAsync(Guid userId);
 
-        Task<ServiceResult> UpdateUserInstrumentAsync(Guid userId, UserInstrument instrument);
+        Task<ServiceResult> UpdateUserInstrumentAsync(Guid userId, UserInstrument userInstrument);
     }
 }

@@ -182,7 +182,7 @@ namespace NoteMapper.Identity.Microsoft
             }
             else
             {
-                user = await _userRepository.CreateAsync(new User(Guid.Empty, DateTime.UtcNow, email, null, false));
+                user = await _userRepository.CreateAsync(new User(Guid.Empty, DateTime.UtcNow, email, null, false, false));
                 if (user == null)
                 {
                     return defaultErrorResult;

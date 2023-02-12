@@ -15,53 +15,24 @@ namespace NoteMapper.Data.Cosmos.Repositories
 
         protected override string ContainerId => "user-instruments";
 
-        public async Task<ServiceResult> CreateUserInstrumentAsync(Guid userId, UserInstrument instrument)
+        public Task<ServiceResult> CreateDefaultInstrumentAsync(UserInstrument userInstrument)
         {
-            using (CosmosClient client = CreateClient())
-            {
-                Container container = GetContainer(client);
-                UserInstruments? entry = await FindAsync(container, userId.ToString());
-                if (entry == null)
-                {
-                    entry = new UserInstruments
-                    {
-                        Id = userId.ToString()
-                    };
-
-                    ServiceResult createResult = await CreateAsync(container, userId.ToString(), entry);
-                    if (!createResult.Success)
-                    {
-                        return createResult;
-                    }
-                }
-
-                entry.Instruments.Add(instrument);
-                return await UpdateAsync(container, userId.ToString(), entry);
-            }
+            return CreateUserInstrumentAsync(DefaultUserId, userInstrument);
         }
 
-        public async Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, string userInstrumentId)
+        public Task<ServiceResult> CreateUserInstrumentAsync(Guid userId, UserInstrument userInstrument)
         {
-            using (CosmosClient client = CreateClient())
-            {
-                Container container = GetContainer(client);
-                UserInstruments? entry = await FindAsync(container, userId.ToString());
-                if (entry == null)
-                {
-                    return ServiceResult.Successful();
-                }
+            return CreateUserInstrumentAsync(userId.ToString(), userInstrument);
+        }
 
-                UserInstrument? remove = entry.Instruments
-                    .FirstOrDefault(x => string.Equals(x.UserInstrumentId, userInstrumentId, StringComparison.InvariantCultureIgnoreCase));
-                if (remove == null)
-                {
-                    return ServiceResult.Successful();
-                }
+        public Task<ServiceResult> DeleteDefaultInstrumentAsync(string userInstrumentId)
+        {
+            return DeleteUserInstrumentAsync(DefaultUserId, userInstrumentId);
+        }
 
-                entry.Instruments.Remove(remove);
-
-                return await UpdateAsync(container, userId.ToString(), entry);
-            }
+        public Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, string userInstrumentId)
+        {
+            return DeleteUserInstrumentAsync(userId.ToString(), userInstrumentId);
         }
 
         public Task<UserInstrument?> FindDefaultInstrumentAsync(string userInstrumentId)
@@ -106,7 +77,7 @@ namespace NoteMapper.Data.Cosmos.Repositories
             }
         }
 
-        public async Task<ServiceResult> UpdateUserInstrumentAsync(Guid userId, UserInstrument instrument)
+        public async Task<ServiceResult> UpdateUserInstrumentAsync(Guid userId, UserInstrument userInstrument)
         {
             using (CosmosClient client = CreateClient())
             {
@@ -119,13 +90,62 @@ namespace NoteMapper.Data.Cosmos.Repositories
 
                 for (int i = 0; i < entry.Instruments.Count; i++)
                 {
-                    if (entry.Instruments[i].UserInstrumentId == instrument.UserInstrumentId)
+                    if (entry.Instruments[i].UserInstrumentId == userInstrument.UserInstrumentId)
                     {
-                        entry.Instruments[i] = instrument;
+                        entry.Instruments[i] = userInstrument;
                     }
                 }
 
                 return await UpdateAsync(container, userId.ToString(), entry);
+            }
+        }
+
+        private async Task<ServiceResult> CreateUserInstrumentAsync(string userId, UserInstrument userInstrument)
+        {
+            using (CosmosClient client = CreateClient())
+            {
+                Container container = GetContainer(client);
+                UserInstruments? entry = await FindAsync(container, userId);
+                if (entry == null)
+                {
+                    entry = new UserInstruments
+                    {
+                        Id = userId
+                    };
+
+                    ServiceResult createResult = await CreateAsync(container, userId, entry);
+                    if (!createResult.Success)
+                    {
+                        return createResult;
+                    }
+                }
+
+                entry.Instruments.Add(userInstrument);
+                return await UpdateAsync(container, userId, entry);
+            }
+        }
+
+        private async Task<ServiceResult> DeleteUserInstrumentAsync(string userId, string userInstrumentId)
+        {
+            using (CosmosClient client = CreateClient())
+            {
+                Container container = GetContainer(client);
+                UserInstruments? entry = await FindAsync(container, userId);
+                if (entry == null)
+                {
+                    return ServiceResult.Successful();
+                }
+
+                UserInstrument? remove = entry.Instruments
+                    .FirstOrDefault(x => string.Equals(x.UserInstrumentId, userInstrumentId, StringComparison.InvariantCultureIgnoreCase));
+                if (remove == null)
+                {
+                    return ServiceResult.Successful();
+                }
+
+                entry.Instruments.Remove(remove);
+
+                return await UpdateAsync(container, userId, entry);
             }
         }
 

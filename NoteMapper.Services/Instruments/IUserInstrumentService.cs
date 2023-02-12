@@ -6,7 +6,11 @@ namespace NoteMapper.Services.Instruments
 {
     public interface IUserInstrumentService
     {
+        Task<ServiceResult> ConvertToDefaultAsync(Guid userId, UserInstrument instrument);
+
         Task<ServiceResult> CreateInstrumentAsync(Guid userId, UserInstrument instrument);
+
+        Task<ServiceResult> DeleteDefaultInstrumentAsync(string userInstrumentId);
 
         Task<ServiceResult> DeleteInstrumentAsync(Guid userId, string userInstrumentId);
 
