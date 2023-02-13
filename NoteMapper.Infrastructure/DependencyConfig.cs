@@ -22,6 +22,7 @@ using NoteMapper.Services.Logging;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
 using NoteMapper.Services.Web.Contact;
+using NoteMapper.Services.Web.Security;
 using NoteMapper.Services.Web.StateManagement;
 
 namespace NoteMapper.Infrastructure
@@ -114,6 +115,9 @@ namespace NoteMapper.Infrastructure
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
                 .AddScoped<IMusicTheoryService, MusicTheoryService>()
+                .AddScoped<IRecaptchaService, RecaptchaService>()
+                .AddSingleton(new RecaptchaServiceSettings(config.GetValue("Recaptcha.SecretKey"),
+                    config.GetValue("Recaptcha.SiteKey"), config.GetValue("Recaptcha.VerifyUrl")))
                 .AddScoped<IUserInstrumentService, UserInstrumentService>()
                 .AddScoped<IUserInstrumentViewModelService, UserInstrumentViewModelService>();
         }

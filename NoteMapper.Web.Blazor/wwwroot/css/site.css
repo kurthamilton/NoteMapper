@@ -11008,6 +11008,10 @@ h3,
   border-right: var(--fretboard-border-hover);
 }
 
+.grecaptcha-badge {
+  display: none !important;
+}
+
 .shepherd-header {
   padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x) !important;
 }

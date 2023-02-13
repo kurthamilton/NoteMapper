@@ -24,6 +24,8 @@
 {
     if (Model.Enabled)
     {
+        <Recaptcha @ref="@RecaptchaComponent" />
+
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
 
@@ -70,6 +72,8 @@ else if (Feedback != null)
 @code {
     ContactRequestViewModel? Model { get; set; }
 
+    Recaptcha? RecaptchaComponent { get; set; }
+
     User? User { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -79,8 +83,15 @@ else if (Feedback != null)
 
     private async Task HandleValidSubmit()
     {
-        if (Model == null)
+        if (Model == null || RecaptchaComponent == null)
         {
+            return;
+        }
+
+        ServiceResult recaptchaResult = await RecaptchaComponent.VerifyAsync();
+        if (!recaptchaResult.Success)
+        {
+            SetFeedback(recaptchaResult);
             return;
         }
 
