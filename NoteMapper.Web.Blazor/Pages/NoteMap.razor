@@ -126,13 +126,14 @@
                     <td colspan="@((EndFret - StartFret) + 2)">
                         @*MODE*@
                         <div class="my-3">
-                            <div class="form-check form-switch">
+                            <div class="form-check form-switch form-check-inline" data-nm-tour-step="modifiers-mode">
                                 <input type="checkbox" class="form-check-input" id="mode" role="switch"
                                    checked="@(Criteria?.Mode == NoteMapMode.Combinations)" @onchange="OnModeChange">
                                 <label class="form-check-label" for="mode">Find combinations</label>
                             </div>
                         </div>
 
+                        @*MANUAL MODIFIER SELECTION*@
                         @if (Criteria?.Mode == NoteMapMode.Manual)
                         {
                             <div class="d-flex">
@@ -298,6 +299,9 @@
     </TourStep>
     <TourStep Target="modifiers-active" HideArrow="@true" Selector=".active">
         <p>The active combination is indicated with a *</p>
+    </TourStep>
+    <TourStep Target="modifiers-mode" HideArrow="@true">
+        <p>Switch to manual pedal selection by turning off combinations mode</p>
     </TourStep>
 </TourContainer>
 

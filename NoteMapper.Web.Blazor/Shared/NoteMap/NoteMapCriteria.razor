@@ -71,9 +71,9 @@
         </div>
 
         @*TYPE*@
-        <div class="@formGroupClass">
+        <div class="@formGroupClass" data-nm-tour-step="criteria-type">
             <div>
-                <label class="form-label" for="type-@inputSuffix">Type</label>
+                <label class="form-label" for="type-@inputSuffix">Notes</label>
                 <select class="form-control" id="type-@inputSuffix" value="@Model.Type"
                         @onchange="OnTypeChange">
                     @foreach (KeyValuePair<string, string?> option in Options.TypeOptions)
@@ -117,9 +117,17 @@
     </TourStep>
     <TourStep Target="criteria-key">
         <p>Select your key</p>
-    </TourStep>
-    <TourStep Target="criteria-mode">
-        <p>Choose between having all possible modifier combinations displayed or selecting custom modifiers</p>
+    </TourStep>    
+    <TourStep Target="criteria-type">
+        <p>Choose which notes you would like to find</p>
+        <p>
+            Choose between
+            <ul>
+                <li><strong>Chord</strong>: Highlight frets where all notes in the selected chord can be played</li>
+                <li><strong>Scale</strong>: Highlight frets where any note in the selected scale can be played</li>
+                <li><strong>Custom</strong>: Highlight frets where a custom selection of notes from the selected scale can be played</li>
+            </ul>
+        </p>
     </TourStep>
 </TourContainer>
 
