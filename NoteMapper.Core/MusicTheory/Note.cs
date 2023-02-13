@@ -79,12 +79,16 @@ namespace NoteMapper.Core.MusicTheory
                 .ToArray();
         }
 
-        public static INoteCollection GetNotes(int noteIndex, string key, NoteCollectionType type)
+        public static INoteCollection GetNotes(int noteIndex, string key, NoteCollectionType type,
+            IReadOnlyCollection<int> customNotes)
         {
             switch (type)
             {
                 case NoteCollectionType.Chord:
                     return Chord.Parse(noteIndex, key);
+                case NoteCollectionType.Custom:
+                    Scale scale = Scale.Parse(noteIndex, key);
+                    return new ScaleNoteCollection(scale, customNotes);
                 case NoteCollectionType.Scale:
                     return Scale.Parse(noteIndex, key);
                 default:

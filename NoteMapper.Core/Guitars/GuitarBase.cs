@@ -33,8 +33,6 @@ namespace NoteMapper.Core.Guitars
 
         public IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> GetPermutations(StringPermutationOptions options)
         {
-            int threshold = 2;
-
             List<IReadOnlyCollection<GuitarStringNote?>> notePermutations = new();
             
             // Store an index of the modifier permutations that were used to avoid duplicating the

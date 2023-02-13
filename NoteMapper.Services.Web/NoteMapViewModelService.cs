@@ -13,20 +13,18 @@ namespace NoteMapper.Services.Web
         private readonly IInstrumentFactory _instrumentFactory;
         private readonly IMusicTheoryService _musicTheoryService;
         private readonly IUserInstrumentRepository _userInstrumentRepository;
-        private readonly IUserService _userService;
-
+        
         public NoteMapViewModelService(IInstrumentFactory instrumentFactory, IMusicTheoryService musicTheoryService,
-            IUserInstrumentRepository userInstrumentRepository, IUserService userService)
+            IUserInstrumentRepository userInstrumentRepository)
         {
             _instrumentFactory = instrumentFactory;
             _musicTheoryService = musicTheoryService;
             _userInstrumentRepository = userInstrumentRepository;
-            _userService = userService;
         }
 
         public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(UserPreferences preferences, 
             NoteMapCriteriaOptionsViewModel options,
-            string instrument, string note, string key, string type, string mode, string intervals, string flats)
+            string instrument, string note, IEnumerable<string> customNotes, string key, string type, string mode)
         {
             if (string.IsNullOrEmpty(instrument))
             {
@@ -47,24 +45,22 @@ namespace NoteMapper.Services.Web
                 parsedMode = NoteMapCriteriaViewModel.DefaultMode;
             }
 
-            if (!bool.TryParse(flats, out bool parsedFlats))
+            HashSet<int> parsedCustomNotes = new();
+            foreach (string s in customNotes)
             {
-                parsedFlats = preferences.Accidental == AccidentalType.Flat;
-            }
-
-            if (!bool.TryParse(intervals, out bool parsedIntervals))
-            {
-                parsedIntervals = preferences.Intervals;
+                if (int.TryParse(s, out int parsedCustomNote))
+                {
+                    parsedCustomNotes.Add(parsedCustomNote);
+                }
             }
 
             return new NoteMapCriteriaViewModel
             {
-                Accidental = parsedFlats ? AccidentalType.Flat : AccidentalType.Sharp,
+                CustomNotes = parsedCustomNotes,
                 InstrumentId = instrument,
                 Mode = parsedMode,
                 NoteIndex = noteIndex,
                 ScaleType = keyScale?.Type.ShortName(),
-                ShowIntervals = parsedIntervals,
                 Type = parsedType
             };
         }
@@ -85,14 +81,16 @@ namespace NoteMapper.Services.Web
                 keyTypes);
         }
 
-        public NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument, NoteMapOptionsViewModel options)
+        public NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument, 
+            NoteMapOptionsViewModel options)
         {
             if (instrument == null)
             {
                 return default;
             }
 
-            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.Key, options.Type);
+            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.Key, 
+                options.Type, options.CustomNotes);
 
             int frets = instrument.Strings.Max(x => x.Frets);
 
@@ -102,8 +100,8 @@ namespace NoteMapper.Services.Web
             {
                 NoteMapFretViewModel fretViewModel = new(fret);
 
-                int threshold = options.Type == NoteCollectionType.Chord
-                    ? notes.Count
+                int threshold = (options.Type == NoteCollectionType.Chord || options.Type == NoteCollectionType.Custom)
+                    ? notes.Count                    
                     : 1;
                 StringPermutationOptions permutationOptions = new(notes, fret, threshold);
 

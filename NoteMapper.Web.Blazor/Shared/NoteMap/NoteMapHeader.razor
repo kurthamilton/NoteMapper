@@ -1,19 +1,33 @@
 ﻿@using NoteMapper.Core.Guitars
+@using NoteMapper.Services.Users;
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Models.NoteMap
-@using NoteMapper.Web.Blazor.Shared.Shared
+@using NoteMapper.Web.Blazor.Shared.Components
 
-<div class="card mb-3 d-none d-md-block">
+@if (UserPreferences == null)
+{
+    return;
+}
+
+<div class="card mb-3 d-none d-sm-block">
     <div class="card-body">
-        <NoteMapCriteria Inline="true" Model="@Criteria" Options="@CriteriaOptions"
+        <NoteMapCriteria Inline="true" 
+                         Model="@Criteria" 
+                         Options="@CriteriaOptions"
+                         UserPreferences="@UserPreferences"
                          OnChange="OnCriteriaChange" />
     </div>
 </div>
 
 <div class="d-flex">
-    <button class="btn btn-outline-secondary btn-sm me-auto d-block d-md-none"
-            @onclick="ToggleOptions">
+    <button class="btn btn-outline-secondary btn-sm me-auto d-block d-sm-none"
+            @onclick="() => OptionsComponent?.Open()">
         Options
+    </button>
+
+    <button class="btn btn-outline-secondary btn-sm me-auto"
+            @onclick="() => PreferencesComponent?.Open()">
+        Preferences
     </button>
 
     <div class="d-flex flex-grow-1 justify-content-end">
@@ -21,21 +35,20 @@
     </div>
 </div>
 
-<div class="d-block d-md-none">
-    <div class="offcanvas offcanvas-start @(OptionsVisible ? "show" : "")">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Options</h5>
-            <button type="button" class="btn-close" @onclick="() => OptionsVisible = false"></button>
-        </div>
-        <div class="offcanvas-body">
-            <NoteMapCriteria Model="@Criteria" Options="@CriteriaOptions" OnChange="OnCriteriaChange" />
-        </div>
-    </div>
-    @if (OptionsVisible)
-    {
-        <div class="offcanvas-backdrop fade show" @onclick="() => OptionsVisible = false"></div>
-    }
+<div class="d-block d-sm-none">
+    <OffCanvas @ref="OptionsComponent" Heading="Options">
+        <NoteMapCriteria Model="@Criteria"
+                         Options="@CriteriaOptions"
+                         UserPreferences="@UserPreferences"
+                         OnChange="OnCriteriaChange" />
+    </OffCanvas>   
 </div>
+
+<OffCanvas @ref="PreferencesComponent" Heading="Preferences">
+    <NoteMapDisplayPreferences UserId="UserId"
+                               UserPreferences="UserPreferences"
+                               OnChange="OnPreferencesChange"/>
+</OffCanvas>
 
 @code {
     [Parameter]
@@ -48,15 +61,21 @@
     public GuitarBase? Instrument { get; set; }
 
     [Parameter]
+    public Guid? UserId { get; set; }
+
+    [Parameter]
+    public UserPreferences? UserPreferences { get; set; }
+
+    [Parameter]
     public EventCallback<NoteMapCriteriaViewModel> OnCriteriaChange { get; set; }
+
+    [Parameter]
+    public EventCallback<UserPreferences> OnPreferencesChange { get; set; }
 
     [Parameter]
     public EventCallback<NoteMapZoomViewModel?> OnZoomChange { get; set; }
 
-    bool OptionsVisible { get; set; }
+    OffCanvas? OptionsComponent;
 
-    void ToggleOptions()
-    {
-        OptionsVisible = !OptionsVisible;
-    }
+    OffCanvas? PreferencesComponent;
 }

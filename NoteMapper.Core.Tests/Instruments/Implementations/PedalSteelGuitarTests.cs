@@ -19,7 +19,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }                
             });
 
-            INoteCollection notes = Note.GetNotes(0, "", NoteCollectionType.Chord);
+            INoteCollection notes = Note.GetNotes(0, "", NoteCollectionType.Chord, Array.Empty<int>());
             StringPermutationOptions options = new(notes, 0, null);
             IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> permutations = 
                 psg.GetPermutations(options).ToArray();
@@ -57,7 +57,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            INoteCollection notes = Note.GetNotes(0, "", NoteCollectionType.Chord);
+            INoteCollection notes = Note.GetNotes(0, "", NoteCollectionType.Chord, Array.Empty<int>());
             StringPermutationOptions options = new(notes, 0, null);
             IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> permutations =
                 psg.GetPermutations(options).ToArray();
@@ -94,7 +94,7 @@ namespace NoteMapper.Core.Tests.Instruments.Implementations
                 }
             });
 
-            INoteCollection notes = Note.GetNotes(0, "", NoteCollectionType.Chord);
+            INoteCollection notes = Note.GetNotes(0, "", NoteCollectionType.Chord, Array.Empty<int>());
             StringPermutationOptions options = new(notes, 1, null);
             IReadOnlyCollection<IReadOnlyCollection<GuitarStringNote?>> permutations =
                 psg.GetPermutations(options).ToArray();

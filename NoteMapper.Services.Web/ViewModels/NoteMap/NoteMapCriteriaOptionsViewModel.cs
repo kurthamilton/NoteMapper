@@ -1,6 +1,5 @@
 ﻿using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
-using NoteMapper.Core.NoteMap;
 
 namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
@@ -15,32 +14,30 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
             UserInstruments = userInstruments.ToArray();
 
             NoteIndexes = noteIndexes;
-            ScaleTypes = scaleTypes;
+            ScaleTypes = scaleTypes;            
 
-            Accidentals = new[]
+            CustomNoteOptions = new KeyValuePair<int, string>[]
             {
-                Accidental.ToString(AccidentalType.Sharp),
-                Accidental.ToString(AccidentalType.Flat)
-            };
-
-            Modes = new[]
-            {
-                NoteMapMode.Combinations,
-                NoteMapMode.Manual
+                new KeyValuePair<int, string>(0, "i"),
+                new KeyValuePair<int, string>(1, "ii"),
+                new KeyValuePair<int, string>(2, "iii"),
+                new KeyValuePair<int, string>(3, "iv"),
+                new KeyValuePair<int, string>(4, "v"),
+                new KeyValuePair<int, string>(5, "vi"),
+                new KeyValuePair<int, string>(6, "vii")
             };
 
             TypeOptions = new[]
             {
                 new KeyValuePair<string, string?>(NoteCollectionType.Chord.ToString(), null),
-                new KeyValuePair<string, string?>(NoteCollectionType.Scale.ToString(), null)
+                new KeyValuePair<string, string?>(NoteCollectionType.Scale.ToString(), null),
+                new KeyValuePair<string, string?>(NoteCollectionType.Custom.ToString(), null)
             };
-        }
+        }        
 
-        public IReadOnlyCollection<string> Accidentals { get; }
+        public IReadOnlyCollection<KeyValuePair<int, string>> CustomNoteOptions { get; }
 
         public IReadOnlyCollection<GuitarBase> DefaultInstruments { get; }
-
-        public IReadOnlyCollection<NoteMapMode> Modes { get; }
 
         public IReadOnlyCollection<int> NoteIndexes { get; }
 

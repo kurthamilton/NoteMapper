@@ -6,14 +6,14 @@
 @using NoteMapper.Core.NoteMap
 @using NoteMapper.Services
 @using NoteMapper.Services.Instruments
-@using NoteMapper.Services.Users;
+@using NoteMapper.Services.Users
 @using NoteMapper.Services.Web
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Extensions
 @using NoteMapper.Web.Blazor.Models.NoteMap
-@using NoteMapper.Web.Blazor.Models.Tour;
+@using NoteMapper.Web.Blazor.Models.Tour
+@using NoteMapper.Web.Blazor.Shared.Components
 @using NoteMapper.Web.Blazor.Shared.NoteMap
-@using NoteMapper.Web.Blazor.Shared.Shared
 @using NoteMapper.Web.Blazor.Shared.Tour
 
 @if (CriteriaOptions == null)
@@ -25,7 +25,10 @@
 <NoteMapHeader Criteria="@Criteria" 
                CriteriaOptions="@CriteriaOptions"
                Instrument="@Instrument"
+               UserId="@UserId"
+               UserPreferences="@UserPreferences"
                OnCriteriaChange="OnCriteriaChange"
+               OnPreferencesChange="OnPreferencesChange"
                OnZoomChange="OnZoomChange"/>
 
 @if (Instrument != null)
@@ -69,10 +72,10 @@
                         <td class="table-column--sticky">
                             <div class="string__name">
                                 <span class="string__index">@(i + 1)</span>
-                                @if (Criteria != null)
+                                @if (UserPreferences != null)
                                 {
                                     <strong>
-                                        @(@string.OpenNote.GetName(Criteria.Accidental))
+                                        @(@string.OpenNote.GetName(UserPreferences.Accidental))
                                     </strong>
                                 }
                             </div>                            
@@ -93,7 +96,7 @@
                                     {
                                         <span class="fret__note badge bg-light text-dark"
                                                 data-nm-tour-step="@(tour ? "fretboard-note" : null)">
-                                            @if (Criteria?.ShowIntervals == true)
+                                            @if (UserPreferences?.Intervals == true)
                                             {
                                                 @note.Interval
                                             }
@@ -121,7 +124,46 @@
             <tbody class="separator">
                 <tr>
                     <td colspan="@((EndFret - StartFret) + 2)">
-                        &nbsp;
+                        @*MODE*@
+                        <div class="my-3">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="mode" role="switch"
+                                   checked="@(Criteria?.Mode == NoteMapMode.Combinations)" @onchange="OnModeChange">
+                                <label class="form-check-label" for="mode">Find combinations</label>
+                            </div>
+                        </div>
+
+                        @if (Criteria?.Mode == NoteMapMode.Manual)
+                        {
+                            <div class="d-flex">
+                                @foreach (IGrouping<string, GuitarStringModifier> group in Instrument.Modifiers.GroupBy(x => x.Type))
+                                {
+                                    <div class="me-1">
+                                        <div>
+                                            @group.Key
+                                        </div>
+                                        <div class="btn-group">
+                                            @foreach (GuitarStringModifier modifier in group)
+                                            {
+                                                bool disabled = !modifier.CanBeUsedWith(SelectedModifiers);
+
+                                                string cssClass = disabled
+                                                    ? "btn-outline-secondary"
+                                                    : SelectedModifiers.Contains(modifier)
+                                                    ? "btn-success"
+                                                    : "btn-outline-success";
+
+                                                <button class="btn @cssClass"
+                                                        @onclick="e => ToggleSelectedModifier(modifier)"
+                                                        disabled="@disabled">
+                                                    @modifier.Name
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </td>
                 </tr>
             </tbody>
@@ -225,39 +267,7 @@
             }
 
         </table>
-    </div>
-
-    if (Criteria?.Mode == NoteMapMode.Manual)
-    {
-        <div class="d-flex">
-            @foreach (IGrouping<string, GuitarStringModifier> group in Instrument.Modifiers.GroupBy(x => x.Type))
-            {
-                <div class="me-1">
-                    <div>
-                        @group.Key
-                    </div>
-                    <div class="btn-group">
-                        @foreach (GuitarStringModifier modifier in group)
-                        {
-                            bool disabled = !modifier.CanBeUsedWith(SelectedModifiers);
-
-                            string cssClass = disabled
-                                ? "btn-outline-secondary"
-                                : SelectedModifiers.Contains(modifier)
-                                ? "btn-success"
-                                : "btn-outline-success";
-
-                            <button class="btn @cssClass"
-                                    @onclick="e => ToggleSelectedModifier(modifier)"
-                                    disabled="@disabled">
-                                @modifier.Name
-                            </button>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-    }
+    </div>    
 }
 
 <TourContainer TourId="note-map-fretboard" Title="Fretboard">
@@ -342,21 +352,30 @@
 
         await NavigationManager.SetQueryStringValuesAsync(new Dictionary<string, string?>
         {
-            { "instrument", Criteria.InstrumentId != CriteriaOptions?.DefaultInstruments.FirstOrDefault()?.Id ? Criteria.InstrumentId : null },
-            { "intervals", Criteria.ShowIntervals ? "true" : null },
-            { "note", Criteria.NoteIndex  != 0 ? Criteria.NoteIndex.ToString() : null },
-            { "key", !string.IsNullOrEmpty(Criteria.ScaleType) ? Criteria.ScaleType : null },
-            { "type", Criteria.Type != NoteMapCriteriaViewModel.DefaultType ? Criteria.Type.ToString() : null },
-            { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : null },
-            { "flats", Criteria.Accidental == AccidentalType.Flat ? "true" : null }
+            { "instrument", Criteria.InstrumentId != CriteriaOptions?.DefaultInstruments.FirstOrDefault()?.Id ? Criteria.InstrumentId : default },
+            { "note", Criteria.NoteIndex  != 0 ? Criteria.NoteIndex.ToString() : default },
+            { "notes", Criteria.CustomNotes.Count > 0 ? string.Join(",", Criteria.CustomNotes) : default },
+            { "key", !string.IsNullOrEmpty(Criteria.ScaleType) ? Criteria.ScaleType : default },
+            { "type", Criteria.Type != NoteMapCriteriaViewModel.DefaultType ? Criteria.Type.ToString() : default },
+            { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : default }
         }, JsRuntime);
+    }
 
-        UserPreferences userPreferences = new UserPreferences(criteria.Accidental, criteria.ShowIntervals);
-        if (UserId != null && UserPreferences != null && !userPreferences.Equals(UserPreferences))
+    Task OnModeChange(ChangeEventArgs e)
+    {
+        if (Criteria == null)
         {
-            UserPreferences = userPreferences;
-            await UserService.UpdateUserPreferences(UserId.Value, userPreferences);
+            return Task.CompletedTask;
         }
+
+        bool value = (bool?)e.Value == true;
+        Criteria.Mode = value ? NoteMapMode.Combinations : NoteMapMode.Manual;
+        return OnCriteriaChange(Criteria);
+    }
+
+    void OnPreferencesChange(UserPreferences userPreferences)
+    {
+        UserPreferences = userPreferences;
     }
 
     void OnZoomChange(NoteMapZoomViewModel? zoom)
@@ -372,21 +391,20 @@
             return;
         }
 
-        NavigationManager.TryGetQueryStringValue("instrument", out string instrument);
-        NavigationManager.TryGetQueryStringValue("intervals", out string intervals);
+        NavigationManager.TryGetQueryStringValue("instrument", out string instrument);        
         NavigationManager.TryGetQueryStringValue("note", out string note);
+        NavigationManager.TryGetQueryStringValue("notes", out string notes);
         NavigationManager.TryGetQueryStringValue("key", out string key);
         NavigationManager.TryGetQueryStringValue("type", out string type);
         NavigationManager.TryGetQueryStringValue("mode", out string mode);
-        NavigationManager.TryGetQueryStringValue("flats", out string flats);
-
+        
         Criteria = NoteMapViewModelService.GetNoteMapCriteriaViewModel(UserPreferences, CriteriaOptions,            
-            instrument, note, key, type, mode, intervals, flats);
+            instrument, note, notes.Split(','), key, type, mode);
     }
 
     void SetPermutations()
     {
-        if (Instrument == null || Criteria == null)
+        if (Instrument == null || Criteria == null || UserPreferences == null)
         {
             ViewModel = null;
             return;
@@ -394,7 +412,8 @@
 
         NoteMapOptionsViewModel options = new()
         {
-            Accidental = Criteria.Accidental,
+            Accidental = UserPreferences.Accidental,
+            CustomNotes = Criteria.CustomNotes,
             Key = Criteria.ScaleType ?? "",
             Mode = Criteria.Mode,
             Modifiers = SelectedModifiers.Select(x => x.Name).ToArray(),

@@ -4,6 +4,7 @@
     {
         None,
         Chord,
-        Scale
+        Scale,
+        Custom
     }
 }

@@ -7,6 +7,8 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
     {
         public AccidentalType Accidental { get; set; }
 
+        public IReadOnlyCollection<int> CustomNotes { get; set; } = Array.Empty<int>();
+
         public string Key { get; set; } = "";
 
         public NoteMapMode Mode { get; set; }

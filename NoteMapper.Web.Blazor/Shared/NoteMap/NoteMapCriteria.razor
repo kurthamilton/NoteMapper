@@ -1,17 +1,19 @@
 ﻿@using NoteMapper.Core
-@using NoteMapper.Core.Guitars;
+@using NoteMapper.Core.Guitars
 @using NoteMapper.Core.MusicTheory
-@using NoteMapper.Core.NoteMap;
+@using NoteMapper.Core.NoteMap
+@using NoteMapper.Services.Users
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Shared.Tour
 
 @{
-    if (Options == null)
+    if (Options == null || UserPreferences == null)
     {
         return;
     }
 
     string formGroupClass = Inline ? "form-group" : "mb-3";
+    string inputSuffix = Inline ? "inline" : "block";
 }
 
 <div>
@@ -22,12 +24,14 @@
                 <i class="icon bi bi-question-circle"></i>
             </button>
         </div>
-    }    
+    }
 
-    <div class="@(Inline ? "form-inline d-block d-sm-flex align-items-center" : "")">        
+    <div class="@(Inline ? "form-inline d-flex align-items-center" : "")">
+
+        @*INSTRUMENT*@
         <div class="@formGroupClass" data-nm-tour-step="criteria-instrument">
-            <label class="form-label" for="instrument">Instrument</label>
-            <select class="form-control" id="instrument" value="@Model.InstrumentId" 
+            <label class="form-label" for="instrument-@inputSuffix">Instrument</label>
+            <select class="form-control" id="instrument-@inputSuffix" value="@Model.InstrumentId"
                     @onchange="OnInstrumentChange">
                 @foreach (GuitarBase instrument in Options.DefaultInstruments)
                 {
@@ -46,16 +50,18 @@
             </select>
         </div>
 
+        @*KEY*@
         <div class="@formGroupClass" data-nm-tour-step="criteria-key">
-            <label class="form-label" for="key">Key</label>
+            <label class="form-label" for="note-@inputSuffix">Key</label>
             <div class="d-flex">
-                <select class="form-control" id="key" value="@Model.NoteIndex" @onchange="OnKeyNameChange">
+                <select class="form-control" id="note-@inputSuffix" value="@Model.NoteIndex"
+                        @onchange="OnKeyNameChange">
                     @foreach (int noteIndex in Options.NoteIndexes)
                     {
-                        <option value="@noteIndex">@(Note.GetName(noteIndex, Model.Accidental))</option>
+                        <option value="@noteIndex">@(Note.GetName(noteIndex, UserPreferences.Accidental))</option>
                     }
                 </select>
-                <select class="form-control" id="key" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
+                <select class="form-control" id="scaletype-@inputSuffix" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
                     @foreach (string type in Options.ScaleTypes)
                     {
                         <option>@type</option>
@@ -64,76 +70,56 @@
             </div>
         </div>
 
+        @*TYPE*@
         <div class="@formGroupClass">
-            @foreach (KeyValuePair<string, string?> option in Options.TypeOptions)
-            {
-                <div class="form-check @(Inline ? null : "form-check-inline")">
-                    <input class="form-check-input" type="radio" name="type-@(Inline ? "inline" : "block")" id="type-@option.Key"
-                       checked="@(Model.Type.ToString() == option.Key)" @onchange="OnTypeChange"
-                       value="@option.Key">
-                    <label class="form-check-label" for="type-@option.Key">
-                        @(option.Value ?? option.Key)
-                    </label>
-                </div>
-            }
-        </div>
-
-        <div class="@formGroupClass" data-nm-tour-step="criteria-mode">
-            <label class="form-label" for="mode">Mode</label>
-            <select class="form-control" id="mode" value="@Model.Mode.ToString()" @onchange="OnModeChange">
-                @foreach (NoteMapMode mode in Options.Modes)
-                {
-                    <option>@mode.ToString()</option>
-                }
-            </select>
-        </div>
-
-        <div class="@formGroupClass"data-nm-tour-step="criteria-intervals">
-            @if (Inline)
-            {
-                <label>&nbsp;</label>
-            }        
-
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="show-intervals"
-                       checked="@Model.ShowIntervals" @onchange="OnShowIntervalsChange">
-                <label class="form-check-label" for="show-intervals">Intervals</label>
+            <div>
+                <label class="form-label" for="type-@inputSuffix">Type</label>
+                <select class="form-control" id="type-@inputSuffix" value="@Model.Type"
+                        @onchange="OnTypeChange">
+                    @foreach (KeyValuePair<string, string?> option in Options.TypeOptions)
+                    {
+                        <option value="@option.Key">@(option.Value ?? option.Key)</option>
+                    }
+                </select>
             </div>
         </div>
 
-        <div class="@formGroupClass" data-nm-tour-step="criteria-accidental">
-            @foreach (string option in Options.Accidentals)
-            {
-                AccidentalType type = Accidental.Parse(option);
-                <div class="form-check @(Inline ? null : "form-check-inline")">
-                    <input class="form-check-input" type="radio" name="accidental-@(Inline ? "inline" : "block")" id="accidental-@type"
-                       checked="@(Model.Accidental == type)" @onchange="OnAccidentalChange"
-                       value="@option">
-                    <label class="form-check-label" for="accidental-@type">
-                        @option
-                    </label>
+        @*CUSTOM NOTES*@
+        @if (Model.Type == NoteCollectionType.Custom)
+        {
+            <div class="@formGroupClass">
+                @if (Inline)
+                {
+                    <label class="form-label">&nbsp;</label>
+                }                
+                <div>
+                    @foreach (KeyValuePair<int, string> option in Options.CustomNoteOptions)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="custom-note-@option.Key-@inputSuffix"
+                           value="@option.Key"
+                           checked="@(Model.CustomNotes.Contains(option.Key))" @onchange="e => OnCustomNoteChange(option.Key, e)">
+                            <label class="form-check-label" for="custom-note-@option.Key-@inputSuffix">
+                                @option.Value
+                            </label>
+                        </div>
+                    }
                 </div>
-            }        
-        </div>
+            </div>
+        }        
     </div>
 </div>
 
-<TourContainer TourId="@TourId" Title="Options">    
+<TourContainer TourId="@TourId" Title="Options">
     <TourStep Target="criteria-instrument">
         <p>Choose your instrument</p>
         <p>Instruments can be viewed and created from the <a href="/instruments" target="_blank">instruments</a> page</p>
-    </TourStep>    
+    </TourStep>
     <TourStep Target="criteria-key">
         <p>Select your key</p>
     </TourStep>
     <TourStep Target="criteria-mode">
         <p>Choose between having all possible modifier combinations displayed or selecting custom modifiers</p>
-    </TourStep>
-    <TourStep Target="criteria-intervals">
-        <p>Note names (C, D, F# etc) are displayed by default. Choose whether you would prefer to see the note intervals</p>
-    </TourStep>
-    <TourStep Target="criteria-accidental">
-        <p>Choose whether notes should be displayed as sharps or flats</p>
     </TourStep>
 </TourContainer>
 
@@ -145,10 +131,13 @@
     public NoteMapCriteriaOptionsViewModel? Options { get; set; }
 
     [Parameter]
+    public NoteMapCriteriaViewModel Model { get; set; } = new();
+
+    [Parameter]
     public EventCallback<NoteMapCriteriaViewModel> OnChange { get; set; }
 
     [Parameter]
-    public NoteMapCriteriaViewModel Model { get; set; } = new();
+    public UserPreferences? UserPreferences { get; set; }
 
     string TourId => $"criteria{(Inline ? "-inline" : "")}";
 
@@ -157,15 +146,18 @@
         base.OnInitialized();
     }
 
-    Task OnAccidentalChange(ChangeEventArgs e)
+    Task OnCustomNoteChange(int note, ChangeEventArgs e)
     {
-        string? value = (string?)e.Value;
-        if (value == null)
+        bool? @checked = (bool?)e.Value;
+        if (@checked == true)
         {
-            return Task.CompletedTask;
+            Model.CustomNotes.Add(note);
         }
-        
-        Model.Accidental = Accidental.Parse(value);
+        else
+        {
+            Model.CustomNotes.Remove(note);
+        }
+
         return EmitChange();
     }
 
@@ -179,25 +171,11 @@
     {
         Model.NoteIndex = int.Parse((string?)e.Value ?? "0");
         return EmitChange();
-    }
-
-    Task OnModeChange(ChangeEventArgs e)
-    {
-        string value = (string?)e.Value ?? "";
-        NoteMapMode mode = Enum.Parse<NoteMapMode>(value, true);
-        Model.Mode = Enum.IsDefined<NoteMapMode>(mode) ? mode : default;
-        return EmitChange();
-    }
+    }    
 
     Task OnScaleTypeChange(ChangeEventArgs e)
     {
         Model.ScaleType = (string?)e.Value;
-        return EmitChange();
-    }
-
-    Task OnShowIntervalsChange(ChangeEventArgs e)
-    {
-        Model.ShowIntervals = (bool?)e.Value ?? false;
         return EmitChange();
     }
 

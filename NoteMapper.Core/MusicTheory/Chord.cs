@@ -1,14 +1,11 @@
 ﻿namespace NoteMapper.Core.MusicTheory
 {
-    public class Chord : NoteCollection
+    public class Chord : ScaleNoteCollection
     {
-        private Chord(IEnumerable<Note> notes, Scale key)
-            : base(notes)
+        private Chord(Scale scale, IEnumerable<int> noteIndexes)
+            : base(scale, noteIndexes)
         {
-            Key = key;
         }
-
-        public override Scale Key { get; }
 
         public static Chord Parse(int noteIndex, string key)
         {
@@ -16,9 +13,7 @@
 
             IEnumerable<int> notes = GetChordNotes(scale.Type);
 
-            IEnumerable<Note> chordNotes = notes
-                .Select(x => scale.ElementAt(x));
-            return new Chord(chordNotes, scale);
+            return new Chord(scale, notes);
         }
 
         private static IEnumerable<int> GetChordNotes(ScaleType type)
