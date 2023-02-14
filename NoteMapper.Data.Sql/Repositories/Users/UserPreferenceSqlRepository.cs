@@ -8,6 +8,11 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 {
     public class UserPreferenceSqlRepository : SqlRepositoryBase<UserPreference>, IUserPreferenceRepository
     {
+        protected override IReadOnlyCollection<string> SelectColumns => new[]
+        {
+            "UserPreferenceTypeId", "Value"
+        };
+
         protected override string TableName => "UserPreferences";
 
         public UserPreferenceSqlRepository(SqlRepositorySettings settings, 
@@ -18,7 +23,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<IReadOnlyCollection<UserPreference>> GetAsync(Guid userId)
         {
-            string sql = "SELECT UserPreferenceTypeId, Value " +
+            string sql = $"SELECT {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId ";
 

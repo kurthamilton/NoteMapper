@@ -26,15 +26,23 @@ else
     <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
         <DataAnnotationsValidator />
 
-        <div class="mb-3">
-            <label for="password" class="form-label required">Password</label>
-            <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" />
-            <ValidationMessage For="() => Model.Password" />
-        </div>
+        <fieldset disabled="@Loading">
+            <div class="mb-3">
+                <label for="password" class="form-label required">Password</label>
+                <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" />
+                <ValidationMessage For="() => Model.Password" />
+            </div>
 
-        <div>
-            <button type="submit" class="btn btn-primary">Activate</button>
-        </div>
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    Activate
+                    @if (Loading)
+                    {
+                        <ButtonSpinner />
+                    }
+                </button>
+            </div>
+        </fieldset>
     </EditForm>
 }
 
@@ -43,6 +51,8 @@ else
     string Code { get; set; } = "";
 
     string Email { get; set; } = "";
+
+    bool Loading { get; set; }
 
     ActivateViewModel Model { get; set; } = new();
 
@@ -63,7 +73,11 @@ else
 
     private async Task HandleValidSubmitAsync()
     {
+        Loading = true;
+
         ServiceResult result = await IdentityService.ActivateUserAsync(Email, Code, Model.Password);
         Feedback = FeedbackViewModel.FromServiceResult(result);
+
+        Loading = false;
     }
 }

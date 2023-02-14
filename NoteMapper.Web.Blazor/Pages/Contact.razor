@@ -29,7 +29,7 @@
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
 
-            <fieldset disabled="@Loading">
+            <fieldset disabled="@Submitting">
                 @if (User == null)
                 {
                     <div class="mb-3">
@@ -50,8 +50,11 @@
                 </div>
 
                 <button class="btn btn-primary">
-                    Submit
-                    <ButtonSpinner Loading="@Loading" />
+                    Submit                    
+                    @if (Submitting)
+                    {
+                        <ButtonSpinner />
+                    }                    
                 </button>
             </fieldset>
         </EditForm>
@@ -74,6 +77,8 @@ else if (Feedback != null)
 
     Recaptcha? RecaptchaComponent { get; set; }
 
+    bool Submitting { get; set; }
+
     User? User { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -88,14 +93,19 @@ else if (Feedback != null)
             return;
         }
 
+        Submitting = true;
+
         ServiceResult recaptchaResult = await RecaptchaComponent.VerifyAsync();
         if (!recaptchaResult.Success)
         {
+            Submitting = true;
             SetFeedback(recaptchaResult);
             return;
         }
 
+        Submitting = false;
+
         ServiceResult result = await ContactService.SendContactRequestAsync(Model);
-        SetFeedback(result);
+        SetFeedback(result);                
     }
 }

@@ -13,7 +13,7 @@
 
 <h1>Login</h1>
 
-<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync" class="@(Loading ? "loading" : null)">
+<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
     <DataAnnotationsValidator />
     
     <fieldset disabled="@Loading">
@@ -37,7 +37,10 @@
         <div class="mb-3">
             <button type="submit" class="btn btn-primary" tabindex="3">
                 Login
-                <ButtonSpinner Loading="@Loading" />
+                @if (Loading)
+                {
+                    <ButtonSpinner />
+                }                
             </button>
         </div>
     </fieldset>
@@ -48,25 +51,28 @@
 @inject NavigationManager NavigationManager
 @inject IUrlEncoder UrlEncoder
 @code {
-
+    bool Loading { get; set; }
     LoginViewModel Model { get; set; } = new();    
 
     private async Task HandleValidSubmitAsync()
     {
-        SetLoading();
+        Loading = true;
 
         User? user = await IdentityService.FindUserAsync(Model.Email);
         ServiceResult result = await IdentityService.CanUserSignIn(user, Model.Password);
         if (user == null || !result.Success)
         {            
             SetFeedback(result);
+            Loading = false;
             return;
         }
 
         UserLoginToken? token = await IdentityService.CreateLoginTokenAsync(user.UserId);
+        Loading = false;
+
         if (token == null)
         {
-            SetError("An error occurred during login");
+            SetError("An error occurred during login");            
             return;
         }
 

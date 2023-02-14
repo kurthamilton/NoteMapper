@@ -14,11 +14,16 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
         }
 
+        protected override IReadOnlyCollection<string> SelectColumns => new[]
+        {
+            "RegistrationCodeId", "ExpiresUtc", "Code"
+        };
+
         protected override string TableName => "RegistrationCodes";
 
         public Task<RegistrationCode?> FindAsync(string code)
         {
-            string sql = "SELECT TOP 1 RegistrationCodeId, ExpiresUtc, Code " +
+            string sql = $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE Code = @Code ";
 

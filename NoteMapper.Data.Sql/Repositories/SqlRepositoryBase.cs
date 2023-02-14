@@ -18,6 +18,10 @@ namespace NoteMapper.Data.Sql
             _settings = settings;
         }
 
+        protected abstract IReadOnlyCollection<string> SelectColumns { get; }
+
+        protected string SelectColumnSql => string.Join(", ", SelectColumns);
+
         protected abstract string TableName { get; }
 
         protected async Task<ServiceResult> ExecuteQueryAsync(string sql, IEnumerable<SqlParameter> parameters)

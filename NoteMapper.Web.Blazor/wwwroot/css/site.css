@@ -10847,14 +10847,6 @@ label.required:after {
   content: " *";
 }
 
-.loading-indicator {
-  display: none;
-}
-
-.loading .loading-indicator {
-  display: inline-block;
-}
-
 .select--notes {
   min-width: 2.5rem;
 }

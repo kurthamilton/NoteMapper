@@ -14,6 +14,8 @@ namespace NoteMapper.Data.Sql.Repositories.Contact
         {
         }
 
+        protected override IReadOnlyCollection<string> SelectColumns => Array.Empty<string>();
+
         protected override string TableName => "ContactRequests";
 
         public Task<ServiceResult> CreateAsync(ContactRequest request)

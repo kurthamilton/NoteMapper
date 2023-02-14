@@ -15,6 +15,11 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
         }
 
+        protected override IReadOnlyCollection<string> SelectColumns => new[]
+        {
+            "UserId", "CreatedUtc", "Email", "ActivatedUtc", "PreventEmails", "IsAdmin"
+        };
+
         protected override string TableName => "Users";
 
         public Task<ServiceResult> ActivateAsync(User user)
@@ -34,7 +39,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
             string sql = $"INSERT INTO {TableName} (CreatedUtc, Email) " +
                          "VALUES (@CreatedUtc, @Email)" +
-                         "SELECT TOP 1 UserId, CreatedUtc, Email " +
+                         $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE Email = @Email";
 
@@ -58,7 +63,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<User?> FindAsync(Guid userId)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc, PreventEmails, IsAdmin " +
+            string sql = $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId";
 
@@ -70,7 +75,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<User?> FindByEmailAsync(string email)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, Email, ActivatedUtc, PreventEmails, IsAdmin " +
+            string sql = $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE Email = @Email";
 

@@ -11,8 +11,6 @@ namespace NoteMapper.Web.Blazor.Pages
     {
         protected FeedbackViewModel? Feedback { get; set; }
 
-        protected bool Loading { get; set; } = false;
-
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         [Inject]
         protected IIdentityService IdentityService { get; set; }
@@ -58,19 +56,9 @@ namespace NoteMapper.Web.Blazor.Pages
             });
         }
 
-        protected void SetLoading()
-        {
-            Loading = true;
-            SetData(null);
-        }
-
         private void SetData(FeedbackViewModel? feedback)
         {
-            Feedback = feedback;
-            if (feedback != null)
-            {
-                Loading = false;
-            }
+            Feedback = feedback;            
             InvokeAsync(() => StateHasChanged());
         }
     }

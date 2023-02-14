@@ -36,24 +36,31 @@
 <h1>Edit instrument</h1>
 
 <EditForm Model="@Model" Context="editContext" OnValidSubmit="UpdateInstrumentAsync">
-    <InstrumentForm Model="@Model" EditContext="@editContext" />
+    
+    <fieldset disabled="@Loading">
+        <InstrumentForm Model="@Model" EditContext="@editContext" />
 
-    <div class="d-flex">
-        <button class="btn btn-primary me-1">
-            Update
-        </button>
-
-        <a class="btn btn-outline-secondary" href="/instruments">
-            Cancel
-        </a>
-
-        @if (User?.IsAdmin == true)
-        {
-            <button class="btn btn-secondary ms-auto" type="button" @onclick="ConvertToDefaultAsync">
-                Convert to default
+        <div class="d-flex">
+            <button class="btn btn-primary me-1">
+                Update
+                @if (Loading)
+                {
+                    <ButtonSpinner />
+                }
             </button>
-        }
-    </div>
+
+            <a class="btn btn-outline-secondary" href="/instruments">
+                Cancel
+            </a>
+
+            @if (User?.IsAdmin == true)
+            {
+                <button class="btn btn-secondary ms-auto" type="button" @onclick="ConvertToDefaultAsync">
+                    Convert to default
+                </button>
+            }
+        </div>
+    </fieldset>    
 </EditForm>
 
 <CopedantLinks />
@@ -64,6 +71,8 @@
 @code {
     [Parameter]
     public Guid Id { get; set; }
+
+    bool Loading { get; set; }
 
     InstrumentEditViewModel? Model { get; set; }
 

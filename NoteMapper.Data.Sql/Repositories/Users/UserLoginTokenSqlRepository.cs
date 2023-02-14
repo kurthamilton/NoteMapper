@@ -14,13 +14,18 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
         }
 
+        protected override IReadOnlyCollection<string> SelectColumns => new[]
+        {
+            "UserId", "CreatedUtc", "ExpiresUtc", "Token"
+        };
+
         protected override string TableName => "UserLoginTokens";
 
         public Task<UserLoginToken?> CreateAsync(UserLoginToken token)
         {
             string sql = $"INSERT INTO {TableName} (UserId, CreatedUtc, ExpiresUtc, Token) " +
                          $"VALUES (@UserId, @CreatedUtc, @ExpiresUtc, @Token) " +
-                         $"SELECT TOP 1 UserId, CreatedUtc, ExpiresUtc, Token " +
+                         $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          "WHERE UserId = @UserId AND CreatedUtc = @CreatedUtc";
 
@@ -46,7 +51,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         public Task<UserLoginToken?> FindAsync(Guid userId, string token)
         {
-            string sql = "SELECT TOP 1 UserId, CreatedUtc, ExpiresUtc, Token " +
+            string sql = $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId AND Token = @Token";
 

@@ -41,15 +41,21 @@
 <EditForm Model="@Model" OnValidSubmit="CreateInstrumentAsync" Context="editContext">
     <DataAnnotationsValidator />
 
-    <InstrumentForm Model="@Model" EditContext="@editContext" />
+    <fieldset disabled="@Loading">
+        <InstrumentForm Model="@Model" EditContext="@editContext" />
 
-    <button class="btn btn-primary me-1">
-        Create
-    </button>
+        <button class="btn btn-primary me-1">
+            Create
+            @if (Loading)
+            {
+                <ButtonSpinner />
+            }
+        </button>
 
-    <a class="btn btn-outline-secondary" href="/instruments">
-        Cancel
-    </a>
+        <a class="btn btn-outline-secondary" href="/instruments">
+            Cancel
+        </a>
+    </fieldset>
 </EditForm>
 
 <CopedantLinks />
@@ -58,6 +64,8 @@
 @inject IUserInstrumentService UserInstrumentService
 @inject IUserInstrumentViewModelService UserInstrumentViewModelService
 @code {
+    bool Loading { get; set; }
+
     InstrumentEditViewModel? Model { get; set; }
 
     UserInstrument? Template { get; set; }
@@ -88,7 +96,7 @@
         {
             Template.Name += " (Copy)";
         }
-        
+
         Model = await UserInstrumentViewModelService.MapUserInstrumentToEditViewModelAsync(UserId, Template);
     }
 
@@ -98,6 +106,8 @@
         {
             return;
         }
+
+        Loading = true;
 
         UserInstrumentViewModelService.MapEditViewModelToUserInstrument(Model, Template);
 
@@ -109,5 +119,7 @@
         }
 
         SetFeedback(result);
+
+        Loading = false;
     }
 }

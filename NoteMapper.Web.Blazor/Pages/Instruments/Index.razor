@@ -55,8 +55,16 @@
                         {
                             <button type="button" 
                                     class="btn btn-outline-danger btn-sm ms-1"
+                                    disabled="@(Deleting != null)"
                                     @onclick="(e => DeleteDefaultInstrumentAsync(instrument.Id))">
-                                <i class="bi bi-x-circle"></i>
+                                @if (Deleting == instrument.Id)
+                                {
+                                    <ButtonSpinner />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-x-circle"></i>
+                                }                                
                             </button>
                         }
                     </td>
@@ -85,8 +93,16 @@
                             Copy
                         </a>
                         <button type="button" class="btn btn-outline-danger btn-sm"
+                            disabled="@(Deleting != null)"
                             @onclick="(e => DeleteInstrumentAsync(instrument.Id))">
-                            <i class="bi bi-x-circle"></i>
+                            @if (Deleting == instrument.Id)
+                            {
+                                <ButtonSpinner />
+                            }
+                            else
+                            {
+                                <i class="bi bi-x-circle"></i>
+                            }    
                         </button>
                     </td>
                 </tr>
@@ -112,11 +128,13 @@ else
     </div>
 }
 
-@inject NavigationManager NavigationManager;
+@inject NavigationManager NavigationManager
 @inject IUserInstrumentService UserInstrumentService
 @code {
     IReadOnlyCollection<GuitarBase>? DefaultInstruments;
     IReadOnlyCollection<GuitarBase>? UserInstruments;
+
+    string? Deleting { get; set; }
 
     User? User { get; set; }
 
@@ -132,16 +150,26 @@ else
 
     async Task DeleteDefaultInstrumentAsync(string userInstrumentId)
     {
+        if (Deleting != null)
+        {
+            return;
+        }
+
         if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this instrument?"))
         {
             return;
-        }        
+        }
+
+        Deleting = userInstrumentId;
+        StateHasChanged();
 
         ServiceResult result = await UserInstrumentService.DeleteDefaultInstrumentAsync(userInstrumentId);
         if (result.Success)
         {
             DefaultInstruments = await UserInstrumentService.GetDefaultInstrumentsAsync();
         }
+
+        Deleting = null;
     }
 
     async Task DeleteInstrumentAsync(string userInstrumentId)
@@ -154,12 +182,17 @@ else
         if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this instrument?"))
         {
             return;
-        }        
+        }
+
+        Deleting = userInstrumentId;
+        StateHasChanged();
 
         ServiceResult result = await UserInstrumentService.DeleteInstrumentAsync(User.UserId, userInstrumentId);
         if (result.Success)
         {
             UserInstruments = await UserInstrumentService.GetUserInstrumentsAsync(User.UserId);
         }
+
+        Deleting = null;
     }
 }

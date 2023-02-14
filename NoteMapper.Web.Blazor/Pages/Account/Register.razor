@@ -28,28 +28,36 @@
     <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
         <DataAnnotationsValidator />
 
-        @if (RegistrationType == RegistrationType.InviteOnly)
-        {
-            <div class="alert alert-warning">
-                Registration is currently invite only
-            </div>
+        <fieldset disabled="@Loading">
+            @if (RegistrationType == RegistrationType.InviteOnly)
+            {
+                <div class="alert alert-warning">
+                    Registration is currently invite only
+                </div>
 
-            <div class="mb-3">                
-                <label for="code" class="form-label required">Invite code</label>
-                <InputText id="code" @bind-Value="Model.Code" class="form-control" />
-                <ValidationMessage For="() => Model.Code" />
-            </div>
-        }        
+                <div class="mb-3">                
+                    <label for="code" class="form-label required">Invite code</label>
+                    <InputText id="code" @bind-Value="Model.Code" class="form-control" />
+                    <ValidationMessage For="() => Model.Code" />
+                </div>
+            }        
         
-        <div class="mb-3">
-            <label for="email" class="form-label required">Email</label>
-            <InputText id="email" @bind-Value="Model.Email" class="form-control" />
-            <ValidationMessage For="() => Model.Email" />
-        </div>
+            <div class="mb-3">
+                <label for="email" class="form-label required">Email</label>
+                <InputText id="email" @bind-Value="Model.Email" class="form-control" />
+                <ValidationMessage For="() => Model.Email" />
+            </div>
 
-        <div>
-            <button type="submit" class="btn btn-primary">Send activation link</button>            
-        </div>
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    Send activation link
+                    @if (Loading)
+                    {
+                        <ButtonSpinner />
+                    }
+                </button>            
+            </div>
+        </fieldset>
     </EditForm>
 }
 else
@@ -58,6 +66,8 @@ else
 }
 
 @code {
+    bool Loading { get; set; }
+
     RegisterViewModel Model { get; set; } = new();
 
     RegistrationType RegistrationType { get; set; }
@@ -69,7 +79,11 @@ else
 
     private async Task HandleValidSubmitAsync()
     {
+        Loading = true;
+
         ServiceResult result = await IdentityService.RegisterUserAsync(Model.Email, Model.Code);
         Feedback = FeedbackViewModel.FromServiceResult(result);
+
+        Loading = false;
     }
 }
