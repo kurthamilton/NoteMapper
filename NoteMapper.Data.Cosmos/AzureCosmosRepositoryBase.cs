@@ -74,7 +74,7 @@ namespace NoteMapper.Data.Cosmos
 
         private async Task LogException(Exception ex, string document, string action)
         {
-            ApplicationError error = new(ex);
+            ApplicationError error = new(_settings.CurrentEnvironment, ex);
             error.AddProperty("Cosmos.ContainerId", ContainerId);
             error.AddProperty("Cosmos.Document", document);
             error.AddProperty("Cosmos.Action", action);

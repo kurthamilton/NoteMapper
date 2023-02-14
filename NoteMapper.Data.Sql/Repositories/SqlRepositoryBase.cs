@@ -115,7 +115,7 @@ namespace NoteMapper.Data.Sql
                 return Task.CompletedTask;
             }
 
-            ApplicationError error = new(ex);
+            ApplicationError error = new(_settings.CurrentEnvironment, ex);
             error.AddProperty("Command.Sql", cmd.CommandText);
 
             foreach (SqlParameter parameter in cmd.Parameters)

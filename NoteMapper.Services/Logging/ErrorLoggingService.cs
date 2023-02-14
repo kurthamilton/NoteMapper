@@ -1,4 +1,5 @@
-﻿using NoteMapper.Data.Core.Errors;
+﻿using NoteMapper.Core;
+using NoteMapper.Data.Core.Errors;
 
 namespace NoteMapper.Services.Logging
 {
@@ -14,6 +15,21 @@ namespace NoteMapper.Services.Logging
             _settings = settings;
         }
 
+        public Task<ServiceResult> DeleteErrorAsync(Guid applicationErrorId)
+        {
+            return _applicationErrorRepository.DeleteErrorAsync(applicationErrorId);
+        }
+
+        public Task<IReadOnlyCollection<KeyValuePair<string, string>>> GetErrorPropertiesAsync(Guid applicationErrorId)
+        {
+            return _applicationErrorRepository.GetErrorPropertiesAsync(applicationErrorId);
+        }
+
+        public Task<IReadOnlyCollection<ApplicationError>> GetErrorsAsync(DateTime from, DateTime? to)
+        {
+            return _applicationErrorRepository.GetErrorsAsync(from, to ?? DateTime.UtcNow);
+        }
+
         public Task LogErrorMessageAsync(string message)
         {
             return LogErrorMessageAsync(message, new Dictionary<string, string>());
@@ -21,7 +37,7 @@ namespace NoteMapper.Services.Logging
 
         public Task LogErrorMessageAsync(string message, IDictionary<string, string> data)
         {
-            ApplicationError error = new(message);
+            ApplicationError error = new(_settings.CurrentEnvironment, message);
             foreach (string key in data.Keys)
             {
                 error.AddProperty(key, data[key]);
@@ -31,13 +47,13 @@ namespace NoteMapper.Services.Logging
 
         public Task LogExceptionAsync(Exception ex)
         {
-            ApplicationError error = new(ex);
+            ApplicationError error = new(_settings.CurrentEnvironment, ex);
             return LogExceptionAsync(error);
         }
 
         public Task LogExceptionAsync(Exception ex, string url)
         {
-            ApplicationError error = new(ex, url);
+            ApplicationError error = new(_settings.CurrentEnvironment, ex, url);
             return LogExceptionAsync(error);
         }
 

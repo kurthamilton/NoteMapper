@@ -42,7 +42,8 @@ namespace NoteMapper.Infrastructure
             container
                 .AddSingleton(new SqlRepositorySettings
                 {
-                    ConnectionString = config.GetConnectionString("note-mapper-sql") ?? ""
+                    ConnectionString = config.GetConnectionString("note-mapper-sql") ?? "",
+                    CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment")
                 })
                 .AddScoped<IApplicationErrorRepository, ApplicationErrorSqlRepository>()
                 .AddScoped<IContactRepository, ContactSqlRepository>()
@@ -60,6 +61,7 @@ namespace NoteMapper.Infrastructure
                 {
                     ApplicationName = config.GetValue("Application.Name"),
                     ConnectionString = config.GetConnectionString("note-mapper-cosmos") ?? "",
+                    CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
                     DatabaseId = config.GetValue("Data.Azure.CosmosDB.DatabaseId"),
                     DefaultUserId = config.GetValue("Data.Azure.CosmosDB.DefaultUserId")
                 })
@@ -108,6 +110,7 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IErrorLoggingService, ErrorLoggingService>()
                 .AddSingleton(new ErrorLoggingServiceSettings
                 {
+                    CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
                     Enabled = config.GetBool("Logging.Enabled")
                 })
                 .AddScoped<IUserService, UserService>();

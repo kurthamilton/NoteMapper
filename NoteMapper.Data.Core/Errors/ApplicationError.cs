@@ -2,28 +2,43 @@
 {
     public class ApplicationError
     {
-        public ApplicationError(string message)
+        public ApplicationError(ApplicationEnvironment environment, string message)
         {
             CreatedUtc = DateTime.UtcNow;
+            Environment = environment;
             Message = message;
             Properties = new Dictionary<string, string>();
         }
 
-        public ApplicationError(Exception ex) 
-            : this(ex.Message)
-        {            
+        public ApplicationError(ApplicationEnvironment environment, Exception ex)
+            : this(environment, ex.Message)
+        {
             Type = ex.GetType().Name;
 
             AddProperty("Exception.StackTrace", ex.StackTrace);
         }
 
-        public ApplicationError(Exception ex, string url)
-            : this(ex)
+        public ApplicationError(ApplicationEnvironment environment, Exception ex, string url)
+            : this(environment, ex)
         {
             AddProperty("Url", url);
         }
 
+        public ApplicationError(Guid applicationErrorId, DateTime createdUtc, ApplicationEnvironment environment, 
+            string message, string? type)
+        {
+            ApplicationErrorId = applicationErrorId;
+            CreatedUtc = createdUtc;
+            Environment = environment;
+            Message = message;
+            Type = type;
+        }
+
+        public Guid? ApplicationErrorId { get; }        
+
         public DateTime CreatedUtc { get; }
+
+        public ApplicationEnvironment Environment { get; }
 
         public string Message { get; }
 
