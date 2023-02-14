@@ -4,39 +4,37 @@
 
 <PageTitle>Note Mapper</PageTitle>
 
-<div class="page">
-    <header>
-        <Navbar Fluid="@Fluid" ContainerClass="@ContainerClass" />
-    </header>
-    <main>
-        <div class="@(Fluid ? "container-xl" : "container") @ContainerClass">
-            <article class="content">
-                @*<LoggingErrorBoundary>
-                    <ChildContent>
-                        @ChildContent
-                    </ChildContent>
-                    <ErrorContent>
-                        <h1 class="text-danger">Error</h1>
-                        <p class="text-danger">An error occurred while processing your request.</p>
-                        <p>
-                            The error has been logged. 
-                            Any relevant information you could send via the <a href="/contact">contact</a> page would be gratefully received.
-                        </p>
-                    </ErrorContent>                    
-                </LoggingErrorBoundary>*@
-                @ChildContent
-            </article>
-        </div>
-    </main>
+<header>
+    <Navbar Fluid="true" ContainerClass="@ContainerClass" />
+</header>
+<div class="container-xl @ContainerClass main">
+    <div class="content @PageClass">
+        @*<LoggingErrorBoundary>
+        <ChildContent>
+        @ChildContent
+        </ChildContent>
+        <ErrorContent>
+        <h1 class="text-danger">Error</h1>
+        <p class="text-danger">An error occurred while processing your request.</p>
+        <p>
+        The error has been logged.
+        Any relevant information you could send via the <a href="/contact">contact</a> page would be gratefully received.
+        </p>
+        </ErrorContent>
+        </LoggingErrorBoundary>*@
+        @ChildContent
+    </div>
 </div>
 
 @code {
     [Parameter] 
     public RenderFragment? ChildContent { get; set; }
 
-    [Parameter]
-    public string? ContainerClass { get; set; }
+    string ContainerClass { get; set; } = "px-md-5";
 
     [Parameter]
     public bool Fluid { get; set; } = true;    
+
+    [Parameter]
+    public string? PageClass { get; set; }
 }
