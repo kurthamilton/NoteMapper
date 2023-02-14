@@ -85,6 +85,14 @@ namespace NoteMapper.Data.Sql.Repositories.Users
             });
         }
 
+        public Task<IReadOnlyCollection<User>> GetUsersAsync()
+        {
+            string sql = $"SELECT {SelectColumnSql} " +
+                         $"FROM {TableName} ";
+
+            return ReadAsync(sql, Array.Empty<SqlParameter>());
+        }
+
         protected override User Map(SqlDataReader reader)
         {
             return new User(reader.GetGuid(0),

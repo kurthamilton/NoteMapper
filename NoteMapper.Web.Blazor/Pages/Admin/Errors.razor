@@ -6,7 +6,7 @@
 @using NoteMapper.Services.Logging
 @using NoteMapper.Web.Blazor.Shared.Components
 
-@if (Errors == null)
+@if (Model == null)
 {
     <Loading />
     return;
@@ -32,7 +32,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (ApplicationError error in Errors)
+        @foreach (ApplicationError error in Model)
         {
             <tr>
                 <td>@error.CreatedUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
@@ -83,7 +83,7 @@
 
 @inject IErrorLoggingService ErrorLoggingService
 @code {
-    IReadOnlyCollection<ApplicationError>? Errors { get; set; }
+    IReadOnlyCollection<ApplicationError>? Model { get; set; }
 
     DateTime From { get; set; } = DateTime.UtcNow.AddDays(-7);
 
@@ -97,17 +97,22 @@
     {
         await base.OnInitializedAsync();
 
-        Errors = await ErrorLoggingService.GetErrorsAsync(From, To);
+        Model = await ErrorLoggingService.GetErrorsAsync(From, To);
     }
 
     async Task DeleteErrorAsync(Guid applicationErrorId)
     {
         await ErrorLoggingService.DeleteErrorAsync(applicationErrorId);
-        Errors = await ErrorLoggingService.GetErrorsAsync(From, To);
+        Model = await ErrorLoggingService.GetErrorsAsync(From, To);
     }
 
     async Task TogglePropertiesAsync(Guid applicationErrorId)
     {
+        if (PropertiesModal == null)
+        {
+            return;
+        }
+
         Properties = await ErrorLoggingService.GetErrorPropertiesAsync(applicationErrorId);
         await PropertiesModal.ShowAsync();
     }

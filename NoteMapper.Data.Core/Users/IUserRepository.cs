@@ -13,5 +13,7 @@ namespace NoteMapper.Data.Core.Users
         Task<User?> FindAsync(Guid userId);
 
         Task<User?> FindByEmailAsync(string email);
+
+        Task<IReadOnlyCollection<User>> GetUsersAsync();
     }
 }

@@ -113,14 +113,17 @@ namespace NoteMapper.Infrastructure
                     CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
                     Enabled = config.GetBool("Logging.Enabled")
                 })
+                .AddScoped<IUserAdminService, UserAdminService>()
                 .AddScoped<IUserService, UserService>();
 
             container
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
                 .AddScoped<IMusicTheoryService, MusicTheoryService>()
                 .AddScoped<IRecaptchaService, RecaptchaService>()
-                .AddSingleton(new RecaptchaServiceSettings(config.GetValue("Recaptcha.SecretKey"),
-                    config.GetValue("Recaptcha.SiteKey"), config.GetValue("Recaptcha.VerifyUrl")))
+                .AddSingleton(new RecaptchaServiceSettings(
+                    config.GetValue("Recaptcha.SecretKey"),
+                    config.GetValue("Recaptcha.SiteKey"), 
+                    config.GetValue("Recaptcha.VerifyUrl")))
                 .AddScoped<IUserInstrumentService, UserInstrumentService>()
                 .AddScoped<IUserInstrumentViewModelService, UserInstrumentViewModelService>();
         }
