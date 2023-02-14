@@ -45,9 +45,8 @@ namespace NoteMapper.Data.Cosmos
                 ItemResponse<T> response = await container.ReadItemAsync<T>(id, new PartitionKey(id));
                 return response.Resource;
             }
-            catch (Exception ex)
+            catch
             {
-                await LogException(ex, id, "Create");
                 return default;
             }
         }

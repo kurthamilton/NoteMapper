@@ -20,11 +20,12 @@ namespace NoteMapper.Data.Sql.Repositories.Errors
 
         public async Task CreateAsync(ApplicationError error)
         {
-            string sql = $"INSERT INTO {TableName} (CreatedUtc, Message, Type) " +
-                         "VALUES (@CreatedUtc, @Message, @Type)" +
+            string sql = $"INSERT INTO {TableName} (CreatedUtc, Message, Type, ApplicationEnvironmentId) " +
+                         "VALUES (@CreatedUtc, @Message, @Type, @ApplicationEnvironmentId)" +
                          "SELECT TOP 1 ApplicationErrorId " +
                          $"FROM {TableName} " +
-                         $"WHERE CreatedUtc = @CreatedUtc AND Message = @Message AND Type = @Type";
+                         $"WHERE CreatedUtc = @CreatedUtc AND Message = @Message AND Type = @Type " +
+                         $"AND ApplicationEnvironmentId = @ApplicationEnvironmentId ";
 
             Guid? applicationErrorId = null; 
 
@@ -32,6 +33,7 @@ namespace NoteMapper.Data.Sql.Repositories.Errors
             {
                 using (SqlCommand cmd = new(sql, conn))
                 {
+                    cmd.Parameters.Add(SqlUtils.GetParameter("@ApplicationEnvironmentId", (int)error.Environment, SqlDbType.Int));
                     cmd.Parameters.Add(SqlUtils.GetParameter("@CreatedUtc", error.CreatedUtc, SqlDbType.DateTime));
                     cmd.Parameters.Add(SqlUtils.GetParameter("@Message", error.Message, SqlDbType.NVarChar));
                     cmd.Parameters.Add(SqlUtils.GetParameter("@Type", error.Type, SqlDbType.NVarChar));
