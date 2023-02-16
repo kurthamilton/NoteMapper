@@ -3,7 +3,6 @@ using System.Data.SqlClient;
 using NoteMapper.Core;
 using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Sql.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NoteMapper.Data.Sql.Repositories.Errors
 {

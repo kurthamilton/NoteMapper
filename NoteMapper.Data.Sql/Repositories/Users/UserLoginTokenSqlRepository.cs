@@ -16,23 +16,23 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         protected override IReadOnlyCollection<string> SelectColumns => new[]
         {
-            "UserId", "CreatedUtc", "ExpiresUtc", "Token"
+            "UserId", "ExpiresUtc", "Token"
         };
 
         protected override string TableName => "UserLoginTokens";
 
         public Task<UserLoginToken?> CreateAsync(UserLoginToken token)
         {
-            string sql = $"INSERT INTO {TableName} (UserId, CreatedUtc, ExpiresUtc, Token) " +
-                         $"VALUES (@UserId, @CreatedUtc, @ExpiresUtc, @Token) " +
+            string sql = $"INSERT INTO {TableName} (UserId, ExpiresUtc, Token) " +
+                         $"VALUES (@UserId, @ExpiresUtc, @Token) " +
                          $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
-                         "WHERE UserId = @UserId AND CreatedUtc = @CreatedUtc";
+                         "WHERE UserId = @UserId " +
+                         "ORDER BY CreatedUtc DESC ";
 
             return ReadSingleAsync(sql, new[]
             {
                 GetParameter("@UserId", token.UserId, SqlDbType.UniqueIdentifier),
-                GetParameter("@CreatedUtc", token.CreatedUtc, SqlDbType.DateTime),
                 GetParameter("@ExpiresUtc", token.ExpiresUtc, SqlDbType.DateTime),
                 GetParameter("@Token", token.Token, SqlDbType.NVarChar)
             });
@@ -66,8 +66,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
             return new UserLoginToken(reader.GetGuid(0),
                 reader.GetDateTime(1),
-                reader.GetDateTime(2),
-                reader.GetString(3));
+                reader.GetString(2));
         }
     }
 }

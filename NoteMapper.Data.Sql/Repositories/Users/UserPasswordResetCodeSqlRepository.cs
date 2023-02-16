@@ -16,23 +16,23 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         protected override IReadOnlyCollection<string> SelectColumns => new[]
         {
-            "UserId", "CreatedUtc", "ExpiresUtc", "Code"
+            "UserId", "ExpiresUtc", "Code"
         };
 
         protected override string TableName => "UserPasswordResetCodes";
 
         public Task<UserPasswordResetCode?> CreateAsync(UserPasswordResetCode resetCode)
         {
-            string sql = $"INSERT INTO {TableName} (UserId, CreatedUtc, ExpiresUtc, Code) " +
-                         "VALUES (@UserId, @CreatedUtc, @ExpiresUtc, @Code) " +
-                         $"SELECT {SelectColumnSql} " +
+            string sql = $"INSERT INTO {TableName} (UserId, ExpiresUtc, Code) " +
+                         "VALUES (@UserId, @ExpiresUtc, @Code) " +
+                         $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
-                         $"WHERE UserId = @UserId AND CreatedUtc = @CreatedUtc";
+                         $"WHERE UserId = @UserId " +
+                         "ORDER BY CreatedUtc ";
 
             return ReadSingleAsync(sql, new[]
             {
                 GetParameter("@UserId", resetCode.UserId, SqlDbType.UniqueIdentifier),
-                GetParameter("@CreatedUtc", resetCode.CreatedUtc, SqlDbType.DateTime),
                 GetParameter("@ExpiresUtc", resetCode.ExpiresUtc, SqlDbType.DateTime),
                 GetParameter("@Code", resetCode.Code, SqlDbType.NVarChar)
             });
@@ -66,8 +66,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
         {
             return new UserPasswordResetCode(reader.GetGuid(0),
                 reader.GetDateTime(1),
-                reader.GetDateTime(2),
-                reader.GetString(3));
+                reader.GetString(2));
         }
     }
 }

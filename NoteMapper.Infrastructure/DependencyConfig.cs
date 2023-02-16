@@ -4,12 +4,14 @@ using NoteMapper.Core.Users;
 using NoteMapper.Data.Core.Contact;
 using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Instruments;
+using NoteMapper.Data.Core.Questionnaires;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Cosmos;
 using NoteMapper.Data.Cosmos.Repositories;
 using NoteMapper.Data.Sql.Repositories;
 using NoteMapper.Data.Sql.Repositories.Contact;
 using NoteMapper.Data.Sql.Repositories.Errors;
+using NoteMapper.Data.Sql.Repositories.Questionnaires;
 using NoteMapper.Data.Sql.Repositories.Users;
 using NoteMapper.Emails;
 using NoteMapper.Identity;
@@ -22,6 +24,7 @@ using NoteMapper.Services.Logging;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
 using NoteMapper.Services.Web.Contact;
+using NoteMapper.Services.Web.Questionnaires;
 using NoteMapper.Services.Web.Security;
 using NoteMapper.Services.Web.StateManagement;
 
@@ -47,12 +50,15 @@ namespace NoteMapper.Infrastructure
                 })
                 .AddScoped<IApplicationErrorRepository, ApplicationErrorSqlRepository>()
                 .AddScoped<IContactRepository, ContactSqlRepository>()
+                .AddScoped<IQuestionnaireQuestionRepository, QuestionnaireQuestionSqlRepository>()
+                .AddScoped<IQuestionnaireRepository, QuestionnaireSqlRepository>()
                 .AddScoped<IRegistrationCodeRepository, RegistrationCodeRepository>()
                 .AddScoped<IUserActivationRepository, UserActivationSqlRepository>()
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
                 .AddScoped<IUserPasswordRepository, UserPasswordSqlRepository>()
                 .AddScoped<IUserPasswordResetCodeRepository, UserPasswordResetCodeSqlRepository>()
                 .AddScoped<IUserPreferenceRepository, UserPreferenceSqlRepository>()
+                .AddScoped<IUserQuestionResponseRepository, UserQuestionResponseSqlRepository>()
                 .AddScoped<IUserRegistrationCodeRepository, UserRegistrationCodeSqlRepository>()
                 .AddScoped<IUserRepository, UserSqlRepository>();
 
@@ -138,7 +144,8 @@ namespace NoteMapper.Infrastructure
                     ContactEmailAddress = config.GetValue("Contact.EmailAddress"),
                     Enabled = config.GetBool("Contact.Enabled")
                 })
-                .AddScoped<INoteMapViewModelService, NoteMapViewModelService>();
+                .AddScoped<INoteMapViewModelService, NoteMapViewModelService>()
+                .AddScoped<IQuestionnaireViewModelService, QuestionnaireViewModelService>();
 
             container.AddSingleton<IStateContainer>(new StateContainer());
         }

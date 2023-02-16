@@ -10777,18 +10777,6 @@ textarea.form-control-lg {
   --color-danger: var(--bs-danger);
 }
 
-.valid.modified:not([type=checkbox]) {
-  outline: 1px solid #26b050;
-}
-
-.invalid {
-  outline: 1px solid red;
-}
-
-.validation-message {
-  color: red;
-}
-
 #blazor-error-ui {
   background: lightyellow;
   bottom: 0;
@@ -10842,17 +10830,25 @@ textarea.form-control-lg {
   margin-bottom: 0;
 }
 
-label.required:after {
-  color: var(--color-danger);
-  content: " *";
-}
-
 .select--notes {
   min-width: 2.5rem;
 }
 
 .select--octaves {
   min-width: 2rem;
+}
+
+label.required:after {
+  color: var(--color-danger);
+  content: " *";
+}
+
+.invalid {
+  outline: 1px solid red;
+}
+
+.validation-message {
+  color: var(--color-danger);
 }
 
 :root {

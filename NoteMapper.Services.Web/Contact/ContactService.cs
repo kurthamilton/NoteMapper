@@ -46,7 +46,6 @@ namespace NoteMapper.Services.Web.Contact
 
             await _contactRepository.CreateAsync(new ContactRequest
             {
-                CreatedUtc = DateTime.UtcNow,
                 Email = request.Email,
                 Message = request.Message
             });

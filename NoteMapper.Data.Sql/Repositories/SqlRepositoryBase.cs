@@ -20,7 +20,7 @@ namespace NoteMapper.Data.Sql
 
         protected abstract IReadOnlyCollection<string> SelectColumns { get; }
 
-        protected string SelectColumnSql => string.Join(", ", SelectColumns);
+        protected string SelectColumnSql => string.Join(", ", SelectColumns.Select(x => $"{TableName}.{x}"));
 
         protected abstract string TableName { get; }
 

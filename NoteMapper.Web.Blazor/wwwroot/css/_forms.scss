@@ -15,15 +15,24 @@
     }
 }
 
-label.required:after {
-    color: var(--color-danger);
-    content: ' *'
-}
-
 .select--notes {
     min-width: 2.5rem;
 }
 
 .select--octaves {
     min-width: 2rem;
+}
+
+// Validation
+label.required:after {
+    color: var(--color-danger);
+    content: ' *'
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: var(--color-danger);
 }

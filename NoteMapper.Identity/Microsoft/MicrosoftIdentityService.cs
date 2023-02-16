@@ -110,7 +110,7 @@ namespace NoteMapper.Identity.Microsoft
             DateTime expiresUtc = createdUtc.AddSeconds(_settings.LoginTokenExpiresAfterSeconds);
             string token = Guid.NewGuid().ToString();
 
-            UserLoginToken loginToken = new(userId, createdUtc, expiresUtc, token);
+            UserLoginToken loginToken = new(userId, expiresUtc, token);
 
             return _userLoginTokenRepository.CreateAsync(loginToken);
         }
@@ -192,7 +192,7 @@ namespace NoteMapper.Identity.Microsoft
             if (registrationCode != null)
             {
                 UserRegistrationCode userRegistrationCode = new(user.UserId,
-                    registrationCode.RegistrationCodeId, user.CreatedUtc);
+                    registrationCode.RegistrationCodeId);
                 await _userRegistrationCodeRepository.CreateAsync(userRegistrationCode);
             }
 
@@ -226,7 +226,7 @@ namespace NoteMapper.Identity.Microsoft
             DateTime createdUtc = DateTime.UtcNow;
             string code = Guid.NewGuid().ToString();
             DateTime expiresUtc = createdUtc.AddHours(_settings.PasswordResetCodeExpiresAfterHours);
-            UserPasswordResetCode userPasswordResetCode = new(user.UserId, createdUtc, expiresUtc, code);
+            UserPasswordResetCode userPasswordResetCode = new(user.UserId, expiresUtc, code);
 
             UserPasswordResetCode? createResult = await _userPasswordResetCodeRepository.CreateAsync(userPasswordResetCode);
             if (createResult == null)
@@ -339,7 +339,7 @@ namespace NoteMapper.Identity.Microsoft
             string activationCode = Guid.NewGuid().ToString();
             DateTime activationCodeExpiresUtc = createdUtc.AddMinutes(_settings.ActivationCodeExpiresAfterMinutes);
 
-            UserActivation? userActivation = new(user.UserId, createdUtc, activationCodeExpiresUtc, activationCode);
+            UserActivation? userActivation = new(user.UserId, activationCodeExpiresUtc, activationCode);
             userActivation = await _userActivationRepository.CreateAsync(userActivation);
             if (userActivation == null)
             {

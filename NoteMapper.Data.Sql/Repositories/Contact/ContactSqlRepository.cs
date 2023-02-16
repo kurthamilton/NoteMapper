@@ -20,12 +20,11 @@ namespace NoteMapper.Data.Sql.Repositories.Contact
 
         public Task<ServiceResult> CreateAsync(ContactRequest request)
         {
-            string sql = $"INSERT INTO {TableName} (CreatedUtc, Email, Message) " +
-                         "VALUES (@CreatedUtc, @Email, @Message) ";
+            string sql = $"INSERT INTO {TableName} (Email, Message) " +
+                         "VALUES (@Email, @Message) ";
 
             return ExecuteQueryAsync(sql, new[]
             {
-                GetParameter("@CreatedUtc", request.CreatedUtc, SqlDbType.DateTime),
                 GetParameter("@Email", request.Email, SqlDbType.NVarChar),
                 GetParameter("@Message", request.Message, SqlDbType.NVarChar)
             });

@@ -16,23 +16,23 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         protected override IReadOnlyCollection<string> SelectColumns => new[]
         {
-            "UserId", "CreatedUtc", "ExpiresUtc", "Code"
+            "UserId", "ExpiresUtc", "Code"
         };
 
         protected override string TableName => "UserActivations";
 
         public Task<UserActivation?> CreateAsync(UserActivation userActivation)
         {
-            string sql = $"INSERT INTO {TableName} (UserId, CreatedUtc, ExpiresUtc, Code) " +
-                         "VALUES (@UserId, @CreatedUtc, @ExpiresUtc, @Code) " +
+            string sql = $"INSERT INTO {TableName} (UserId, ExpiresUtc, Code) " +
+                         "VALUES (@UserId, @ExpiresUtc, @Code) " +
                          $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
-                         $"WHERE UserId = @UserId AND CreatedUtc = @CreatedUtc";
+                         $"WHERE UserId = @UserId " +
+                         "ORDER BY CreatedUtc DESC ";
 
             return ReadSingleAsync(sql, new[]
             {
                 GetParameter("@UserId", userActivation.UserId, SqlDbType.UniqueIdentifier),
-                GetParameter("@CreatedUtc", userActivation.CreatedUtc, SqlDbType.DateTime),
                 GetParameter("@ExpiresUtc", userActivation.ExpiresUtc, SqlDbType.DateTime),
                 GetParameter("@Code", userActivation.Code, SqlDbType.NVarChar)
             });
@@ -67,8 +67,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
             return new UserActivation(
                 reader.GetGuid(0),
                 reader.GetDateTime(1),
-                reader.GetDateTime(2),
-                reader.GetString(3));
+                reader.GetString(2));
         }
     }
 }

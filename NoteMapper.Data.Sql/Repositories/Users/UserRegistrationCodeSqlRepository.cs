@@ -15,15 +15,15 @@ namespace NoteMapper.Data.Sql.Repositories.Users
 
         protected override IReadOnlyCollection<string> SelectColumns => new[]
         {
-            "UserId", "RegistrationCodeId", "CreatedUtc"
+            "UserId", "RegistrationCodeId"
         };
 
         protected override string TableName => "UserRegistrationCodes";
 
         public Task<UserRegistrationCode?> CreateAsync(UserRegistrationCode userRegistrationCode)
         {
-            string sql = $"INSERT INTO {TableName} (UserId, RegistrationCodeId, CreatedUtc) " +
-                         "VALUES (@UserId, @RegistrationCodeId, @CreatedUtc) " +
+            string sql = $"INSERT INTO {TableName} (UserId, RegistrationCodeId) " +
+                         "VALUES (@UserId, @RegistrationCodeId) " +
                          $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          "WHERE UserId = @UserId AND RegistrationCodeId = @RegistrationCodeId";
@@ -31,8 +31,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
             return ReadSingleAsync(sql, new[]
             {
                 GetParameter("@UserId", userRegistrationCode.UserId, SqlDbType.UniqueIdentifier),
-                GetParameter("@RegistrationCodeId", userRegistrationCode.RegistrationCodeId, SqlDbType.UniqueIdentifier),
-                GetParameter("@CreatedUtc", userRegistrationCode.CreatedUtc, SqlDbType.DateTime)
+                GetParameter("@RegistrationCodeId", userRegistrationCode.RegistrationCodeId, SqlDbType.UniqueIdentifier)
             });
         }
 
