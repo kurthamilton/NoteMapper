@@ -19,6 +19,43 @@ namespace NoteMapper.Services.Web.Questionnaires
             _userQuestionResponseRepository = userQuestionResponseRepository;
         }
 
+        public async Task<ServiceResult> CreateQuestionnaireAsync(EditQuestionnaireViewModel viewModel)
+        {
+            Questionnaire? questionnaire = MapEditViewModelToQuestionnaire(Guid.Empty, viewModel);
+
+            questionnaire = await _questionnaireRepository.CreateAsync(questionnaire);
+
+            if (questionnaire == null)
+            {
+                return ServiceResult.Failure("Error creating questionnaire");
+            }
+
+            IReadOnlyCollection<QuestionnaireQuestion> questions = viewModel.Questions
+                .Select((x, i) => MapEditViewModelToQuestion(Guid.Empty, questionnaire.QuestionnaireId, x, i))
+                .ToArray();
+
+            ServiceResult result = await _questionnaireQuestionRepository.UpdateQuestionsAsync(questions, 
+                Array.Empty<QuestionnaireQuestion>(), 
+                Array.Empty<QuestionnaireQuestion>());
+
+            return result.Success
+                ? ServiceResult.Successful("Questionnaire created")
+                : ServiceResult.Failure("Error creating questions");
+        }
+
+        public async Task<EditQuestionnaireViewModel?> GetEditQuestionnaireViewModel(Guid questionnaireId)
+        {
+            Questionnaire? questionnaire = await _questionnaireRepository.FindAsync(questionnaireId);
+            if (questionnaire == null)
+            {
+                return null;
+            }
+
+            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionnaireQuestionRepository.GetQuestionsAsync(questionnaireId);
+
+            return new EditQuestionnaireViewModel(questionnaire, questions);
+        }
+
         public async Task<QuestionnaireResponsesViewModel?> GetLatestQuestionnaireResponsesAsync(Guid userId)
         {
             Questionnaire? questionnaire = await _questionnaireRepository.GetCurrentAsync();
@@ -41,8 +78,18 @@ namespace NoteMapper.Services.Web.Questionnaires
                 responseViewModels.Add(new QuestionnaireResponseViewModel(question, response));
             }
 
-            return new QuestionnaireResponsesViewModel(questionnaire.QuestionnaireId,
+            return new QuestionnaireResponsesViewModel(questionnaire,
                 responseViewModels);
+        }
+
+        public async Task<IReadOnlyCollection<ListQuestionnaireViewModel>> GetQuestionnairesAsync()
+        {
+            IReadOnlyCollection<Questionnaire> questionnaires = await _questionnaireRepository.GetAllAsync();
+            IDictionary<Guid, int> respondentCounts = await _questionnaireRepository.GetQuestionnaireRespondentCountsAsync();
+
+            return questionnaires
+                .Select(x => new ListQuestionnaireViewModel(x, respondentCounts[x.QuestionnaireId]))
+                .ToArray();
         }
 
         public async Task<ServiceResult> SaveResponsesAsync(Guid userId,
@@ -83,8 +130,77 @@ namespace NoteMapper.Services.Web.Questionnaires
             ServiceResult result = await _userQuestionResponseRepository.SaveAsync(responses);
 
             return result.Success
-                ? ServiceResult.Successful("Responses saved")
+                ? ServiceResult.Successful("Responses saved. Thank you")
                 : ServiceResult.Failure("Error saving responses");
+        }
+
+        public async Task<ServiceResult> UpdateQuestionnaireAsync(Guid questionnaireId,
+            EditQuestionnaireViewModel viewModel)
+        {
+            Questionnaire? existing = await _questionnaireRepository.FindAsync(questionnaireId);
+            if (existing == null)
+            {
+                return ServiceResult.Failure("Not found");
+            }
+
+            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionnaireQuestionRepository
+                .GetQuestionsAsync(questionnaireId);
+
+            IDictionary<Guid, QuestionnaireQuestion> questionDictionary = questions
+                .ToDictionary(x => x.QuestionId);
+
+            Questionnaire updateQuestionnaire = MapEditViewModelToQuestionnaire(questionnaireId, viewModel);
+
+            List<QuestionnaireQuestion> insertQuestions = new();
+
+            List<QuestionnaireQuestion> updateQuestions = new();
+
+            for (int i = 0; i < viewModel.Questions.Count; i++)
+            {
+                EditQuestionViewModel questionViewModel = viewModel.Questions[i];
+                if (questionViewModel.QuestionId == null || !questionDictionary.ContainsKey(questionViewModel.QuestionId.Value))
+                {
+                    QuestionnaireQuestion insertQuestion = MapEditViewModelToQuestion(Guid.Empty, questionnaireId, questionViewModel, i);
+                    insertQuestions.Add(insertQuestion);
+                }
+                else
+                {
+                    QuestionnaireQuestion updateQuestion = MapEditViewModelToQuestion(questionViewModel.QuestionId.Value, questionnaireId, questionViewModel, i);
+                    updateQuestions.Add(updateQuestion);
+                }                
+            }
+
+            IReadOnlyCollection<QuestionnaireQuestion> deleteQuestions = questions
+                .Where(x => !viewModel.Questions.Any(q => q.QuestionId == x.QuestionId))
+                .ToArray();
+
+            ServiceResult updateQuestionnaireResult = await _questionnaireRepository.UpdateAsync(updateQuestionnaire);
+            if (!updateQuestionnaireResult.Success)
+            {
+                return ServiceResult.Failure("Error updating questionnaire");
+            }
+
+            ServiceResult updateQuestionsResult = await _questionnaireQuestionRepository.UpdateQuestionsAsync(insertQuestions, updateQuestions, deleteQuestions);
+            return updateQuestionsResult.Success
+                ? ServiceResult.Successful("Questionnaire updated")
+                : ServiceResult.Failure("Error updating questions");
+        }
+
+        private static QuestionnaireQuestion MapEditViewModelToQuestion(Guid id, Guid questionnaireId, EditQuestionViewModel viewModel, int index)
+        {
+            return new QuestionnaireQuestion(id, questionnaireId, viewModel.QuestionText,
+                viewModel.Type, viewModel.Required, viewModel.MinValue, viewModel.MaxValue,
+                index + 1);
+        }
+
+        private static Questionnaire MapEditViewModelToQuestionnaire(Guid id, EditQuestionnaireViewModel viewModel)
+        {
+            return new Questionnaire(id, 
+                viewModel.Name, 
+                viewModel.ExpiresUtc, 
+                viewModel.Active, 
+                viewModel.LinkText, 
+                viewModel.IntroText);
         }
     }
 }

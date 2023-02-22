@@ -21,6 +21,7 @@ using NoteMapper.Services;
 using NoteMapper.Services.Emails;
 using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Logging;
+using NoteMapper.Services.Questionnaires;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web;
 using NoteMapper.Services.Web.Contact;
@@ -119,6 +120,7 @@ namespace NoteMapper.Infrastructure
                     CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
                     Enabled = config.GetBool("Logging.Enabled")
                 })
+                .AddScoped<IQuestionnaireService, QuestionnaireService>()
                 .AddScoped<IUserAdminService, UserAdminService>()
                 .AddScoped<IUserService, UserService>();
 

@@ -2,14 +2,24 @@
 {
     public class Questionnaire
     {
-        public Questionnaire(Guid questionnaireId, string name, DateTime? expiresUtc)
+        public Questionnaire(Guid questionnaireId, string name, DateTime? expiresUtc,
+            bool active, string linkText, string introText)
         {
+            Active = active;
             ExpiresUtc = expiresUtc;
+            IntroText = introText;
+            LinkText = linkText;
             Name = name;
             QuestionnaireId = questionnaireId;
         }
 
-        public DateTime? ExpiresUtc { get; set; }
+        public bool Active { get; }
+
+        public DateTime? ExpiresUtc { get; }
+
+        public string IntroText { get; }
+
+        public string LinkText { get; }
 
         public string Name { get; }
 

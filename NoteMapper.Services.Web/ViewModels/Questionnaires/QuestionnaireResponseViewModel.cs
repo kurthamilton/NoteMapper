@@ -1,32 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
-using NoteMapper.Data.Core.Questionnaires;
+﻿using NoteMapper.Data.Core.Questionnaires;
 using NoteMapper.Services.Web.ViewModels.DataAnnotations;
 
 namespace NoteMapper.Services.Web.ViewModels.Questionnaires
 {
     public class QuestionnaireResponseViewModel
     {
-        private static Regex NumberRangeRegex = new Regex(@"^(?<min>-?\d+)-(?<max>-?\d+)$", RegexOptions.Compiled);
-
         public QuestionnaireResponseViewModel(QuestionnaireQuestion question, 
             UserQuestionResponse? response)
         {
+            MaxValue = question.MaxValue;
+            MinValue = question.MinValue;
             QuestionId = question.QuestionId;
             QuestionText = question.QuestionText;
             QuestionType = question.Type;            
             Required = question.Required;
-            Value = response?.Value ?? "";
-
-            if (QuestionType == QuestionType.Number && !string.IsNullOrEmpty(question.Range))
-            {
-                Match match = NumberRangeRegex.Match(question.Range);
-                if (match.Success)
-                {
-                    MinValue = int.Parse(match.Groups["min"].Value);
-                    MaxValue = int.Parse(match.Groups["max"].Value);
-                }
-            }
+            Value = response?.Value ?? "";            
         }
 
         public int? MaxValue { get; }
@@ -43,6 +31,16 @@ namespace NoteMapper.Services.Web.ViewModels.Questionnaires
 
         [RequiredIf(nameof(Required))]
         public string Value { get; set; }
+
+        public bool ValueBoolean
+        {
+            get
+            {
+                bool.TryParse(Value, out bool boolValue);
+                return boolValue;
+            }
+            set => Value = value.ToString();
+        }
 
         public int ValueNumber
         {

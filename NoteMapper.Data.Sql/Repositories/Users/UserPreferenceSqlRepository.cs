@@ -27,7 +27,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId ";
 
-            return ReadAsync(sql, new[]
+            return ReadManyAsync(sql, new[]
             {
                 GetParameter("@UserId", userId, SqlDbType.UniqueIdentifier)
             });

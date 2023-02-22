@@ -45,6 +45,11 @@ namespace NoteMapper.Web.Blazor.Pages
             await base.OnAfterRenderAsync(firstRender);
         }        
 
+        protected void RemoveFeedback()
+        {
+            SetData(null);
+        }
+
         protected void SetFeedback(ServiceResult result) 
         {
             SetData(FeedbackViewModel.FromServiceResult(result));

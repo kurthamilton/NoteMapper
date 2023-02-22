@@ -90,7 +90,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
             string sql = $"SELECT {SelectColumnSql} " +
                          $"FROM {TableName} ";
 
-            return ReadAsync(sql, Array.Empty<SqlParameter>());
+            return ReadManyAsync(sql, Array.Empty<SqlParameter>());
         }
 
         protected override User Map(SqlDataReader reader)

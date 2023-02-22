@@ -11,6 +11,13 @@ namespace NoteMapper.Data.Sql.Extensions
                 : reader.GetDateTime(i);
         }
 
+        public static int? GetIntOrNull(this SqlDataReader reader, int i)
+        {
+            return reader.IsDBNull(i)
+                ? null
+                : reader.GetInt32(i);
+        }
+
         public static string? GetStringOrNull(this SqlDataReader reader, int i)
         {
             return reader.IsDBNull(i)

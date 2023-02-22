@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using NoteMapper.Core;
 using NoteMapper.Data.Core.Errors;
@@ -26,25 +27,30 @@ namespace NoteMapper.Data.Sql
 
         protected async Task<ServiceResult> ExecuteQueryAsync(string sql, IEnumerable<SqlParameter> parameters)
         {
-            using (SqlConnection conn = GetConnection())
+            using (SqlConnection connection = GetConnection())
             {
-                using (SqlCommand cmd = GetCommand(conn, sql, parameters))
+                await connection.OpenAsync();
+                                    
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    cmd.CommandType = CommandType.Text;
-
-                    await conn.OpenAsync();
-
-                    try
+                    using (SqlCommand command = GetCommand(connection, transaction, sql, parameters))
                     {
-                        await cmd.ExecuteNonQueryAsync();
-                        return ServiceResult.Successful();
-                    }
-                    catch (Exception ex)
-                    {
-                        await LogExceptionAsync(ex, cmd);
-                        return ServiceResult.Failure("");
-                    }
-                }
+                        command.CommandType = CommandType.Text;
+
+                        try
+                        {
+                            await command.ExecuteNonQueryAsync();
+                            await transaction.CommitAsync();
+                            return ServiceResult.Successful();
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            await LogExceptionAsync(ex, command);
+                            return ServiceResult.Failure("");
+                        }
+                    }                        
+                }                                        
             }
         }        
 
@@ -55,7 +61,13 @@ namespace NoteMapper.Data.Sql
 
         protected abstract T Map(SqlDataReader reader);
 
-        protected async Task<IReadOnlyCollection<T>> ReadAsync(string sql, IEnumerable<SqlParameter> parameters)
+        protected Task<IReadOnlyCollection<T>> ReadManyAsync(string sql, IEnumerable<SqlParameter> parameters)
+        {
+            return ReadManyAsync<T>(sql, parameters, Map);
+        }
+
+        protected async Task<IReadOnlyCollection<TCustom>> ReadManyAsync<TCustom>(string sql, IEnumerable<SqlParameter> parameters,
+            Func<SqlDataReader, TCustom> map)
         {
             using (SqlConnection conn = GetConnection())
             {
@@ -66,13 +78,13 @@ namespace NoteMapper.Data.Sql
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     if (!await reader.ReadAsync())
                     {
-                        return Array.Empty<T>();
+                        return Array.Empty<TCustom>();
                     }
 
-                    List<T> entities = new();
+                    List<TCustom> entities = new();
                     do
                     {
-                        T entity = Map(reader);
+                        TCustom entity = map(reader);
                         entities.Add(entity);
                     } while (await reader.ReadAsync());
 
@@ -129,6 +141,13 @@ namespace NoteMapper.Data.Sql
         private SqlCommand GetCommand(SqlConnection conn, string sql, IEnumerable<SqlParameter> parameters)
         {
             SqlCommand cmd = new(sql, conn);
+            cmd.Parameters.AddRange(parameters.ToArray());
+            return cmd;
+        }
+
+        private SqlCommand GetCommand(SqlConnection conn, SqlTransaction transaction, string sql, IEnumerable<SqlParameter> parameters)
+        {
+            SqlCommand cmd = new(sql, conn, transaction);
             cmd.Parameters.AddRange(parameters.ToArray());
             return cmd;
         }

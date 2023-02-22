@@ -30,7 +30,7 @@ namespace NoteMapper.Data.Sql.Repositories.Questionnaires
                          $"JOIN QuestionnaireQuestions ON {TableName}.QuestionId = QuestionnaireQuestions.QuestionId " +
                          "WHERE UserId = @UserId AND QuestionnaireId = @QuestionnaireId ";
 
-            return ReadAsync(sql, new[]
+            return ReadManyAsync(sql, new[]
             {
                 GetParameter("@UserId", userId, SqlDbType.UniqueIdentifier),
                 GetParameter("@QuestionnaireId", questionnaireId, SqlDbType.UniqueIdentifier)
