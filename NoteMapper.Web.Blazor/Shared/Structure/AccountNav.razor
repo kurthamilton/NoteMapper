@@ -2,6 +2,7 @@
     <Authorized>
         @if (IsMobile)
         {
+            <BSNavItem Url="/survey">Survey</BSNavItem>
             <BSNavItem>
                 <a class="btn btn-outline-light w-100" href="/account/logout">Logout</a>
             </BSNavItem>
@@ -13,6 +14,9 @@
                     <span class="bi bi-person text-light fs-2"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="/survey">Survey</a>
+                    </li>
                     <li>
                         <a class="dropdown-item" href="/account/logout">Logout</a>
                     </li>                

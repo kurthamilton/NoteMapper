@@ -6,7 +6,7 @@ using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web.ViewModels.Instruments;
 
-namespace NoteMapper.Services.Web
+namespace NoteMapper.Services.Web.Instruments
 {
     public class UserInstrumentViewModelService : IUserInstrumentViewModelService
     {
@@ -36,14 +36,14 @@ namespace NoteMapper.Services.Web
         {
             UserPreferences preferences = await _userService.GetPreferences(userId);
 
-            InstrumentEditViewModel viewModel = new(userInstrument.UserInstrumentId, 
+            InstrumentEditViewModel viewModel = new(userInstrument.UserInstrumentId,
                 userInstrument.Type, preferences.Accidental)
             {
                 Name = userInstrument.Name
             };
 
             AddStringViewModels(userInstrument, viewModel, preferences.Accidental);
-            AddModifierViewModels(userInstrument, viewModel);                                    
+            AddModifierViewModels(userInstrument, viewModel);
 
             return viewModel;
         }
@@ -71,7 +71,7 @@ namespace NoteMapper.Services.Web
             userInstrument.Modifiers.AddRange(modifiers);
         }
 
-        private static void SetIncompatibleViewModelModifiers(UserInstrument userInstrument, 
+        private static void SetIncompatibleViewModelModifiers(UserInstrument userInstrument,
             InstrumentEditViewModel instrumentViewModel)
         {
             for (int index = 0; index < userInstrument.Modifiers.Count; index++)
@@ -79,7 +79,7 @@ namespace NoteMapper.Services.Web
                 UserInstrumentModifier modifier = userInstrument.Modifiers[index];
                 if (modifier.MutuallyExclusive == null)
                 {
-                    continue;                    
+                    continue;
                 }
 
                 foreach (string incompatibleModifier in modifier.MutuallyExclusive)
@@ -94,8 +94,8 @@ namespace NoteMapper.Services.Web
                     int otherIndex = userInstrument.Modifiers.IndexOf(other);
 
                     IReadOnlyCollection<InstrumentModifierViewModel> modifierViewModels = instrumentViewModel.Modifiers;
-                    
-                    instrumentViewModel.SetIncompatibleModifiers(index, otherIndex);                    
+
+                    instrumentViewModel.SetIncompatibleModifiers(index, otherIndex);
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace NoteMapper.Services.Web
                         ? offset.Offset
                         : 0;
                 }
-            }                        
+            }
         }
 
         private static void AddModifierViewModels(UserInstrument userInstrument, InstrumentEditViewModel instrumentViewModel)
@@ -192,8 +192,8 @@ namespace NoteMapper.Services.Web
 
                 yield return new UserInstrumentModifier
                 {
-                    MutuallyExclusive = mutuallyExclusive.Count > 0 
-                        ? mutuallyExclusive 
+                    MutuallyExclusive = mutuallyExclusive.Count > 0
+                        ? mutuallyExclusive
                         : null,
                     Name = modifierViewModel.Name,
                     Offsets = offsets,

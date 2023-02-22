@@ -6,14 +6,14 @@ using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web.ViewModels.NoteMap;
 
-namespace NoteMapper.Services.Web
+namespace NoteMapper.Services.Web.NoteMap
 {
     public class NoteMapViewModelService : INoteMapViewModelService
     {
         private readonly IInstrumentFactory _instrumentFactory;
         private readonly IMusicTheoryService _musicTheoryService;
         private readonly IUserInstrumentRepository _userInstrumentRepository;
-        
+
         public NoteMapViewModelService(IInstrumentFactory instrumentFactory, IMusicTheoryService musicTheoryService,
             IUserInstrumentRepository userInstrumentRepository)
         {
@@ -22,7 +22,7 @@ namespace NoteMapper.Services.Web
             _userInstrumentRepository = userInstrumentRepository;
         }
 
-        public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(UserPreferences preferences, 
+        public NoteMapCriteriaViewModel GetNoteMapCriteriaViewModel(UserPreferences preferences,
             NoteMapCriteriaOptionsViewModel options,
             string instrument, string note, IEnumerable<string> customNotes, string key, string type, string mode)
         {
@@ -68,20 +68,20 @@ namespace NoteMapper.Services.Web
         public async Task<NoteMapCriteriaOptionsViewModel> GetNoteMapCriteriaOptionsViewModelAsync(Guid? userId)
         {
             IReadOnlyCollection<UserInstrument> defaultInstruments = await _userInstrumentRepository.GetDefaultInstrumentsAsync();
-            IReadOnlyCollection<UserInstrument> userInstruments = userId != null 
+            IReadOnlyCollection<UserInstrument> userInstruments = userId != null
                 ? await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
                 : Array.Empty<UserInstrument>();
 
             IReadOnlyCollection<int> noteIndexes = _musicTheoryService.GetNoteIndexes();
             IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetScaleTypes();
             return new NoteMapCriteriaOptionsViewModel(
-                defaultInstruments.Select(_instrumentFactory.FromUserInstrument), 
-                userInstruments.Select(_instrumentFactory.FromUserInstrument), 
-                noteIndexes, 
+                defaultInstruments.Select(_instrumentFactory.FromUserInstrument),
+                userInstruments.Select(_instrumentFactory.FromUserInstrument),
+                noteIndexes,
                 keyTypes);
         }
 
-        public NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument, 
+        public NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument,
             NoteMapOptionsViewModel options)
         {
             if (instrument == null)
@@ -89,7 +89,7 @@ namespace NoteMapper.Services.Web
                 return default;
             }
 
-            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.Key, 
+            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.Key,
                 options.Type, options.CustomNotes);
 
             int frets = instrument.Strings.Max(x => x.Frets);
@@ -100,12 +100,12 @@ namespace NoteMapper.Services.Web
             {
                 NoteMapFretViewModel fretViewModel = new(fret);
 
-                int threshold = (options.Type == NoteCollectionType.Chord || options.Type == NoteCollectionType.Custom)
-                    ? notes.Count                    
+                int threshold = options.Type == NoteCollectionType.Chord || options.Type == NoteCollectionType.Custom
+                    ? notes.Count
                     : 1;
                 StringPermutationOptions permutationOptions = new(notes, fret, threshold);
 
-                List<IReadOnlyCollection<GuitarStringNote?>> permutations = new();                
+                List<IReadOnlyCollection<GuitarStringNote?>> permutations = new();
 
                 if (options.Mode == NoteMapMode.Manual)
                 {
@@ -115,7 +115,7 @@ namespace NoteMapper.Services.Web
                     if (singlePermutation.Count > 0)
                     {
                         permutations.Add(singlePermutation);
-                    }                    
+                    }
                 }
                 else if (options.Mode == NoteMapMode.Combinations)
                 {
@@ -127,7 +127,7 @@ namespace NoteMapper.Services.Web
                     NoteMapNotesViewModel permutationViewModel = new(permutation, notes.Key, options.Accidental);
                     fretViewModel.AddPermutation(permutationViewModel);
                 }
-                
+
                 viewModel.AddFret(fretViewModel);
             }
 

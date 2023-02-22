@@ -2,7 +2,7 @@
 using NoteMapper.Data.Core.Instruments;
 using NoteMapper.Services.Web.ViewModels.Instruments;
 
-namespace NoteMapper.Services.Web
+namespace NoteMapper.Services.Web.Instruments
 {
     public interface IUserInstrumentViewModelService
     {
