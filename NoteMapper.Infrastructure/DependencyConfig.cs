@@ -147,7 +147,12 @@ namespace NoteMapper.Infrastructure
                     Enabled = config.GetBool("Contact.Enabled")
                 })
                 .AddScoped<INoteMapViewModelService, NoteMapViewModelService>()
-                .AddScoped<IQuestionnaireViewModelService, QuestionnaireViewModelService>();
+                .AddScoped<IQuestionnaireViewModelService, QuestionnaireViewModelService>()
+                .AddSingleton(new QuestionnaireViewModelServiceSettings
+                {
+                    ApplicationName = config.GetValue("Application.Name"),
+                    NotificationEmailAddress = config.GetValue("Contact.EmailAddress"),
+                });
 
             container.AddSingleton<IStateContainer>(new StateContainer());
         }

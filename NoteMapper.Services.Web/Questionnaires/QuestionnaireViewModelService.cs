@@ -1,21 +1,27 @@
 ﻿using NoteMapper.Core;
 using NoteMapper.Data.Core.Questionnaires;
+using NoteMapper.Services.Emails;
 using NoteMapper.Services.Web.ViewModels.Questionnaires;
 
 namespace NoteMapper.Services.Web.Questionnaires
 {
     public class QuestionnaireViewModelService : IQuestionnaireViewModelService
     {
+        private readonly IEmailSenderService _emailSenderService;
         private readonly IQuestionnaireQuestionRepository _questionnaireQuestionRepository;
         private readonly IQuestionnaireRepository _questionnaireRepository;
+        private readonly QuestionnaireViewModelServiceSettings _settings;
         private readonly IUserQuestionResponseRepository _userQuestionResponseRepository;
 
         public QuestionnaireViewModelService(IQuestionnaireRepository questionnaireRepository,
             IQuestionnaireQuestionRepository questionnaireQuestionRepository,
-            IUserQuestionResponseRepository userQuestionResponseRepository)
+            IUserQuestionResponseRepository userQuestionResponseRepository,
+            QuestionnaireViewModelServiceSettings settings, IEmailSenderService emailSenderService)
         {
+            _emailSenderService = emailSenderService;
             _questionnaireQuestionRepository = questionnaireQuestionRepository;
             _questionnaireRepository = questionnaireRepository;
+            _settings = settings;
             _userQuestionResponseRepository = userQuestionResponseRepository;
         }
 
@@ -129,6 +135,11 @@ namespace NoteMapper.Services.Web.Questionnaires
 
             ServiceResult result = await _userQuestionResponseRepository.SaveAsync(responses);
 
+            if (result.Success)
+            {
+                await SendNotificationEmailAsync(userId, questions, responses);
+            }
+
             return result.Success
                 ? ServiceResult.Successful("Responses saved. Thank you")
                 : ServiceResult.Failure("Error saving responses");
@@ -201,6 +212,27 @@ namespace NoteMapper.Services.Web.Questionnaires
                 viewModel.Active, 
                 viewModel.LinkText, 
                 viewModel.IntroText);
+        }
+
+        private async Task SendNotificationEmailAsync(Guid userId, IReadOnlyCollection<QuestionnaireQuestion> questions,
+            IReadOnlyCollection<UserQuestionResponse> responses)
+        {
+            string subject = $"{_settings.ApplicationName}: New survey response";
+            string bodyPlain = $"User: {userId}" + Environment.NewLine;
+
+            foreach (UserQuestionResponse response in responses)
+            {
+                QuestionnaireQuestion? question = questions.FirstOrDefault(x => x.QuestionId == response.QuestionId);
+                if (question == null)
+                {
+                    continue;
+                }
+
+                bodyPlain += Environment.NewLine + question.QuestionText + Environment.NewLine + response.Value;
+            }
+
+            Email email = new(_settings.NotificationEmailAddress, subject, "", bodyPlain);
+            await _emailSenderService.SendEmailAsync(email);
         }
     }
 }
