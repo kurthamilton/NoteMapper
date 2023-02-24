@@ -2,12 +2,15 @@
     <p>
         Links to some common copedants:
     </p>
-    <p>
+    <ul class="list-group">
+        
         @foreach (string link in Links)
         {
-            <a href="@link" target="_blank" class="d-block">@link</a>
-        }
-    </p>
+            <li class="list-group-item">
+                <a href="@link" target="_blank">@link</a>
+            </li>            
+        }        
+    </ul>    
 </section>
 
 @code {
