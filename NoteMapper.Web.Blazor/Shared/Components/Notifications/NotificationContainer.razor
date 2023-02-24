@@ -1,0 +1,94 @@
+﻿@using System.Globalization
+@using NoteMapper.Data.Core.Users
+@using NoteMapper.Services.Feedback
+@using NoteMapper.Services.Questionnaires
+@using NoteMapper.Services.Users
+@using NoteMapper.Services.Web.Caching
+@implements IDisposable
+
+<div class="notifications-container">
+    @if (ShowSurveyMessage)
+    {
+        <Notification Header="Help improve Note Mapper!" OnDismiss="() => OnDismissAsync(SurveyId)">
+            <Content>
+                Please give your feedback by taking the <a href="/survey">survey</a>
+            </Content>
+        </Notification>
+    }
+
+    @foreach (FeedbackMessage message in Messages)
+    {
+        <Notification HideAfter="@TimeSpan.FromSeconds(10)" Header="@message.Heading" OnDismiss="() => Messages.Remove(message)">
+            <Content>
+                <NotificationIcon Model="@message.Type" />
+                @message.Message
+            </Content>
+        </Notification>
+    }
+</div>
+
+@inject IClientStorageService ClientStorageService
+@inject IFeedbackService FeedbackService
+@inject IQuestionnaireService QuestionnaireService
+@inject IUserLocator UserLocator
+@code {
+    const string StorageDateTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
+
+    List<FeedbackMessage> Messages { get; } = new();
+
+    bool ShowSurveyMessage { get; set; }
+
+    string SurveyId { get; } = "Survey";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        FeedbackService.OnNotify += OnNotify;
+
+        string storageKey = GetClientStorageKey(SurveyId);
+        string? showAfter = await ClientStorageService.GetAsync(storageKey);
+
+        DateTime.TryParseExact(showAfter, StorageDateTimeFormat, null, DateTimeStyles.AssumeUniversal, out DateTime parsedShowAfter);
+
+        User? user = await UserLocator.GetCurrentUserAsync();
+
+        ShowSurveyMessage = user != null && 
+                            user.CreatedUtc < DateTime.UtcNow.AddDays(-1) &&
+                            (parsedShowAfter == DateTime.MinValue || parsedShowAfter < DateTime.UtcNow) &&
+                            !await QuestionnaireService.UserHasFinishedCurrentQuestionnaire(user.UserId);
+    }
+
+    static string GetClientStorageKey(string id)
+    {
+        return $"Notifications.{id}.ShowAfter";
+    }
+
+    void IDisposable.Dispose()
+    {
+        FeedbackService.OnNotify -= OnNotify;
+    }
+
+    Task OnDismissAsync(string id)
+    {
+        ShowSurveyMessage = false;
+
+        string showAfter = DateTime.UtcNow
+            .AddDays(1)
+            .ToString(StorageDateTimeFormat);
+
+        string key = GetClientStorageKey(id);
+        return ClientStorageService.SetAsync(key, showAfter);
+    }
+
+    void OnNotify(FeedbackMessage feedback)
+    {
+        if (string.IsNullOrEmpty(feedback.Message))
+        {
+            return;
+        }
+
+        Messages.Add(feedback);
+        StateHasChanged();
+    }
+}

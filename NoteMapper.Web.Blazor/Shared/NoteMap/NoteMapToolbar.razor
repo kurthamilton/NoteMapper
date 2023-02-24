@@ -1,5 +1,7 @@
-﻿@using NoteMapper.Core.Guitars;
-@using NoteMapper.Web.Blazor.Models.NoteMap;
+﻿@using NoteMapper.Core.Guitars
+@using NoteMapper.Services.Users
+@using NoteMapper.Web.Blazor.Models.NoteMap
+@using NoteMapper.Web.Blazor.Shared.Components
 
 @if (Instrument == null)
 {
@@ -7,7 +9,12 @@
 }
 
 <div class="btn-toolbar">
-    <div class="btn-group btn-group-sm me-3"
+    <button class="btn btn-outline-secondary btn-sm me-2"
+            @onclick="() => PreferencesComponent?.Open()">
+        <i class="bi bi-gear"></i>
+    </button>
+
+    <div class="btn-group btn-group-sm me-2"
          data-nm-tour-step="fretboard-zoom">
         <button class="btn btn-outline-secondary @(CanZoom(1) ? "" : "disabled")"
                 @onclick="e => Zoom(1)">
@@ -33,12 +40,27 @@
     </div>
 </div>
 
+<OffCanvas @ref="PreferencesComponent" Heading="Preferences">
+    <NoteMapDisplayPreferences UserId="UserId"
+                               UserPreferences="UserPreferences"
+                               OnChange="OnPreferencesChange"/>
+</OffCanvas>
+
 @code{
     [Parameter]
     public GuitarBase? Instrument { get; set; }
 
     [Parameter]
-    public EventCallback<NoteMapZoomViewModel> OnChange { get; set; }
+    public Guid? UserId { get; set; }
+
+    [Parameter]
+    public UserPreferences? UserPreferences { get; set; }
+
+    [Parameter]
+    public EventCallback<NoteMapZoomViewModel> OnZoom { get; set; }
+
+    [Parameter]
+    public EventCallback<UserPreferences> OnPreferencesChange { get; set; }
 
     int EndFret { get; set; }
     int LastFret { get; set; }
@@ -46,7 +68,9 @@
     int TotalFrets { get; set; }
     int VisibleFrets { get; set; }
 
-    private GuitarBase? PreviousInstrument { get; set; }
+    OffCanvas? PreferencesComponent;
+
+    GuitarBase? PreviousInstrument { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -104,7 +128,7 @@
 
     private Task TriggerChange()
     {
-        return OnChange.InvokeAsync(new NoteMapZoomViewModel
+        return OnZoom.InvokeAsync(new NoteMapZoomViewModel
         {
             EndFret = EndFret,
             StartFret = StartFret

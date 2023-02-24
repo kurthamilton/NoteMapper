@@ -1,6 +1,5 @@
 ﻿@page "/contact"
 @inherits NoteMapperComponentBase
-@layout ContentLayout
 @attribute [AllowAnonymous]
 
 @using NoteMapper.Core
@@ -10,66 +9,68 @@
 @using NoteMapper.Web.Blazor.Shared.Components
 @using NoteMapper.Web.Blazor.Shared.Layouts
 
-<h1>Contact</h1>
+<ContentPage>
+    <h1>Contact</h1>
 
-@if (Model == null)
-{
-    <Loading />
-    return;
-}
-
-<Feedback Model="@Feedback" />
-
-@if (Model != null && Feedback == null)
-{
-    if (Model.Enabled)
+    @if (Model == null)
     {
-        <Recaptcha @ref="@RecaptchaComponent" />
-
-        <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
-            <DataAnnotationsValidator />
-
-            <fieldset disabled="@Submitting">
-                @if (User == null)
-                {
-                    <div class="mb-3">
-                        <label for="email" class="form-label required">Your email address</label>
-                        <InputText id="email" type="email" @bind-Value="Model.Email" class="form-control" />
-                        <ValidationMessage For="() => Model.Email" />
-                    </div>
-                }
-                else
-                {
-                    <input type="hidden" value="@User.Email" />
-                }
-
-                <div class="mb-3">
-                    <label for="message" class="form-label required">Message</label>
-                    <InputTextArea id="message" @bind-Value="Model.Message" class="form-control"></InputTextArea>
-                    <ValidationMessage For="() => Model.Message" />
-                </div>
-
-                <button class="btn btn-primary">
-                    Submit                    
-                    @if (Submitting)
-                    {
-                        <ButtonSpinner />
-                    }                    
-                </button>
-            </fieldset>
-        </EditForm>
-    }    
-    else
-    {
-        <div class="alert alert-danger">
-            The contact form is currently closed
-        </div>
+        <Loading />
+        return;
     }
-}
-else if (Feedback != null)
-{
-    <button class="btn btn-outline-secondary" @onclick="() => Feedback = null">Back</button>    
-}
+
+    <Feedback Model="@Feedback" />
+
+    @if (Model != null && Feedback == null)
+    {
+        if (Model.Enabled)
+        {
+            <Recaptcha @ref="@RecaptchaComponent" />
+
+            <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+
+                <fieldset disabled="@Submitting">
+                    @if (User == null)
+                    {
+                        <div class="mb-3">
+                            <label for="email" class="form-label required">Your email address</label>
+                            <InputText id="email" type="email" @bind-Value="Model.Email" class="form-control" />
+                            <ValidationMessage For="() => Model.Email" />
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" value="@User.Email" />
+                    }
+
+                    <div class="mb-3">
+                        <label for="message" class="form-label required">Message</label>
+                        <InputTextArea id="message" @bind-Value="Model.Message" class="form-control"></InputTextArea>
+                        <ValidationMessage For="() => Model.Message" />
+                    </div>
+
+                    <button class="btn btn-primary">
+                        Submit                    
+                        @if (Submitting)
+                        {
+                            <ButtonSpinner />
+                        }                    
+                    </button>
+                </fieldset>
+            </EditForm>
+        }    
+        else
+        {
+            <div class="alert alert-danger">
+                The contact form is currently closed
+            </div>
+        }
+    }
+    else if (Feedback != null)
+    {
+        <button class="btn btn-outline-secondary" @onclick="() => Feedback = null">Back</button>    
+    }
+</ContentPage>
 
 @inject IContactService ContactService
 @code {

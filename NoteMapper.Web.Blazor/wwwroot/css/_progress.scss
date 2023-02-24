@@ -1,0 +1,15 @@
+﻿.progress--thin {
+    height: 1px;
+}
+
+.progress-circle-wrapper {
+    border: 1px solid blue;
+    position: relative;
+
+    svg {
+        fill: none;
+        stroke: red;
+        stroke-width: 2px;
+        position: absolute;
+    }
+}

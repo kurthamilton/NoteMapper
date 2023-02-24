@@ -1,15 +1,14 @@
 ﻿@page "/instruments/create"
 @inherits NoteMapperComponentBase
-@layout ContentLayout
 @attribute [Authorize]
 
 @using NoteMapper.Core.Guitars
 @using NoteMapper.Core
 @using NoteMapper.Core.MusicTheory
 @using NoteMapper.Data.Core.Instruments
+@using NoteMapper.Services.Feedback;
 @using NoteMapper.Services.Instruments
-@using NoteMapper.Services.Web.Instruments;
-@using NoteMapper.Services.Web.StateManagement
+@using NoteMapper.Services.Web.Instruments
 @using NoteMapper.Services.Web.ViewModels.Instruments
 @using NoteMapper.Web.Blazor.Extensions
 @using NoteMapper.Web.Blazor.Models
@@ -33,8 +32,6 @@
         <li class="breadcrumb-item active">Create</li>
     </ol>
 </nav>
-
-<Feedback Model="Feedback" />
 
 <h1>Create new instrument</h1>
 
@@ -60,6 +57,7 @@
 
 <CopedantLinks />
 
+@inject IFeedbackService FeedbackService
 @inject IUserInstrumentService UserInstrumentService
 @inject IUserInstrumentViewModelService UserInstrumentViewModelService
 @code {
@@ -113,6 +111,7 @@
         ServiceResult result = await UserInstrumentService.CreateInstrumentAsync(UserId, Template);
         if (result.Success)
         {
+            FeedbackService.Notify(new FeedbackMessage(result));
             NavigationManager.NavigateTo("/instruments");
             return;
         }

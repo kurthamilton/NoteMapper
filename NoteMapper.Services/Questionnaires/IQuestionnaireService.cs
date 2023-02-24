@@ -8,5 +8,7 @@ namespace NoteMapper.Services.Questionnaires
         Task<ServiceResult> DeleteQuestionnaireAsync(Guid questionnaireId);
 
         Task<IReadOnlyCollection<Questionnaire>> GetQuestionnairesAsync();
+
+        Task<bool> UserHasFinishedCurrentQuestionnaire(Guid userId);
     }
 }

@@ -8,21 +8,21 @@ namespace NoteMapper.Services.Web.Questionnaires
     public class QuestionnaireViewModelService : IQuestionnaireViewModelService
     {
         private readonly IEmailSenderService _emailSenderService;
-        private readonly IQuestionnaireQuestionRepository _questionnaireQuestionRepository;
         private readonly IQuestionnaireRepository _questionnaireRepository;
+        private readonly IQuestionnaireQuestionRepository _questionRepository;
+        private readonly IUserQuestionResponseRepository _responseRepository;
         private readonly QuestionnaireViewModelServiceSettings _settings;
-        private readonly IUserQuestionResponseRepository _userQuestionResponseRepository;
 
         public QuestionnaireViewModelService(IQuestionnaireRepository questionnaireRepository,
-            IQuestionnaireQuestionRepository questionnaireQuestionRepository,
-            IUserQuestionResponseRepository userQuestionResponseRepository,
+            IQuestionnaireQuestionRepository questionRepository,
+            IUserQuestionResponseRepository responseRepository,
             QuestionnaireViewModelServiceSettings settings, IEmailSenderService emailSenderService)
         {
             _emailSenderService = emailSenderService;
-            _questionnaireQuestionRepository = questionnaireQuestionRepository;
             _questionnaireRepository = questionnaireRepository;
+            _questionRepository = questionRepository;
+            _responseRepository = responseRepository;
             _settings = settings;
-            _userQuestionResponseRepository = userQuestionResponseRepository;
         }
 
         public async Task<ServiceResult> CreateQuestionnaireAsync(EditQuestionnaireViewModel viewModel)
@@ -40,7 +40,7 @@ namespace NoteMapper.Services.Web.Questionnaires
                 .Select((x, i) => MapEditViewModelToQuestion(Guid.Empty, questionnaire.QuestionnaireId, x, i))
                 .ToArray();
 
-            ServiceResult result = await _questionnaireQuestionRepository.UpdateQuestionsAsync(questions, 
+            ServiceResult result = await _questionRepository.UpdateQuestionsAsync(questions, 
                 Array.Empty<QuestionnaireQuestion>(), 
                 Array.Empty<QuestionnaireQuestion>());
 
@@ -57,7 +57,7 @@ namespace NoteMapper.Services.Web.Questionnaires
                 return null;
             }
 
-            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionnaireQuestionRepository.GetQuestionsAsync(questionnaireId);
+            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionRepository.GetQuestionsAsync(questionnaireId);
 
             return new EditQuestionnaireViewModel(questionnaire, questions);
         }
@@ -70,10 +70,10 @@ namespace NoteMapper.Services.Web.Questionnaires
                 return null;
             }
 
-            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionnaireQuestionRepository.GetQuestionsAsync(
+            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionRepository.GetQuestionsAsync(
                 questionnaire.QuestionnaireId);
 
-            IReadOnlyCollection<UserQuestionResponse> responses = await _userQuestionResponseRepository.GetAsync(
+            IReadOnlyCollection<UserQuestionResponse> responses = await _responseRepository.GetAsync(
                 userId, questionnaire.QuestionnaireId);
 
             List<QuestionnaireResponseViewModel> responseViewModels = new();
@@ -107,10 +107,10 @@ namespace NoteMapper.Services.Web.Questionnaires
                 return ServiceResult.Failure("Error saving responses");
             }
 
-            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionnaireQuestionRepository.GetQuestionsAsync(
+            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionRepository.GetQuestionsAsync(
                 questionnaire.QuestionnaireId);
 
-            List<UserQuestionResponse> responses = new List<UserQuestionResponse>(await _userQuestionResponseRepository.GetAsync(
+            List<UserQuestionResponse> responses = new List<UserQuestionResponse>(await _responseRepository.GetAsync(
                 userId, questionnaire.QuestionnaireId));
 
             foreach (QuestionnaireResponseViewModel responseViewModel in viewModel.Responses)
@@ -133,7 +133,7 @@ namespace NoteMapper.Services.Web.Questionnaires
                 }
             }
 
-            ServiceResult result = await _userQuestionResponseRepository.SaveAsync(responses);
+            ServiceResult result = await _responseRepository.SaveAsync(responses);
 
             if (result.Success)
             {
@@ -154,7 +154,7 @@ namespace NoteMapper.Services.Web.Questionnaires
                 return ServiceResult.Failure("Not found");
             }
 
-            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionnaireQuestionRepository
+            IReadOnlyCollection<QuestionnaireQuestion> questions = await _questionRepository
                 .GetQuestionsAsync(questionnaireId);
 
             IDictionary<Guid, QuestionnaireQuestion> questionDictionary = questions
@@ -191,7 +191,7 @@ namespace NoteMapper.Services.Web.Questionnaires
                 return ServiceResult.Failure("Error updating questionnaire");
             }
 
-            ServiceResult updateQuestionsResult = await _questionnaireQuestionRepository.UpdateQuestionsAsync(insertQuestions, updateQuestions, deleteQuestions);
+            ServiceResult updateQuestionsResult = await _questionRepository.UpdateQuestionsAsync(insertQuestions, updateQuestions, deleteQuestions);
             return updateQuestionsResult.Success
                 ? ServiceResult.Successful("Questionnaire updated")
                 : ServiceResult.Failure("Error updating questions");

@@ -3,7 +3,10 @@
 @*Mobile nav*@
 <BSNavbar Class="d-sm-none" Color="BSColor.Dark" IsDark="true" Expand="Size.Small">
     <BSContainer>
-        <BSNavbarBrand Url="/">@ApplicationName</BSNavbarBrand>
+        <BSNavbarBrand Url="/">
+            <img src="/img/brand-icon.png" />
+            @ApplicationName
+        </BSNavbarBrand>
         <BSCollapse IsInNavbar="true">
             <Toggler>
                 <BSNavbarToggle />
@@ -23,8 +26,11 @@
 
 @*Desktop nav*@
 <BSNavbar Class="d-none d-sm-flex" Color="BSColor.Dark" IsDark="true" Expand="Size.Small">
-    <BSContainer Container="Fluid ? Container.ExrtaLarge : Container.Default" Class="@ContainerClass">
-        <BSNavbarBrand Url="/">@ApplicationName</BSNavbarBrand>
+    <BSContainer Container="Container.ExrtaLarge" Class="px-md-5">
+        <BSNavbarBrand Url="/">
+            <img src="/img/brand-icon.png" />
+            @ApplicationName
+        </BSNavbarBrand>
         <BSNav MarginEnd="Margins.Auto">
             <BSNavItem Url="/instruments">Instruments</BSNavItem>
             <BSNavItem Url="/about">About</BSNavItem>
@@ -37,12 +43,6 @@
 
 @inject IConfiguration Configuration
 @code{
-    [Parameter]
-    public string? ContainerClass { get; set; }
-
-    [Parameter]
-    public bool Fluid { get; set; } = true;
-
     string? ApplicationName { get; set; }
 
     protected override void OnInitialized()

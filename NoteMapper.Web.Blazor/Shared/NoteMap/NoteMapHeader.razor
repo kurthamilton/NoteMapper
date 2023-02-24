@@ -20,18 +20,19 @@
 </div>
 
 <div class="d-flex">
-    <button class="btn btn-outline-secondary btn-sm me-auto d-block d-sm-none"
-            @onclick="() => OptionsComponent?.Open()">
-        Options
-    </button>
-
-    <button class="btn btn-outline-secondary btn-sm me-auto"
-            @onclick="() => PreferencesComponent?.Open()">
-        Preferences
-    </button>
+    <div class="btn-group d-sm-none me-auto">
+        <button class="btn btn-outline-secondary btn-sm "
+                @onclick="() => OptionsComponent?.Open()">
+            Options
+        </button>
+    </div>
 
     <div class="d-flex flex-grow-1 justify-content-end">
-        <NoteMapToolbar Instrument="@Instrument" OnChange="OnZoomChange" />
+        <NoteMapToolbar Instrument="@Instrument"
+                        UserId="UserId"
+                        UserPreferences="UserPreferences"
+                        OnPreferencesChange="OnPreferencesChange"
+                        OnZoom="OnZoomChange" />
     </div>
 </div>
 
@@ -43,12 +44,6 @@
                          OnChange="OnCriteriaChange" />
     </OffCanvas>   
 </div>
-
-<OffCanvas @ref="PreferencesComponent" Heading="Preferences">
-    <NoteMapDisplayPreferences UserId="UserId"
-                               UserPreferences="UserPreferences"
-                               OnChange="OnPreferencesChange"/>
-</OffCanvas>
 
 @code {
     [Parameter]
@@ -76,6 +71,4 @@
     public EventCallback<NoteMapZoomViewModel?> OnZoomChange { get; set; }
 
     OffCanvas? OptionsComponent;
-
-    OffCanvas? PreferencesComponent;
 }

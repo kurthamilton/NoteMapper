@@ -1,7 +1,7 @@
 ﻿@page "/account/login"
 @inherits NoteMapperComponentBase
-@layout ContentLayout
 @attribute [AllowAnonymous]
+
 @using NoteMapper.Core
 @using NoteMapper.Data.Core.Users
 @using NoteMapper.Services.Users
@@ -11,42 +11,44 @@
 @using NoteMapper.Web.Blazor.Shared.Components
 @using NoteMapper.Web.Blazor.Shared.Layouts
 
-<h1>Login</h1>
+<ContentPage>
+    <h1>Login</h1>
 
-<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
-    <DataAnnotationsValidator />
+    <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
+        <DataAnnotationsValidator />
     
-    <fieldset disabled="@Loading">
-        <div class="mb-3">
-            <label for="email" class="form-label required">Email</label>
-            <InputText id="email" @bind-Value="Model.Email" class="form-control" tabindex="1" />
-            <ValidationMessage For="() => Model.Email" />
-        </div>
-
-        <div class="mb-3">
-            <div class="d-flex">
-                <label for="password" class="form-label required me-auto">Password</label>
-                <a href="/account/password/forgotten" tabindex="4">
-                    Forgotten password?
-                </a>
+        <fieldset disabled="@Loading">
+            <div class="mb-3">
+                <label for="email" class="form-label required">Email</label>
+                <InputText id="email" @bind-Value="Model.Email" class="form-control" tabindex="1" />
+                <ValidationMessage For="() => Model.Email" />
             </div>
-            <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" tabindex="2" />            
-            <ValidationMessage For="() => Model.Password" />
-        </div>
 
-        <div class="mb-3">
-            <button type="submit" class="btn btn-primary" tabindex="3">
-                Login
-                @if (Loading)
-                {
-                    <ButtonSpinner />
-                }                
-            </button>
-        </div>
-    </fieldset>
-</EditForm>
+            <div class="mb-3">
+                <div class="d-flex">
+                    <label for="password" class="form-label required me-auto">Password</label>
+                    <a href="/account/password/forgotten" tabindex="4">
+                        Forgotten password?
+                    </a>
+                </div>
+                <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" tabindex="2" />            
+                <ValidationMessage For="() => Model.Password" />
+            </div>
 
-<Feedback Model="@Feedback" />
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary" tabindex="3">
+                    Login
+                    @if (Loading)
+                    {
+                        <ButtonSpinner />
+                    }                
+                </button>
+            </div>
+        </fieldset>
+    </EditForm>
+
+    <Feedback Model="@Feedback" />
+</ContentPage>
 
 @inject IUrlEncoder UrlEncoder
 @code {

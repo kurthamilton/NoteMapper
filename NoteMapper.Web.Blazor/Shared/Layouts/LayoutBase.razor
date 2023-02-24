@@ -1,14 +1,16 @@
-﻿@using NoteMapper.Web.Blazor.Shared.Logging
+﻿@using NoteMapper.Web.Blazor.Shared.Components.Notifications
+@using NoteMapper.Web.Blazor.Shared.Logging
 @using NoteMapper.Web.Blazor.Shared.Structure
 @inherits LayoutComponentBase
 
 <PageTitle>Note Mapper</PageTitle>
 
 <header>
-    <Navbar Fluid="true" ContainerClass="@ContainerClass" />
+    <Navbar />
 </header>
-<div class="container-xl @ContainerClass main">
-    <div class="content @PageClass">
+<div class="container-xl px-md-5 main">    
+    <div class="content position-relative">
+        <NotificationContainer />
         @*<LoggingErrorBoundary>
         <ChildContent>
         @ChildContent
@@ -23,18 +25,10 @@
         </ErrorContent>
         </LoggingErrorBoundary>*@
         @ChildContent
-    </div>
+    </div>  
 </div>
 
 @code {
     [Parameter] 
-    public RenderFragment? ChildContent { get; set; }
-
-    string ContainerClass { get; set; } = "px-md-5";
-
-    [Parameter]
-    public bool Fluid { get; set; } = true;    
-
-    [Parameter]
-    public string? PageClass { get; set; }
+    public RenderFragment? ChildContent { get; set; }  
 }

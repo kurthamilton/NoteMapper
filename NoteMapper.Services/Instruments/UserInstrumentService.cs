@@ -40,7 +40,9 @@ namespace NoteMapper.Services.Instruments
             userInstrument.UserInstrumentId = Guid.NewGuid().ToString();
 
             ServiceResult result = await _userInstrumentRepository.CreateUserInstrumentAsync(userId, userInstrument);
-            return result;
+            return result.Success
+                ? ServiceResult.Successful($"Instrument '{userInstrument.Name}' created")
+                : result;
         }
 
         public Task<ServiceResult> DeleteDefaultInstrumentAsync(string userInstrumentId)
@@ -48,9 +50,18 @@ namespace NoteMapper.Services.Instruments
             return _userInstrumentRepository.DeleteDefaultInstrumentAsync(userInstrumentId);
         }
 
-        public Task<ServiceResult> DeleteInstrumentAsync(Guid userId, string userInstrumentId)
+        public async Task<ServiceResult> DeleteInstrumentAsync(Guid userId, string userInstrumentId)
         {
-            return _userInstrumentRepository.DeleteUserInstrumentAsync(userId, userInstrumentId);
+            UserInstrument? instrument = await _userInstrumentRepository.FindUserInstrumentAsync(userId, userInstrumentId);
+            if (instrument == null)
+            {
+                return ServiceResult.Successful();
+            }
+
+            ServiceResult result = await _userInstrumentRepository.DeleteUserInstrumentAsync(userId, userInstrumentId);
+            return result.Success
+                ? ServiceResult.Successful($"Instrument '{instrument.Name}' deleted")
+                : result;
         }
 
         public async Task<GuitarBase?> FindAsync(Guid? userId, string userInstrumentId)
@@ -124,7 +135,9 @@ namespace NoteMapper.Services.Instruments
             }
 
             ServiceResult result = await _userInstrumentRepository.UpdateUserInstrumentAsync(userId, instrument);
-            return result;
+            return result.Success
+                ? ServiceResult.Successful($"Instrument '{instrument.Name}' updated")
+                : result;
         }
 
         private async Task<ServiceResult> ValidateInstrumentAsync(Guid? userId, UserInstrument instrument)

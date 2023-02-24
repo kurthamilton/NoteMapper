@@ -1,6 +1,5 @@
 ﻿@page "/account/activate"
 @inherits NoteMapperComponentBase
-@layout ContentLayout
 @attribute [AllowAnonymous]
 
 @using NoteMapper.Core
@@ -11,40 +10,42 @@
 @using NoteMapper.Web.Blazor.Shared.Components
 @using NoteMapper.Web.Blazor.Shared.Layouts
 
-<h1>Activate your account</h1>
+<ContentPage>
+    <h1>Activate your account</h1>
 
-<Feedback Model="@Feedback" />
+    <Feedback Model="@Feedback" />
 
-@if (Feedback?.Type == FeedbackType.Success)
-{
-    <div class="mt-3">
-        <a href="/account/login" class="btn btn-outline-primary">Login</a>
-    </div>
-}
-else
-{
-    <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
-        <DataAnnotationsValidator />
+    @if (Feedback?.Type == FeedbackType.Success)
+    {
+        <div class="mt-3">
+            <a href="/account/login" class="btn btn-outline-primary">Login</a>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
 
-        <fieldset disabled="@Loading">
-            <div class="mb-3">
-                <label for="password" class="form-label required">Password</label>
-                <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" />
-                <ValidationMessage For="() => Model.Password" />
-            </div>
+            <fieldset disabled="@Loading">
+                <div class="mb-3">
+                    <label for="password" class="form-label required">Password</label>
+                    <InputText id="password" type="password" @bind-Value="Model.Password" class="form-control" />
+                    <ValidationMessage For="() => Model.Password" />
+                </div>
 
-            <div>
-                <button type="submit" class="btn btn-primary">
-                    Activate
-                    @if (Loading)
-                    {
-                        <ButtonSpinner />
-                    }
-                </button>
-            </div>
-        </fieldset>
-    </EditForm>
-}
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Activate
+                        @if (Loading)
+                        {
+                            <ButtonSpinner />
+                        }
+                    </button>
+                </div>
+            </fieldset>
+        </EditForm>
+    }
+</ContentPage>
 
 @code {
     string Code { get; set; } = "";

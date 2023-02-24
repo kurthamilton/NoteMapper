@@ -19,16 +19,17 @@ using NoteMapper.Identity.Microsoft;
 using NoteMapper.Infrastructure.Extensions;
 using NoteMapper.Services;
 using NoteMapper.Services.Emails;
+using NoteMapper.Services.Feedback;
 using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Logging;
 using NoteMapper.Services.Questionnaires;
 using NoteMapper.Services.Users;
+using NoteMapper.Services.Web.Caching;
 using NoteMapper.Services.Web.Contact;
 using NoteMapper.Services.Web.Instruments;
 using NoteMapper.Services.Web.NoteMap;
 using NoteMapper.Services.Web.Questionnaires;
 using NoteMapper.Services.Web.Security;
-using NoteMapper.Services.Web.StateManagement;
 
 namespace NoteMapper.Infrastructure
 {
@@ -112,34 +113,32 @@ namespace NoteMapper.Infrastructure
                     ApiSecret = config.GetValue("Emails.Mailjet.ApiSecret"),
                     FromEmail = config.GetValue("Emails.Mailjet.FromEmail"),
                     FromName = config.GetValue("Emails.Mailjet.FromName"),
-                });
-
-            container
+                })
                 .AddScoped<IErrorLoggingService, ErrorLoggingService>()
                 .AddSingleton(new ErrorLoggingServiceSettings
                 {
                     CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
                     Enabled = config.GetBool("Logging.Enabled")
                 })
-                .AddScoped<IQuestionnaireService, QuestionnaireService>()
-                .AddScoped<IUserAdminService, UserAdminService>()
-                .AddScoped<IUserService, UserService>();
-
-            container
+                // use singleton IFeedbackService to implement pub-sub pattern
+                .AddSingleton<IFeedbackService>(new FeedbackService())
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
                 .AddScoped<IMusicTheoryService, MusicTheoryService>()
+                .AddScoped<IQuestionnaireService, QuestionnaireService>()
                 .AddScoped<IRecaptchaService, RecaptchaService>()
                 .AddSingleton(new RecaptchaServiceSettings(
                     config.GetValue("Recaptcha.SecretKey"),
-                    config.GetValue("Recaptcha.SiteKey"), 
+                    config.GetValue("Recaptcha.SiteKey"),
                     config.GetValue("Recaptcha.VerifyUrl")))
+                .AddScoped<IUserAdminService, UserAdminService>()
                 .AddScoped<IUserInstrumentService, UserInstrumentService>()
-                .AddScoped<IUserInstrumentViewModelService, UserInstrumentViewModelService>();
+                .AddScoped<IUserService, UserService>();
         }
 
         private static void RegisterWebServices(IDependencyContainer container, IConfiguration config)
         {
             container
+                .AddScoped<IClientStorageService, ClientStorageService>()
                 .AddScoped<IContactService, ContactService>()
                 .AddSingleton(new ContactServiceSettings
                 {
@@ -153,9 +152,10 @@ namespace NoteMapper.Infrastructure
                 {
                     ApplicationName = config.GetValue("Application.Name"),
                     NotificationEmailAddress = config.GetValue("Contact.EmailAddress"),
-                });
-
-            container.AddSingleton<IStateContainer>(new StateContainer());
+                })
+                // use singleton StateContainer to persist data across views in the same request
+                .AddSingleton<IStateContainer>(new StateContainer())
+                .AddScoped<IUserInstrumentViewModelService, UserInstrumentViewModelService>();
         }
     }
 }

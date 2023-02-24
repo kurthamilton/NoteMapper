@@ -6,8 +6,9 @@
 @using NoteMapper.Core.MusicTheory
 @using NoteMapper.Data.Core.Instruments
 @using NoteMapper.Data.Core.Users
+@using NoteMapper.Services.Feedback
 @using NoteMapper.Services.Instruments
-@using NoteMapper.Services.Web.Instruments;
+@using NoteMapper.Services.Web.Instruments
 @using NoteMapper.Services.Web.ViewModels.Instruments
 @using NoteMapper.Web.Blazor.Shared.Components
 @using NoteMapper.Web.Blazor.Shared.Instruments
@@ -37,13 +38,13 @@
 
 <EditForm Model="@Model" Context="editContext" OnValidSubmit="UpdateInstrumentAsync">
     
-    <fieldset disabled="@Loading">
+    <fieldset disabled="@Updating">
         <InstrumentForm Model="@Model" EditContext="@editContext" />
 
         <div class="d-flex">
             <button class="btn btn-primary me-1">
                 Update
-                @if (Loading)
+                @if (Updating)
                 {
                     <ButtonSpinner />
                 }
@@ -65,6 +66,7 @@
 
 <CopedantLinks />
 
+@inject IFeedbackService FeedbackService
 @inject IUserInstrumentService UserInstrumentService
 @inject IUserInstrumentViewModelService UserInstrumentViewModelService
 @code {
@@ -74,6 +76,8 @@
     bool Loading { get; set; }
 
     InstrumentEditViewModel? Model { get; set; }
+
+    bool Updating { get; set; }
 
     User? User { get; set; }
 
@@ -125,14 +129,19 @@
             return;
         }
 
+        Updating = true;
+
         UserInstrumentViewModelService.MapEditViewModelToUserInstrument(Model, UserInstrument);
 
         ServiceResult result = await UserInstrumentService.UpdateInstrumentAsync(User.UserId, UserInstrument);
         if (result.Success)
         {
+            FeedbackService.Notify(new FeedbackMessage(result));
             NavigationManager.NavigateTo("/instruments");
             return;
         }
+
+        Updating = false;
 
         SetFeedback(result);
     }
