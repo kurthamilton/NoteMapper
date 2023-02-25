@@ -126,7 +126,7 @@
                     <td colspan="@((EndFret - StartFret) + 2)">
                         @*MODE*@
                         <div class="my-3">
-                            <div class="form-check form-switch form-check-inline" data-nm-tour-step="modifiers-mode">
+                            <div class="form-check form-check-reverse form-switch form-check-inline" data-nm-tour-step="modifiers-mode">
                                 <input type="checkbox" class="form-check-input" id="mode" role="switch"
                                    checked="@(Criteria?.Mode == NoteMapMode.Combinations)" @onchange="OnModeChange">
                                 <label class="form-check-label" for="mode">Find combinations</label>
