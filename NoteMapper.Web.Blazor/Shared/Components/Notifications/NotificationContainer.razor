@@ -1,25 +1,32 @@
-﻿@using System.Globalization
-@using NoteMapper.Data.Core.Users
-@using NoteMapper.Services.Feedback
-@using NoteMapper.Services.Questionnaires
+﻿@using NoteMapper.Services.Feedback
+@using NoteMapper.Services.Notifications
 @using NoteMapper.Services.Users
-@using NoteMapper.Services.Web.Caching
+@using NotificationModel = NoteMapper.Data.Core.Notifications.Notification
 @implements IDisposable
 
 <div class="notifications-container">
-    @if (ShowSurveyMessage)
+    @if (Notifications != null)
     {
-        <Notification Header="Help improve Note Mapper!" OnDismiss="() => OnDismissAsync(SurveyId)">
-            <Content>
-                Please give your feedback by taking the <a href="/survey">survey</a>
-            </Content>
-        </Notification>
+        foreach (NotificationModel notification in Notifications)
+        {
+            <Notification Header="@notification.Heading" OnClose="() => Notifications.Remove(notification)">
+                <Content>
+                    @((MarkupString)notification.ContentHtml)
+                </Content>
+                <Footer>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-sm btn-link p-0" @onclick="() => OnHideAsync(notification)">Maybe later</button>
+                        <button class="btn btn-sm btn-link p-0" @onclick="() => OnDismissAsync(notification)">Don't show me again</button>
+                    </div>                    
+                </Footer>
+            </Notification>   
+        }        
     }
 
     @foreach (FeedbackMessage message in Messages)
     {
         <Notification HideAfter="@TimeSpan.FromSeconds(5)" Header="@message.Heading" 
-            OnDismiss="() => Messages.Remove(message)">
+            OnClose="() => Messages.Remove(message)">
             <Content>
                 <NotificationIcon Model="@message.Type" />
                 @message.Message
@@ -28,18 +35,15 @@
     }
 </div>
 
-@inject IClientStorageService ClientStorageService
 @inject IFeedbackService FeedbackService
-@inject IQuestionnaireService QuestionnaireService
+@inject INotificationService NotificationService
 @inject IUserLocator UserLocator
 @code {
-    const string StorageDateTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
-
     List<FeedbackMessage> Messages { get; } = new();
 
-    bool ShowSurveyMessage { get; set; }
+    List<NotificationModel>? Notifications { get; set; }
 
-    string SurveyId { get; } = "Survey";
+    Guid? UserId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,22 +51,12 @@
 
         FeedbackService.OnNotify += OnNotify;
 
-        string storageKey = GetClientStorageKey(SurveyId);
-        string? showAfter = await ClientStorageService.GetAsync(storageKey);
+        UserId = await UserLocator.GetCurrentUserIdAsync();
 
-        DateTime.TryParseExact(showAfter, StorageDateTimeFormat, null, DateTimeStyles.AssumeUniversal, out DateTime parsedShowAfter);
-
-        User? user = await UserLocator.GetCurrentUserAsync();
-
-        ShowSurveyMessage = user != null && 
-                            user.CreatedUtc < DateTime.UtcNow.AddDays(-1) &&
-                            (parsedShowAfter == DateTime.MinValue || parsedShowAfter < DateTime.UtcNow) &&
-                            !await QuestionnaireService.UserHasFinishedCurrentQuestionnaire(user.UserId);
-    }
-
-    static string GetClientStorageKey(string id)
-    {
-        return $"Notifications.{id}.ShowAfter";
+        if (UserId != null)
+        {
+            Notifications = new List<NotificationModel>(await NotificationService.GetUserNotificationsAsync(UserId.Value));
+        }
     }
 
     void IDisposable.Dispose()
@@ -70,16 +64,28 @@
         FeedbackService.OnNotify -= OnNotify;
     }
 
-    Task OnDismissAsync(string id)
+    Task OnDismissAsync(NotificationModel notification)
     {
-        ShowSurveyMessage = false;
+        Notifications?.Remove(notification);
 
-        string showAfter = DateTime.UtcNow
-            .AddDays(1)
-            .ToString(StorageDateTimeFormat);
+        if (UserId == null)
+        {
+            return Task.CompletedTask;
+        }
 
-        string key = GetClientStorageKey(id);
-        return ClientStorageService.SetAsync(key, showAfter);
+        return NotificationService.DismissNotificationAsync(UserId.Value, notification);
+    }
+
+    Task OnHideAsync(NotificationModel notification)
+    {
+        Notifications?.Remove(notification);
+
+        if (UserId == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return NotificationService.HideNotificationAsync(UserId.Value, notification);
     }
 
     void OnNotify(FeedbackMessage feedback)

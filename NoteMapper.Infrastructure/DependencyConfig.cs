@@ -4,6 +4,7 @@ using NoteMapper.Core.Users;
 using NoteMapper.Data.Core.Contact;
 using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Core.Instruments;
+using NoteMapper.Data.Core.Notifications;
 using NoteMapper.Data.Core.Questionnaires;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Cosmos;
@@ -11,6 +12,7 @@ using NoteMapper.Data.Cosmos.Repositories;
 using NoteMapper.Data.Sql.Repositories;
 using NoteMapper.Data.Sql.Repositories.Contact;
 using NoteMapper.Data.Sql.Repositories.Errors;
+using NoteMapper.Data.Sql.Repositories.Notifications;
 using NoteMapper.Data.Sql.Repositories.Questionnaires;
 using NoteMapper.Data.Sql.Repositories.Users;
 using NoteMapper.Emails;
@@ -22,12 +24,14 @@ using NoteMapper.Services.Emails;
 using NoteMapper.Services.Feedback;
 using NoteMapper.Services.Instruments;
 using NoteMapper.Services.Logging;
+using NoteMapper.Services.Notifications;
 using NoteMapper.Services.Questionnaires;
 using NoteMapper.Services.Users;
 using NoteMapper.Services.Web.Caching;
 using NoteMapper.Services.Web.Contact;
 using NoteMapper.Services.Web.Instruments;
 using NoteMapper.Services.Web.NoteMap;
+using NoteMapper.Services.Web.Notifications;
 using NoteMapper.Services.Web.Questionnaires;
 using NoteMapper.Services.Web.Security;
 
@@ -53,11 +57,13 @@ namespace NoteMapper.Infrastructure
                 })
                 .AddScoped<IApplicationErrorRepository, ApplicationErrorSqlRepository>()
                 .AddScoped<IContactRepository, ContactSqlRepository>()
+                .AddScoped<INotificationRepository, NotificationSqlRepository>()
                 .AddScoped<IQuestionnaireQuestionRepository, QuestionnaireQuestionSqlRepository>()
                 .AddScoped<IQuestionnaireRepository, QuestionnaireSqlRepository>()
                 .AddScoped<IRegistrationCodeRepository, RegistrationCodeRepository>()
                 .AddScoped<IUserActivationRepository, UserActivationSqlRepository>()
                 .AddScoped<IUserLoginTokenRepository, UserLoginTokenSqlRepository>()
+                .AddScoped<IUserNotificationRepository, UserNotificationSqlRepository>()
                 .AddScoped<IUserPasswordRepository, UserPasswordSqlRepository>()
                 .AddScoped<IUserPasswordResetCodeRepository, UserPasswordResetCodeSqlRepository>()
                 .AddScoped<IUserPreferenceRepository, UserPreferenceSqlRepository>()
@@ -124,6 +130,7 @@ namespace NoteMapper.Infrastructure
                 .AddSingleton<IFeedbackService>(new FeedbackService())
                 .AddScoped<IInstrumentFactory, InstrumentFactory>()
                 .AddScoped<IMusicTheoryService, MusicTheoryService>()
+                .AddScoped<INotificationService, NotificationService>()
                 .AddScoped<IQuestionnaireService, QuestionnaireService>()
                 .AddScoped<IRecaptchaService, RecaptchaService>()
                 .AddSingleton(new RecaptchaServiceSettings(
@@ -147,6 +154,7 @@ namespace NoteMapper.Infrastructure
                     Enabled = config.GetBool("Contact.Enabled")
                 })
                 .AddScoped<INoteMapViewModelService, NoteMapViewModelService>()
+                .AddScoped<INotificationViewModelService, NotificationViewModelService>()
                 .AddScoped<IQuestionnaireViewModelService, QuestionnaireViewModelService>()
                 .AddSingleton(new QuestionnaireViewModelServiceSettings
                 {

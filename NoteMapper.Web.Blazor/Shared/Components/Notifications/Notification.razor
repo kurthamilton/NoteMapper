@@ -9,7 +9,7 @@
             <span class="me-auto">
                 @Header
             </span>
-            <button type="button" class="btn-close" @onclick="OnDismiss"></button>
+            <button type="button" class="btn-close" @onclick="OnClose"></button>
         </div>
     }
     
@@ -24,14 +24,24 @@
         </span>
         @if (Header == null)
         {
-            <button type="button" class="btn-close" @onclick="OnDismiss"></button>
+            <button type="button" class="btn-close" @onclick="OnClose"></button>
         }
     </div>
+
+    @if (Footer != null)
+    {
+        <div class="toast-body">
+            @Footer
+        </div>
+    }
 </div>
 
 @code {
     [Parameter]
     public RenderFragment? Content { get; set; }
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
 
     [Parameter]
     public string? Header { get; set; }
@@ -40,7 +50,7 @@
     public TimeSpan? HideAfter { get; set; }
 
     [Parameter]
-    public EventCallback OnDismiss { get; set; }
+    public EventCallback OnClose { get; set; }
 
     Guid Id { get; } = Guid.NewGuid();
 
@@ -86,7 +96,7 @@
         if (Progress >= 1)
         {
             Timer?.Dispose();
-            InvokeAsync(OnDismiss.InvokeAsync);
+            InvokeAsync(OnClose.InvokeAsync);
             return;
         }                
     }
