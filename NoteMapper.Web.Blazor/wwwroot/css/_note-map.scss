@@ -100,7 +100,6 @@
     &.hover {
         cursor: pointer;
         opacity: 0.8;
-        border-left: var(--fretboard-border-hover);
-        border-right: var(--fretboard-border-hover);
+        background-color: lightgoldenrodyellow;
     }
 }

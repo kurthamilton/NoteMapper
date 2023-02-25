@@ -10820,6 +10820,10 @@ textarea.form-control-lg {
   display: inline-flex;
 }
 
+.btn:focus-visible {
+  background-color: transparent;
+}
+
 .form-inline {
   display: flex;
 }
@@ -10908,14 +10912,17 @@ body {
 }
 
 .progress-circle-wrapper {
-  border: 1px solid blue;
   position: relative;
 }
 .progress-circle-wrapper svg {
   fill: none;
-  stroke: red;
+  stroke: var(--bs-primary);
   stroke-width: 2px;
   position: absolute;
+}
+.progress-circle-wrapper .btn-close {
+  margin-top: 1px;
+  margin-left: 1px;
 }
 
 .table-fixed {
@@ -11046,8 +11053,7 @@ h3,
 .modifier__permutation.hover {
   cursor: pointer;
   opacity: 0.8;
-  border-left: var(--fretboard-border-hover);
-  border-right: var(--fretboard-border-hover);
+  background-color: lightgoldenrodyellow;
 }
 
 .grecaptcha-badge {

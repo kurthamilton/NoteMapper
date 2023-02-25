@@ -8,3 +8,7 @@
         display: inline-flex;
     }
 }
+
+.btn:focus-visible {
+    background-color: transparent;
+}

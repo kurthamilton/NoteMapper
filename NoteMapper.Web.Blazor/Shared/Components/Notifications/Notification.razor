@@ -76,13 +76,18 @@
             return;
         }
 
-        if (DateTime.Now >= Start + HideAfter.Value)
+        long deltaTicks = (DateTime.Now - Start).Ticks;
+        long hideAfterTicks = HideAfter.Value.Ticks;
+
+        Progress = (double)deltaTicks / hideAfterTicks;
+
+        InvokeAsync(StateHasChanged);
+
+        if (Progress >= 1)
         {
+            Timer?.Dispose();
             InvokeAsync(OnDismiss.InvokeAsync);
             return;
-        }
-
-        Progress = ((double)(DateTime.Now - Start).Ticks / HideAfter.Value.Ticks);
-        InvokeAsync(StateHasChanged);
+        }                
     }
 }

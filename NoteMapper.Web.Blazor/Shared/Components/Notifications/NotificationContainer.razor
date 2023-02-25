@@ -18,7 +18,8 @@
 
     @foreach (FeedbackMessage message in Messages)
     {
-        <Notification HideAfter="@TimeSpan.FromSeconds(10)" Header="@message.Heading" OnDismiss="() => Messages.Remove(message)">
+        <Notification HideAfter="@TimeSpan.FromSeconds(5)" Header="@message.Heading" 
+            OnDismiss="() => Messages.Remove(message)">
             <Content>
                 <NotificationIcon Model="@message.Type" />
                 @message.Message

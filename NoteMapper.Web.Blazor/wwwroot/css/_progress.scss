@@ -3,13 +3,17 @@
 }
 
 .progress-circle-wrapper {
-    border: 1px solid blue;
     position: relative;
 
     svg {
         fill: none;
-        stroke: red;
+        stroke: var(--bs-primary);
         stroke-width: 2px;
         position: absolute;
+    }
+
+    .btn-close {
+        margin-top: 1px;
+        margin-left: 1px;
     }
 }

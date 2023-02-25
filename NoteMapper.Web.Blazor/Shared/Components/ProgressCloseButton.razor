@@ -1,7 +1,8 @@
-﻿<div class="progress-circle-wrapper">
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-         width="@(Diameter + Offset)" height="@(Diameter + Offset)">
-        <path d=" M @(Radius + Offset) @Offset A @Arc" />
+﻿<div class="progress-circle-wrapper d-flex">
+    <svg xmlns="http://www.w3.org/2000/svg" height="@SvgSize" width="@SvgSize">
+        <circle cx="@Centre" cy="@Centre" r="@Radius" 
+            stroke-dasharray="@Circumference" 
+            stroke-dashoffset="@DashOffset" />
     </svg>
     <button type="button" class="btn-close" @onclick="OnClose"></button>
 </div>
@@ -13,50 +14,17 @@
     [Parameter]
     public double Value { get; set; }    
 
-    string? Arc { get; set; }
+    double Centre => Radius + Offset;
+
+    double Circumference => Diameter * Math.PI;
+
+    double DashOffset => Circumference - (Circumference * Value);
 
     double Diameter => Radius * 2;
 
     double Offset { get; set; } = 1;
 
-    double Radius { get; set; } = (double)25 / 2;
+    double Radius { get; set; } = 11;
 
-    int XAxisRotation { get; } = 270;
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-
-        double angleInDegrees = Value * 360;
-        SetArc(Radius, Offset, angleInDegrees);
-    }
-
-    (double x, double y) PolarToCartesian(double centreX, double centreY, double radius, double angleInDegrees)
-    {
-        var angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
-
-        var x = centreX + (radius * Math.Cos(angleInRadians));
-        var y = centreY + (radius * Math.Sin(angleInRadians));
-        return (x, y);
-    }
-
-    // https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-    void SetArc(double radius, double offset, double angleInDegrees)
-    {
-        (double endX, double endY) = PolarToCartesian(radius + offset, radius + offset, radius, angleInDegrees);
-
-        int largeArcFlag = angleInDegrees > 180 ? 1 : 0;
-        int sweepFlag = angleInDegrees > 0 ? 1 : 0;
-
-        Arc = string.Join(" ", new double[]
-        {
-            Radius,
-            Radius,
-            XAxisRotation,
-            largeArcFlag,
-            sweepFlag,
-            endX,
-            endY
-        });
-    }
+    double SvgSize => Diameter + Offset + 2;
 }
