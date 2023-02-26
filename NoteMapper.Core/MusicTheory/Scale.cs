@@ -18,21 +18,25 @@ namespace NoteMapper.Core.MusicTheory
 
         public ScaleType Type { get; }
 
-        public static Scale Parse(int noteIndex, string keyType)
+        public static Scale Parse(int noteIndex, ScaleType scaleType)
         {
             Note note = new Note(noteIndex);
             
-            ScaleType type = ParseScaleType(keyType);
-            IReadOnlyCollection<byte> intervals = GetIntervals(type);
+            IReadOnlyCollection<byte> intervals = GetIntervals(scaleType);
             IEnumerable<Note> notes = GetNotes(note, intervals);
-            return new(notes, type);
+            return new(notes, scaleType);
         }
 
-        public static Scale? TryParse(int noteIndex, string key)
+        public static ScaleType ParseType(string type)
+        {
+            return KeyShortNames.FirstOrDefault(x => x.Value == type).Key;
+        }
+
+        public static Scale? TryParse(int noteIndex, ScaleType scaleType)
         {
             try
             {
-                return Parse(noteIndex, key);
+                return Parse(noteIndex, scaleType);
             }
             catch
             {

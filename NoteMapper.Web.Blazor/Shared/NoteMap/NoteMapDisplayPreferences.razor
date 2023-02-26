@@ -23,7 +23,7 @@
         @foreach (KeyValuePair<AccidentalType, string> option in Options.AccidentalOptions)
         {
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="accidental-@option.Key" id="accidental-@option.Key"
+                <input class="form-check-input" type="radio" name="accidental" id="accidental-@option.Key"
                    checked="@(UserPreferences.Accidental == option.Key)" @onchange="OnAccidentalChange"
                    value="@option.Key">
                 <label class="form-check-label" for="accidental-@option.Key">

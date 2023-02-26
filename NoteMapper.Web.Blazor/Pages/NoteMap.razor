@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inherits NoteMapperComponentBase
 
+@using NoteMapper.Core.Extensions;
 @using NoteMapper.Core.Guitars
 @using NoteMapper.Core.MusicTheory;
 @using NoteMapper.Core.NoteMap
@@ -358,7 +359,7 @@
             { "instrument", Criteria.InstrumentId != CriteriaOptions?.DefaultInstruments.FirstOrDefault()?.Id ? Criteria.InstrumentId : default },
             { "note", Criteria.NoteIndex  != 0 ? Criteria.NoteIndex.ToString() : default },
             { "notes", Criteria.CustomNotes.Count > 0 ? string.Join(",", Criteria.CustomNotes) : default },
-            { "key", !string.IsNullOrEmpty(Criteria.ScaleType) ? Criteria.ScaleType : default },
+            { "key", !string.IsNullOrEmpty(Criteria.ScaleType.ShortDisplayName()) ? Criteria.ScaleType.ShortDisplayName() : default },
             { "type", Criteria.Type != NoteMapCriteriaViewModel.DefaultType ? Criteria.Type.ToString() : default },
             { "mode", Criteria.Mode != NoteMapCriteriaViewModel.DefaultMode ? Criteria.Mode.ToString() : default }
         }, JsRuntime);
@@ -417,10 +418,10 @@
         {
             Accidental = UserPreferences.Accidental,
             CustomNotes = Criteria.CustomNotes,
-            Key = Criteria.ScaleType ?? "",
             Mode = Criteria.Mode,
             Modifiers = SelectedModifiers.Select(x => x.Name).ToArray(),
             NoteIndex = Criteria.NoteIndex,
+            ScaleType = Criteria.ScaleType,
             Type = Criteria.Type
         };
 

@@ -7,9 +7,9 @@
         {
         }
 
-        public static Chord Parse(int noteIndex, string key)
+        public static Chord Parse(int noteIndex, ScaleType scaleType)
         {
-            Scale scale = Scale.Parse(noteIndex, key);
+            Scale scale = Scale.Parse(noteIndex, scaleType);
 
             IEnumerable<int> notes = GetChordNotes(scale.Type);
 

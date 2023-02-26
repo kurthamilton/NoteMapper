@@ -1,9 +1,11 @@
-﻿namespace NoteMapper.Services
+﻿using NoteMapper.Core.MusicTheory;
+
+namespace NoteMapper.Services
 {
     public interface IMusicTheoryService
     {        
         IReadOnlyCollection<int> GetNoteIndexes();
 
-        IReadOnlyCollection<string> GetScaleTypes();
+        IReadOnlyCollection<ScaleType> GetScaleTypes();
     }
 }

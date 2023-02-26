@@ -1,4 +1,5 @@
 ﻿@using NoteMapper.Core
+@using NoteMapper.Core.Extensions
 @using NoteMapper.Core.Guitars
 @using NoteMapper.Core.MusicTheory
 @using NoteMapper.Core.NoteMap
@@ -52,21 +53,22 @@
 
         @*KEY*@
         <div class="@formGroupClass" data-nm-tour-step="criteria-key">
-            <label class="form-label" for="note-@inputSuffix">Key</label>
-            <div class="d-flex">
-                <select class="form-control" id="note-@inputSuffix" value="@Model.NoteIndex"
-                        @onchange="OnKeyNameChange">
-                    @foreach (int noteIndex in Options.NoteIndexes)
-                    {
-                        <option value="@noteIndex">@(Note.GetName(noteIndex, UserPreferences.Accidental))</option>
-                    }
-                </select>
-                <select class="form-control" id="scaletype-@inputSuffix" value="@Model.ScaleType" @onchange="OnScaleTypeChange">
-                    @foreach (string type in Options.ScaleTypes)
-                    {
-                        <option>@type</option>
-                    }
-                </select>
+            <label class="form-label">Key</label>
+            <div class="dropdown">
+                <button class="btn btn-link p-0 dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                        @onclick="() => ShowNoteSelector = !ShowNoteSelector">
+                    @(Note.GetName(Model.NoteIndex, UserPreferences.Accidental))@Model.ScaleType.ShortDisplayName()
+                </button>
+
+                <div class="dropdown-menu py-0">
+                    <NoteMapKeyMenu Criteria="@Model" 
+                                    InputSuffix="@inputSuffix" 
+                                    Options="@Options"
+                                    UserPreferences="@UserPreferences"
+                                    OnNoteChange="x => OnNoteChange(x)"
+                                    OnScaleTypeChange="x => OnScaleTypeChange(x)"/>
+                </div>
             </div>
         </div>
 
@@ -147,6 +149,8 @@
     [Parameter]
     public UserPreferences? UserPreferences { get; set; }
 
+    bool ShowNoteSelector { get; set; } = true;
+
     string TourId => $"criteria{(Inline ? "-inline" : "")}";
 
     protected override void OnInitialized()
@@ -175,15 +179,15 @@
         return EmitChange();
     }
 
-    Task OnKeyNameChange(ChangeEventArgs e)
+    Task OnNoteChange(int noteIndex)
     {
-        Model.NoteIndex = int.Parse((string?)e.Value ?? "0");
+        Model.NoteIndex = noteIndex;
         return EmitChange();
     }    
 
-    Task OnScaleTypeChange(ChangeEventArgs e)
+    Task OnScaleTypeChange(ScaleType type)
     {
-        Model.ScaleType = (string?)e.Value;
+        Model.ScaleType = type;
         return EmitChange();
     }
 

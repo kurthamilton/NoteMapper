@@ -5,8 +5,7 @@ namespace NoteMapper.Services
 {
     public class MusicTheoryService : IMusicTheoryService
     {
-        private static readonly IReadOnlyCollection<string> _keyTypes = Enum.GetValues<ScaleType>()
-            .Select(x => x.ShortName())
+        private static readonly IReadOnlyCollection<ScaleType> _keyTypes = Enum.GetValues<ScaleType>()
             .ToArray();
 
         public IReadOnlyCollection<int> GetNoteIndexes()
@@ -14,7 +13,7 @@ namespace NoteMapper.Services
             return Note.GetNoteIndexes();
         }
 
-        public IReadOnlyCollection<string> GetScaleTypes()
+        public IReadOnlyCollection<ScaleType> GetScaleTypes()
         {
             return _keyTypes;
         }

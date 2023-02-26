@@ -79,18 +79,18 @@ namespace NoteMapper.Core.MusicTheory
                 .ToArray();
         }
 
-        public static INoteCollection GetNotes(int noteIndex, string key, NoteCollectionType type,
+        public static INoteCollection GetNotes(int noteIndex, ScaleType scaleType, NoteCollectionType type,
             IReadOnlyCollection<int> customNotes)
         {
             switch (type)
             {
                 case NoteCollectionType.Chord:
-                    return Chord.Parse(noteIndex, key);
+                    return Chord.Parse(noteIndex, scaleType);
                 case NoteCollectionType.Custom:
-                    Scale scale = Scale.Parse(noteIndex, key);
+                    Scale scale = Scale.Parse(noteIndex, scaleType);
                     return new ScaleNoteCollection(scale, customNotes);
                 case NoteCollectionType.Scale:
-                    return Scale.Parse(noteIndex, key);
+                    return Scale.Parse(noteIndex, scaleType);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
@@ -107,6 +107,11 @@ namespace NoteMapper.Core.MusicTheory
             {
                 0, 1, 2, 3, 4, 5, 6, 7, 8
             };
+        }
+
+        public static bool IsNatural(int noteIndex)
+        {
+            return Notes.ElementAt(noteIndex % Notes.Count) != "";
         }
 
         public string GetName(AccidentalType accidental)

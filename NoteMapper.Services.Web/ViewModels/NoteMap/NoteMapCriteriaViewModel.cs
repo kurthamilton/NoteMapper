@@ -16,7 +16,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public int NoteIndex { get; set; }
 
-        public string? ScaleType { get; set; }
+        public ScaleType ScaleType { get; set; }
 
         public NoteCollectionType Type { get; set; } = DefaultType;
     }

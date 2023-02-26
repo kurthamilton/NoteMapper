@@ -33,7 +33,8 @@ namespace NoteMapper.Services.Web.NoteMap
 
             int.TryParse(note, out int noteIndex);
 
-            Scale? keyScale = Scale.TryParse(noteIndex, key);
+            ScaleType scaleType = Scale.ParseType(key);
+            Scale? keyScale = Scale.TryParse(noteIndex, scaleType);
 
             if (!Enum.TryParse(type, true, out NoteCollectionType parsedType))
             {
@@ -60,7 +61,7 @@ namespace NoteMapper.Services.Web.NoteMap
                 InstrumentId = instrument,
                 Mode = parsedMode,
                 NoteIndex = noteIndex,
-                ScaleType = keyScale?.Type.ShortName(),
+                ScaleType = keyScale?.Type ?? ScaleType.Major,
                 Type = parsedType
             };
         }
@@ -73,12 +74,12 @@ namespace NoteMapper.Services.Web.NoteMap
                 : Array.Empty<UserInstrument>();
 
             IReadOnlyCollection<int> noteIndexes = _musicTheoryService.GetNoteIndexes();
-            IReadOnlyCollection<string> keyTypes = _musicTheoryService.GetScaleTypes();
+            IReadOnlyCollection<ScaleType> scaleTypes = _musicTheoryService.GetScaleTypes();
             return new NoteMapCriteriaOptionsViewModel(
                 defaultInstruments.Select(_instrumentFactory.FromUserInstrument),
                 userInstruments.Select(_instrumentFactory.FromUserInstrument),
                 noteIndexes,
-                keyTypes);
+                scaleTypes);
         }
 
         public NoteMapViewModel? GetNoteMapPermutationsViewModel(GuitarBase? instrument,
@@ -89,7 +90,7 @@ namespace NoteMapper.Services.Web.NoteMap
                 return default;
             }
 
-            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.Key,
+            INoteCollection notes = Note.GetNotes(options.NoteIndex, options.ScaleType,
                 options.Type, options.CustomNotes);
 
             int frets = instrument.Strings.Max(x => x.Frets);

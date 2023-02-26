@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2C2051A2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Services.Web.Tests", "NoteMapper.Services.Web.Tests\NoteMapper.Services.Web.Tests.csproj", "{28544338-2B15-490C-BD8D-9810D2743685}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteMapper.Data.Core.Tests", "NoteMapper.Data.Core.Tests\NoteMapper.Data.Core.Tests.csproj", "{09C45687-68C2-4733-A571-AF4DE6734FA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteMapper.Data.Core.Tests", "NoteMapper.Data.Core.Tests\NoteMapper.Data.Core.Tests.csproj", "{09C45687-68C2-4733-A571-AF4DE6734FA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

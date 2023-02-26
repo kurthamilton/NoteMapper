@@ -8,7 +8,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
         public NoteMapCriteriaOptionsViewModel(IEnumerable<GuitarBase> defaultInstruments, 
             IEnumerable<GuitarBase> userInstruments,
             IReadOnlyCollection<int> noteIndexes,
-            IReadOnlyCollection<string> scaleTypes)
+            IReadOnlyCollection<ScaleType> scaleTypes)
         {
             DefaultInstruments = defaultInstruments.ToArray();
             UserInstruments = userInstruments.ToArray();
@@ -41,7 +41,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public IReadOnlyCollection<int> NoteIndexes { get; }
 
-        public IReadOnlyCollection<string> ScaleTypes { get; }
+        public IReadOnlyCollection<ScaleType> ScaleTypes { get; }
 
         public IReadOnlyCollection<KeyValuePair<string, string?>> TypeOptions { get; }
 

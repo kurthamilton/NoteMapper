@@ -10885,6 +10885,13 @@ body {
   padding-bottom: 1.1rem;
 }
 
+.list-group-item-action {
+  cursor: pointer;
+}
+.list-group-item-action label {
+  cursor: pointer;
+}
+
 .navbar-brand {
   background-image: url("/img/Pedals.svg");
   background-repeat: no-repeat;
@@ -11060,6 +11067,10 @@ h3,
   cursor: pointer;
   opacity: 0.8;
   background-color: lightgoldenrodyellow;
+}
+
+.note-map-key-selector {
+  display: flex;
 }
 
 .grecaptcha-badge {

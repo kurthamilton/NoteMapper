@@ -9,7 +9,7 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 
         public IReadOnlyCollection<int> CustomNotes { get; set; } = Array.Empty<int>();
 
-        public string Key { get; set; } = "";
+        public ScaleType ScaleType { get; set; } = ScaleType.Major;
 
         public NoteMapMode Mode { get; set; }
 
