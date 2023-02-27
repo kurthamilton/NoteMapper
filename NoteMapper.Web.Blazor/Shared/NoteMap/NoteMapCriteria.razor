@@ -54,22 +54,37 @@
         @*KEY*@
         <div class="@formGroupClass" data-nm-tour-step="criteria-key">
             <label class="form-label">Key</label>
-            <div class="dropdown">
-                <button class="btn btn-link p-0 dropdown-toggle" type="button"
+            @if (Inline)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-link p-0 dropdown-toggle" type="button"
                         data-bs-toggle="dropdown" data-bs-auto-close="outside"
                         @onclick="() => ShowNoteSelector = !ShowNoteSelector">
-                    @(Note.GetName(Model.NoteIndex, UserPreferences.Accidental))@Model.ScaleType.ShortDisplayName()
-                </button>
+                        @(Note.GetName(Model.NoteIndex, UserPreferences.Accidental))@Model.ScaleType.ShortDisplayName()
+                    </button>
 
-                <div class="dropdown-menu py-0">
-                    <NoteMapKeyMenu Criteria="@Model" 
-                                    InputSuffix="@inputSuffix" 
+                    <div class="dropdown-menu py-0">
+                        <NoteMapKeyMenu Criteria="@Model"
+                                    Inline="@Inline"
+                                    InputSuffix="@inputSuffix"
                                     Options="@Options"
                                     UserPreferences="@UserPreferences"
                                     OnNoteChange="x => OnNoteChange(x)"
-                                    OnScaleTypeChange="x => OnScaleTypeChange(x)"/>
+                                    OnScaleTypeChange="x => OnScaleTypeChange(x)" />
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <NoteMapKeyMenu Criteria="@Model"
+                            Inline="@Inline"
+                            InputSuffix="@inputSuffix"
+                            Options="@Options"
+                            UserPreferences="@UserPreferences"
+                            OnNoteChange="x => OnNoteChange(x)"
+                            OnScaleTypeChange="x => OnScaleTypeChange(x)" />
+            }
+            
         </div>
 
         @*TYPE*@

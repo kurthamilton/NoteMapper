@@ -10892,6 +10892,10 @@ body {
   cursor: pointer;
 }
 
+.list-group-item-sm {
+  padding: 0.25rem 0.5rem;
+}
+
 .navbar-brand {
   background-image: url("/img/Pedals.svg");
   background-repeat: no-repeat;

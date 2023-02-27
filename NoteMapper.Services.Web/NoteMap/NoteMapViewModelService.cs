@@ -73,7 +73,7 @@ namespace NoteMapper.Services.Web.NoteMap
                 ? await _userInstrumentRepository.GetUserInstrumentsAsync(userId.Value)
                 : Array.Empty<UserInstrument>();
 
-            IReadOnlyCollection<int> noteIndexes = _musicTheoryService.GetNoteIndexes();
+            IReadOnlyCollection<(int, int?)> noteIndexes = _musicTheoryService.GetNaturalNoteIndexesWithSharps();
             IReadOnlyCollection<ScaleType> scaleTypes = _musicTheoryService.GetScaleTypes();
             return new NoteMapCriteriaOptionsViewModel(
                 defaultInstruments.Select(_instrumentFactory.FromUserInstrument),

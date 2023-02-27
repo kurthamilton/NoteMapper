@@ -22,7 +22,7 @@ namespace NoteMapper.Core.Extensions
                 case ScaleType.DominantSeven:
                     return "7";
                 case ScaleType.Major:
-                    return "M";
+                    return "Maj";
                 case ScaleType.MajorSeven:
                     return "maj7";
                 case ScaleType.Minor:
