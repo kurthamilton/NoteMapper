@@ -35,7 +35,7 @@ namespace NoteMapper.Core.MusicTheory
         public int Index { get; }
 
         /// <summary>
-        /// The index of the note within the chromatic sale
+        /// The index of the note within the chromatic scale
         /// </summary>
         public int NoteIndex { get; }
 

@@ -5,17 +5,17 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapNoteViewModel
     {
-        public NoteMapNoteViewModel(GuitarStringNote note, Scale key, AccidentalType accidental)
+        public NoteMapNoteViewModel(GuitarStringNote note, Scale key)
         {
             Interval = key.GetInterval(note.Note);
             Modifier = note.Modifier?.Name;
-            Note = note.Note.GetName(accidental);
+            NoteIndex = note.Note.NoteIndex;
         }
 
         public int Interval { get; set; }
 
         public string? Modifier { get; set; }
 
-        public string Note { get; set; }
+        public int NoteIndex { get; set; }
     }
 }

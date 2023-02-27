@@ -125,7 +125,7 @@ namespace NoteMapper.Services.Web.NoteMap
 
                 foreach (IReadOnlyCollection<GuitarStringNote?> permutation in permutations)
                 {
-                    NoteMapNotesViewModel permutationViewModel = new(permutation, notes.Key, options.Accidental);
+                    NoteMapNotesViewModel permutationViewModel = new(permutation, notes.Key);
                     fretViewModel.AddPermutation(permutationViewModel);
                 }
 

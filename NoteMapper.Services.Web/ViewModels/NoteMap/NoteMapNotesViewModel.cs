@@ -5,11 +5,10 @@ namespace NoteMapper.Services.Web.ViewModels.NoteMap
 {
     public class NoteMapNotesViewModel
     {
-        public NoteMapNotesViewModel(IReadOnlyCollection<GuitarStringNote?> notes, Scale key, 
-            AccidentalType accidental)
+        public NoteMapNotesViewModel(IReadOnlyCollection<GuitarStringNote?> notes, Scale key)
         {
             Notes = notes
-                .Select(x => x != null ? new NoteMapNoteViewModel(x, key, accidental) : null)
+                .Select(x => x != null ? new NoteMapNoteViewModel(x, key) : null)
                 .ToArray();
         }
 
