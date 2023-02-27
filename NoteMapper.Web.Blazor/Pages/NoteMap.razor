@@ -1,14 +1,14 @@
 ﻿@page "/"
 @inherits NoteMapperComponentBase
 
-@using NoteMapper.Core.Extensions;
+@using NoteMapper.Core.Extensions
 @using NoteMapper.Core.Guitars
-@using NoteMapper.Core.MusicTheory;
+@using NoteMapper.Core.MusicTheory
 @using NoteMapper.Core.NoteMap
 @using NoteMapper.Services
 @using NoteMapper.Services.Instruments
 @using NoteMapper.Services.Users
-@using NoteMapper.Services.Web.NoteMap;
+@using NoteMapper.Services.Web.NoteMap
 @using NoteMapper.Services.Web.ViewModels.NoteMap
 @using NoteMapper.Web.Blazor.Extensions
 @using NoteMapper.Web.Blazor.Models.NoteMap
@@ -284,6 +284,15 @@
     </TourStep>
     <TourStep Target="fretboard-modifier" HideArrow="@true">
         <p>The modifier (pedal or lever) is shown here</p>
+    </TourStep>
+    <TourStep Target="fretboard-preferences" HideArrow="@true">
+        <p>Choose your display preferences</p>
+        <p>
+            <ul>
+                <li><strong>Show note intervals</strong>: When selected notes will be displayed as their relative position in the current key rather than their names</li>
+                <li><strong>Sharps/flats</strong>: Choose whether non-natural notes are displayed as sharps or flats</li>
+            </ul>
+        </p>
     </TourStep>
     <TourStep Target="fretboard-zoom" HideArrow="@true">
         <p>Zoom into the fretboard</p>
