@@ -57,7 +57,7 @@
             @if (Inline)
             {
                 <div class="dropdown">
-                    <button class="btn btn-link p-0 dropdown-toggle" type="button"
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
                         data-bs-toggle="dropdown" data-bs-auto-close="outside"
                         @onclick="() => ShowNoteSelector = !ShowNoteSelector">
                         @(Note.GetName(Model.NoteIndex, UserPreferences.Accidental))@Model.ScaleType.ShortDisplayName()

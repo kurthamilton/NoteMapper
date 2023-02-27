@@ -207,7 +207,7 @@
                                                     data-nm-tour-step="modifiers-active">
                                                 @if (selected)
                                                 {
-                                                    @:*
+                                                    <small><i class="bi bi-asterisk"></i></small>
                                                 }
                                             </div>
                                         }
@@ -299,7 +299,7 @@
         <p>Click on a combination to activate it and show the available notes on the fretboard.</p>
     </TourStep>
     <TourStep Target="modifiers-active" HideArrow="@true" Selector=".active">
-        <p>The active combination is indicated with a *</p>
+        <p>The active combination is indicated with a <small><i class="bi bi-asterisk"></i></small></p>
     </TourStep>
     <TourStep Target="modifiers-mode" HideArrow="@true">
         <p>Switch to manual pedal selection by turning off combinations mode</p>
