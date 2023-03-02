@@ -6,7 +6,7 @@
 @using NoteMapper.Web.Blazor.Shared.Layouts
 
 <ContentPage>
-    <h1>About</h1>
+    <h1 data-version="@Version">About</h1>
 
     <h4>What is Note Mapper?</h4>
     <p>
@@ -25,3 +25,14 @@
         Create your own instrument using the <a href="/instruments">instrument builder</a>.
     </p>
 </ContentPage>
+
+@code {
+    string? Version { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Version = ThisAssembly.Git.Commit;
+    }
+}
