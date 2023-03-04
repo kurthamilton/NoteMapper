@@ -8,8 +8,9 @@ namespace NoteMapper.Identity.Microsoft
         public static IdentityUser ToIdentityUser(this User user)
         {
             IdentityUser identityUser = new(user.Email)
-            {            
+            {
                 Email = user.Email,
+                EmailConfirmed = true,
                 Id = user.UserId.ToString(),                
                 UserName = user.Email                
             };            

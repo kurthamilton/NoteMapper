@@ -14,6 +14,8 @@ namespace NoteMapper.Data.Core.Instruments
 
         public GuitarType Type { get; set; }
 
+        public Guid? UserId { get; set; }
+
         public string UserInstrumentId { get; set; } = "";
     }
 }

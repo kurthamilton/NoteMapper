@@ -40,9 +40,15 @@ namespace NoteMapper.Data.Cosmos.Repositories
             return FindUserInstrumentAsync(DefaultUserId, userInstrumentId);
         }
 
-        public Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId)
+        public async Task<UserInstrument?> FindUserInstrumentAsync(Guid userId, string userInstrumentId)
         {
-            return FindUserInstrumentAsync(userId.ToString(), userInstrumentId);
+            UserInstrument? userInstrument = await FindUserInstrumentAsync(userId.ToString(), userInstrumentId);
+            if (userInstrument != null)
+            {
+                userInstrument.UserId = userId;
+            }
+
+            return userInstrument;
         }
 
         public async Task<IReadOnlyCollection<UserInstrument>> GetDefaultInstrumentsAsync()

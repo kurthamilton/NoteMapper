@@ -96,6 +96,6 @@
         }
 
         Messages.Add(feedback);
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 }

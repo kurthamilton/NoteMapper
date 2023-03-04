@@ -93,8 +93,14 @@
         }
 
         UserInstrument = await UserInstrumentService.FindUserInstrumentAsync(User.UserId, Id.ToString());
-
+        
         if (UserInstrument == null)
+        {
+            NavigationManager.NavigateTo("/instruments");
+            return;
+        }
+
+        if (UserInstrument.UserId != User.UserId && !User.IsAdmin)
         {
             NavigationManager.NavigateTo("/instruments");
             return;

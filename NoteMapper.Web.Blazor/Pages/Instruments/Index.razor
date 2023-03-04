@@ -45,12 +45,20 @@
                 @if (User != null)
                 {
                     <td>
+                        @if (User?.IsAdmin == true)
+                        {
+                            <a href="/instruments/@instrument.Id/edit"
+                                class="btn btn-outline-primary btn-sm me-1">
+                                Edit
+                            </a>
+                        }       
+
                         <a href="/instruments/create?template=@instrument.Id"
                            class="btn btn-outline-primary btn-sm">
                             Copy
                         </a>
 
-                        @if (User.IsAdmin)
+                        @if (User?.IsAdmin == true)
                         {
                             <button type="button" 
                                     class="btn btn-outline-danger btn-sm ms-1"
@@ -86,7 +94,7 @@
                     <td>
                         <a href="/instruments/@instrument.Id/edit">@instrument.Name</a>
                     </td>
-                    <td>
+                    <td>                                         
                         <a href="/instruments/create?template=@instrument.Id"
                             class="btn btn-outline-primary btn-sm">
                             Copy

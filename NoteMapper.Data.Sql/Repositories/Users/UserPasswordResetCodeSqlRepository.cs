@@ -28,7 +28,7 @@ namespace NoteMapper.Data.Sql.Repositories.Users
                          $"SELECT TOP 1 {SelectColumnSql} " +
                          $"FROM {TableName} " +
                          $"WHERE UserId = @UserId " +
-                         "ORDER BY CreatedUtc ";
+                         "ORDER BY CreatedUtc DESC ";
 
             return ReadSingleAsync(sql, new[]
             {

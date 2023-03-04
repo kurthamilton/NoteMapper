@@ -34,7 +34,6 @@ namespace NoteMapper.Web.Blazor.Pages.Account
             
             IdentityUser identityUser = UserMapper.ToIdentityUser(user);
             await _signInManager.SignInAsync(identityUser, true, "Form");
-
             return Redirect("/");
         }
     }

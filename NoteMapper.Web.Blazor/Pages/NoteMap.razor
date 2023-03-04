@@ -103,7 +103,7 @@
                                             }
                                             else
                                             {
-                                                @Note.GetName(note.NoteIndex, UserPreferences.Accidental)
+                                                @Note.GetName(note.NoteIndex, UserPreferences?.Accidental ?? AccidentalType.Sharp)
                                             }
                                         </span>
                                         @:&nbsp;@*Force the table cell contents to filll the table cell*@

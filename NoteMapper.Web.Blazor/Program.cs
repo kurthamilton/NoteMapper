@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 IServiceCollection services = builder.Services;
-services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true);
+services.AddDefaultIdentity<IdentityUser>();
 services.AddRazorPages();
 services.AddServerSideBlazor();
 services.AddBlazorStrap();
