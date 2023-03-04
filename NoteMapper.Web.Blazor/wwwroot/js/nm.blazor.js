@@ -1,12 +1,8 @@
 ﻿// CREDIT: https://www.peug.net/en/blazor-manage-disconnects/
 
-return;
-
 // Wait until a reload button appears
 new MutationObserver((mutations, observer) => {
-    // TODO: do this better
-    // The element might be present, but it might not be visible
-    if (document.querySelector('#components-reconnect-modal')) {
+    if (document.querySelector('#components-reconnect-modal h5 a')) {
         // Now every 10 seconds, see if the server appears to be back, and if so, reload
         async function attemptReload() {
             // Check the server really is back
@@ -15,6 +11,6 @@ new MutationObserver((mutations, observer) => {
         }
         observer.disconnect();
         attemptReload();
-        setInterval(attemptReload, 2000);
+        setInterval(attemptReload, 10000);
     }
 }).observe(document.body, { childList: true, subtree: true });
