@@ -37,7 +37,6 @@
 <h1>Edit instrument</h1>
 
 <EditForm Model="@Model" Context="editContext" OnValidSubmit="UpdateInstrumentAsync">
-    
     <fieldset disabled="@Updating">
         <InstrumentForm Model="@Model" EditContext="@editContext" />
 
@@ -53,13 +52,6 @@
             <a class="btn btn-outline-secondary" href="/instruments">
                 Cancel
             </a>
-
-            @if (User?.IsAdmin == true)
-            {
-                <button class="btn btn-secondary ms-auto" type="button" @onclick="ConvertToDefaultAsync">
-                    Convert to default
-                </button>
-            }
         </div>
     </fieldset>    
 </EditForm>
@@ -92,41 +84,15 @@
             return;
         }
 
-        UserInstrument = await UserInstrumentService.FindUserInstrumentAsync(User.UserId, Id.ToString());
-        
+        UserInstrument = await UserInstrumentService.FindUserInstrumentAsync(User.UserId, Id.ToString());        
         if (UserInstrument == null)
         {
             NavigationManager.NavigateTo("/instruments");
             return;
         }
 
-        if (UserInstrument.UserId != User.UserId && !User.IsAdmin)
-        {
-            NavigationManager.NavigateTo("/instruments");
-            return;
-        }
-
         Model = await UserInstrumentViewModelService.MapUserInstrumentToEditViewModelAsync(User.UserId, UserInstrument);
-    }
-
-    async Task ConvertToDefaultAsync()
-    {
-        if (Model == null || UserInstrument == null || User == null)
-        {
-            return;
-        }
-
-        UserInstrumentViewModelService.MapEditViewModelToUserInstrument(Model, UserInstrument);
-
-        ServiceResult result = await UserInstrumentService.ConvertToDefaultAsync(User.UserId, UserInstrument);
-        if (result.Success)
-        {
-            NavigationManager.NavigateTo("/instruments");
-            return;
-        }
-
-        SetFeedback(result);
-    }
+    }    
 
     async Task UpdateInstrumentAsync()
     {

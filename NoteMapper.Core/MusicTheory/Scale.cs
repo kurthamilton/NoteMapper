@@ -8,19 +8,20 @@ namespace NoteMapper.Core.MusicTheory
 
         private static readonly IReadOnlyDictionary<ScaleType, string> KeyShortNames = CreateKeyShortNames();
 
-        private Scale(IEnumerable<Note> notes, ScaleType type)
-            : base(notes)
+        private Scale(IEnumerable<Note> notes, ScaleType scaleType)
+            : base(NoteCollectionType.Scale, notes)
         {
-            Type = type;
+            ScaleType = scaleType;
         }
 
         public override Scale Key => this;
 
-        public ScaleType Type { get; }
+        public ScaleType ScaleType { get; }
+
 
         public static Scale Parse(int noteIndex, ScaleType scaleType)
         {
-            Note note = new Note(noteIndex);
+            Note note = new(noteIndex);
             
             IReadOnlyCollection<byte> intervals = GetIntervals(scaleType);
             IEnumerable<Note> notes = GetNotes(note, intervals);
@@ -119,23 +120,6 @@ namespace NoteMapper.Core.MusicTheory
             {
                 yield return startingNote = startingNote.Next(interval);
             }
-        }
-
-        private static ScaleType ParseScaleType(string type)
-        {
-            if (Enum.TryParse(type, out ScaleType parsed) && Enum.IsDefined(parsed))
-            {
-                return parsed;
-            }
-
-            if (KeyShortNames.Any(x => string.Equals(type, x.Value, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                return KeyShortNames
-                    .First(x => string.Equals(type, x.Value, StringComparison.InvariantCultureIgnoreCase))
-                    .Key;
-            }
-
-            return default;
         }
     }
 }

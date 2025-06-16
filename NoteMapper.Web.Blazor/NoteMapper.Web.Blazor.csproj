@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\win-x64 - Copy.pubxml" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\win-x64.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BlazorStrap.V5" Version="5.1.100" />
     <PackageReference Include="GitInfo" Version="3.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -22,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="App_Data\SQLite\note-mapper-demo.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\launchSettings.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -33,6 +41,12 @@
     <None Include="compilerconfig.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appSettings.Development.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\NoteMapper.Data.Core\NoteMapper.Data.Core.csproj" />
     <ProjectReference Include="..\NoteMapper.Infrastructure\NoteMapper.Infrastructure.csproj" />

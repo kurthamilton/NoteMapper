@@ -1,0 +1,111 @@
+﻿@page "/adm/instruments/{id}/edit"
+@inherits NoteMapperAdminComponentBase
+@attribute [Authorize]
+
+@using NoteMapper.Core;
+@using NoteMapper.Data.Core.Instruments
+@using NoteMapper.Services.Feedback
+@using NoteMapper.Services.Instruments
+@using NoteMapper.Services.Web.Instruments
+@using NoteMapper.Services.Web.ViewModels.Instruments
+@using NoteMapper.Web.Blazor.Shared.Components
+@using NoteMapper.Web.Blazor.Shared.Instruments
+
+@if (Model == null)
+{
+    <Loading />
+    return;
+}
+
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/adm">Admin</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/adm/instruments">Instruments</a>
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav>
+
+<EditForm Model="@Model" Context="editContext" OnValidSubmit="UpdateInstrumentAsync">
+    
+    <fieldset disabled="@Updating">
+        <InstrumentForm Model="@Model" EditContext="@editContext" />
+
+        <div class="d-flex">
+            <button class="btn btn-primary me-1">
+                Update
+                @if (Updating)
+                {
+                    <ButtonSpinner />
+                }
+            </button>
+
+            <a class="btn btn-outline-secondary" href="/adm/instruments">
+                Cancel
+            </a>
+        </div>
+    </fieldset>    
+</EditForm>
+
+@inject IFeedbackService FeedbackService
+@inject IUserInstrumentService UserInstrumentService
+@inject IUserInstrumentViewModelService UserInstrumentViewModelService
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    bool Loading { get; set; }
+
+    InstrumentEditViewModel? Model { get; set; }
+
+    bool Updating { get; set; }
+
+    UserInstrument? UserInstrument { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (Id == null)
+        {
+            NavigationManager.NavigateTo("/adm/instruments");
+            return;
+        }
+
+        UserInstrument = await UserInstrumentService.FindDefaultInstrumentAsync(Id);
+        if (UserInstrument == null)
+        {
+            NavigationManager.NavigateTo("/adm/instruments");
+            return;
+        }
+
+        Model = await UserInstrumentViewModelService.MapUserInstrumentToEditViewModelAsync(User?.UserId, UserInstrument);
+    }
+
+    async Task UpdateInstrumentAsync()
+    {
+        if (Model == null || UserInstrument == null || User == null)
+        {
+            return;
+        }
+
+        Updating = true;
+
+        UserInstrumentViewModelService.MapEditViewModelToUserInstrument(Model, UserInstrument);
+
+        ServiceResult result = await UserInstrumentService.UpdateDefaultInstrumentAsync(UserInstrument);
+        if (result.Success)
+        {
+            FeedbackService.Notify(new FeedbackMessage(result));
+            NavigationManager.NavigateTo("/adm/instruments");
+            return;
+        }
+
+        Updating = false;
+
+        SetFeedback(result);
+    }
+}

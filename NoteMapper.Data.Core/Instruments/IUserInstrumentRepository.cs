@@ -10,6 +10,8 @@ namespace NoteMapper.Data.Core.Instruments
 
         Task<ServiceResult> DeleteDefaultInstrumentAsync(string userInstrumentId);
 
+        Task<ServiceResult> DeleteUserAsync(Guid userId);
+
         Task<ServiceResult> DeleteUserInstrumentAsync(Guid userId, string userInstrumentId);
 
         Task<UserInstrument?> FindDefaultInstrumentAsync(string userInstrumentId);
@@ -19,6 +21,8 @@ namespace NoteMapper.Data.Core.Instruments
         Task<IReadOnlyCollection<UserInstrument>> GetDefaultInstrumentsAsync();
 
         Task<IReadOnlyCollection<UserInstrument>> GetUserInstrumentsAsync(Guid userId);
+
+        Task<ServiceResult> UpdateDefaultInstrumentAsync(UserInstrument userInstrument);
 
         Task<ServiceResult> UpdateUserInstrumentAsync(Guid userId, UserInstrument userInstrument);
     }

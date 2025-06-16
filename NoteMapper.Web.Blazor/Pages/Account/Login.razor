@@ -43,11 +43,15 @@
                         <ButtonSpinner />
                     }                
                 </button>
-            </div>
+            </div>            
         </fieldset>
     </EditForm>
 
     <Feedback Model="@Feedback" />
+
+    <p>
+        <a href="/privacy" target="_blank">Privacy policy</a>
+    </p>
 </ContentPage>
 
 @inject IUrlEncoder UrlEncoder
@@ -58,6 +62,7 @@
     private async Task HandleValidSubmitAsync()
     {
         Loading = true;
+        await InvokeAsync(StateHasChanged);
 
         User? user = await IdentityService.FindUserAsync(Model.Email);
         ServiceResult result = await IdentityService.CanUserSignIn(user, Model.Password);
@@ -70,6 +75,7 @@
 
         UserLoginToken? token = await IdentityService.CreateLoginTokenAsync(user.UserId);
         Loading = false;
+        await InvokeAsync(StateHasChanged);
 
         if (token == null)
         {

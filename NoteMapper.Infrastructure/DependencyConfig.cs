@@ -9,6 +9,9 @@ using NoteMapper.Data.Core.Questionnaires;
 using NoteMapper.Data.Core.Users;
 using NoteMapper.Data.Cosmos;
 using NoteMapper.Data.Cosmos.Repositories;
+using NoteMapper.Data.Json;
+using NoteMapper.Data.Mongo;
+using NoteMapper.Data.Mongo.Repositories;
 using NoteMapper.Data.Sql.Repositories;
 using NoteMapper.Data.Sql.Repositories.Contact;
 using NoteMapper.Data.Sql.Repositories.Errors;
@@ -49,11 +52,16 @@ namespace NoteMapper.Infrastructure
 
         private static void RegisterData(IDependencyContainer container, IConfiguration config)
         {
+            string sqlConnectionStringName = config.GetValue("Data.Sql.ConnectionStringName");
+            string? sqlConnectionString = config.GetConnectionString(sqlConnectionStringName)
+                ?.Replace("{rootdirectory}", AppContext.BaseDirectory);
+
             container
                 .AddSingleton(new SqlRepositorySettings
                 {
-                    ConnectionString = config.GetConnectionString("note-mapper-sql") ?? "",
-                    CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment")
+                    ConnectionString = sqlConnectionString ?? "",
+                    CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
+                    Provider = config.GetValue("Data.Sql.Provider")
                 })
                 .AddScoped<IApplicationErrorRepository, ApplicationErrorSqlRepository>()
                 .AddScoped<IContactRepository, ContactSqlRepository>()
@@ -71,16 +79,57 @@ namespace NoteMapper.Infrastructure
                 .AddScoped<IUserRegistrationCodeRepository, UserRegistrationCodeSqlRepository>()
                 .AddScoped<IUserRepository, UserSqlRepository>();
 
-            container
-                .AddSingleton(new AzureCosmosRepositorySettings
-                {
-                    ApplicationName = config.GetValue("Application.Name"),
-                    ConnectionString = config.GetConnectionString("note-mapper-cosmos") ?? "",
-                    CurrentEnvironment = config.GetEnum<ApplicationEnvironment>("Environment"),
-                    DatabaseId = config.GetValue("Data.Azure.CosmosDB.DatabaseId"),
-                    DefaultUserId = config.GetValue("Data.Azure.CosmosDB.DefaultUserId")
-                })
-                .AddScoped<IUserInstrumentRepository, UserInstrumentAzureCosmosRepository>();
+            RegisterDocumentStorageData(container, config);
+        }
+
+        private static void RegisterDocumentStorageData(IDependencyContainer container, IConfiguration config)
+        {
+            string provider = config.GetValue("Data.DocumentStorage.Provider");
+            string connectionStringName = config.GetValue("Data.DocumentStorage.ConnectionStringName");
+            string connectionString = config.GetConnectionString(connectionStringName) ?? "";
+            string defaultUserId = config.GetValue("Data.DocumentStorage.DefaultUserId");
+            
+            ApplicationEnvironment environment = config.GetEnum<ApplicationEnvironment>("Environment");
+
+            if (string.Equals(provider, "Cosmos", StringComparison.InvariantCultureIgnoreCase))
+            {
+                string applicationName = config.GetValue("Application.Name");
+
+                container
+                    .AddSingleton(new AzureCosmosRepositorySettings
+                    {
+                        ApplicationName = applicationName,
+                        ConnectionString = connectionString,
+                        CurrentEnvironment = environment,
+                        DatabaseId = config.GetValue("Data.DocumentStorage.Cosmos.DatabaseId"),
+                        DefaultUserId = defaultUserId
+                    })
+                    .AddScoped<IUserInstrumentRepository, UserInstrumentAzureCosmosRepository>();
+            }
+            else if (string.Equals(provider, "Mongo", StringComparison.InvariantCultureIgnoreCase))
+            {
+                container
+                    .AddSingleton(new MongoRepositorySettings
+                    {
+                        ConnectionString = connectionString,
+                        CurrentEnvironment = environment,
+                        DatabaseId = config.GetValue("Data.DocumentStorage.Mongo.DatabaseId"),
+                        DefaultUserId = defaultUserId
+                    })
+                    .AddScoped<IUserInstrumentRepository, UserInstrumentMongoRepository>();
+            }
+            else if (string.Equals(provider, "Json", StringComparison.InvariantCultureIgnoreCase))
+            {
+                container
+                    .AddSingleton(new JsonRepositorySettings
+                    {
+                        CurrentEnvironment = environment,
+                        DefaultUserId = defaultUserId,
+                        FilePath = config.GetValue("Data.DocumentStorage.Json.Path")
+                            .Replace("{rootdirectory}", AppContext.BaseDirectory)
+                    })
+                    .AddScoped<IUserInstrumentRepository, UserInstrumentJsonRepository>();
+            }
         }
 
         private static void RegisterIdentity(IDependencyContainer container, IConfiguration config)
@@ -97,7 +146,8 @@ namespace NoteMapper.Infrastructure
                     LoginTokenExpiresAfterSeconds = config.GetInt("Account.LoginTokenExpiresAfterSeconds"),
                     PasswordResetCodeExpiresAfterHours = config.GetInt("Account.PasswordResetCodeExpiresAfterHours"),
                     PasswordResetUrl = baseUrl + config.GetValue("Account.PasswordResetUrl"),
-                    RegistrationType = config.GetEnum<RegistrationType>("Account.RegistrationType")
+                    RegistrationType = config.GetEnum<RegistrationType>("Account.RegistrationType"),
+                    RequireEmailVerification = config.GetBool("Account.RequireEmailVerification")
                 })
                 .AddScoped<IPasswordHasher, CustomPasswordHasher>()
                 .AddSingleton(new CustomPasswordHasherSettings
