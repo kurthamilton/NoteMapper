@@ -79,7 +79,7 @@ namespace NoteMapper.Data.Cosmos
         {
             try
             {
-                object mapped = MapEntity(entity);
+                var mapped = MapEntity(entity);
                 await container.UpsertItemAsync(mapped, new PartitionKey(id));
                 return ServiceResult.Successful();
             }
@@ -99,7 +99,7 @@ namespace NoteMapper.Data.Cosmos
             await _applicationErrorRepository.CreateAsync(error);
         }
 
-        private object MapEntity(T entity)
+        private object? MapEntity(T entity)
         {
             JsonSerializerSettings settings = new()
             {
@@ -107,7 +107,7 @@ namespace NoteMapper.Data.Cosmos
             };
 
             string json = JsonConvert.SerializeObject(entity, settings);
-            object result = JsonConvert.DeserializeObject(json);
+            var result = JsonConvert.DeserializeObject(json);
             return result;
         }
     }

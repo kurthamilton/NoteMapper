@@ -12,7 +12,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 IServiceCollection services = builder.Services;
-services.AddDefaultIdentity<IdentityUser>();
+
+services.AddCascadingAuthenticationState();
+
+services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+})
+    .AddIdentityCookies();
+
+services
+    .AddIdentityCore<IdentityUser>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
 services.AddRazorPages();
 services.AddServerSideBlazor();
 services.AddBlazorStrap();

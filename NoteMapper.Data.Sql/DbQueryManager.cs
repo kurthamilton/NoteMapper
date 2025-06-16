@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Data.SQLite;
+using Microsoft.Data.SqlClient;
 using NoteMapper.Core;
 using NoteMapper.Data.Core.Errors;
 using NoteMapper.Data.Sql.Repositories;
@@ -21,30 +21,41 @@ namespace NoteMapper.Data.Sql
 
         public async Task<ServiceResult> ExecuteQueryAsync(string sql, IEnumerable<DbParameter> parameters)
         {
-            using (DbConnection connection = GetConnection())
+            using var connection = GetConnection();
+
+            await connection.OpenAsync();
+
+            var useTransaction = false;
+            using var transaction = useTransaction 
+                ? await connection.BeginTransactionAsync()
+                : null;
+            
+            using var command = transaction != null 
+                ? GetCommand(connection, transaction, sql, parameters)
+                : GetCommand(connection, sql, parameters);
+
+            command.CommandType = CommandType.Text;
+
+            try
             {
-                await connection.OpenAsync();
-
-                using (DbTransaction transaction = await connection.BeginTransactionAsync())
+                await command.ExecuteNonQueryAsync();
+                
+                if (transaction != null)
                 {
-                    using (DbCommand command = GetCommand(connection, transaction, sql, parameters))
-                    {
-                        command.CommandType = CommandType.Text;
-
-                        try
-                        {
-                            await command.ExecuteNonQueryAsync();
-                            await transaction.CommitAsync();
-                            return ServiceResult.Successful();
-                        }
-                        catch (Exception ex)
-                        {
-                            await transaction.RollbackAsync();
-                            await LogExceptionAsync(ex, command);
-                            return ServiceResult.Failure("");
-                        }
-                    }
+                    await transaction.CommitAsync();
                 }
+                
+                return ServiceResult.Successful();
+            }
+            catch (Exception ex)
+            {
+                if (transaction != null)
+                {
+                    await transaction.RollbackAsync();
+                }
+                
+                await LogExceptionAsync(ex, command);
+                return ServiceResult.Failure("");
             }
         }
 

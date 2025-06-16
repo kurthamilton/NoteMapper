@@ -1,4 +1,5 @@
-﻿using NoteMapper.Core.Permutations;
+﻿using FluentAssertions;
+using NoteMapper.Core.Permutations;
 
 namespace NoteMapper.Core.Tests.Permutations
 {
@@ -17,36 +18,41 @@ namespace NoteMapper.Core.Tests.Permutations
         [Test]
         public static void GetPermutations()
         {
+            // Act
             IReadOnlyCollection<Permutation> permutations = Permutation.GetPermutations(3);
 
-            IReadOnlyCollection<IReadOnlyCollection<bool>> expected = new[]
-            {
+            // Assert
+            IReadOnlyCollection<IReadOnlyCollection<bool>> expected =
+            [
                 new[] { false, false, false },
-                new[] { true, false, false },
-                new[] { false, true, false },
-                new[] { true, true, false },
-                new[] { false, false, true },
-                new[] { true, false, true },
-                new[] { false, true, true },
-                new[] { true, true, true }
-            };
+                [true, false, false],
+                [false, true, false],
+                [true, true, false],
+                [false, false, true],
+                [true, false, true],
+                [false, true, true],
+                [true, true, true]
+            ];
 
-            CollectionAssert.AreEqual(expected, permutations);
+            permutations.Should().BeEquivalentTo(expected);
         }
 
         [Test]
         public static void Parse()
         {
+            // Arrange
             string bits = "10101";
-            Permutation permutation = Permutation.Parse(bits);
-            bool[] expected = new[]
-            {
-                true, false, true, false, true
-            };
 
+            // Act
+            Permutation permutation = Permutation.Parse(bits);
+            
+            // Assert
             bool[] actual = permutation.ToArray();
 
-            CollectionAssert.AreEqual(expected, actual);
+            actual.Should().BeEquivalentTo(
+            [
+                true, false, true, false, true
+            ]);
         }
     }
 }

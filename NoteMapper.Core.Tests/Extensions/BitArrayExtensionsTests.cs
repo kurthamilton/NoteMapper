@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using FluentAssertions;
 using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core.Tests.Extensions
@@ -8,52 +9,60 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void ToArray_LengthShorterThanBitArray_CopiesSubset()
         {
+            // Arrange
             BitArray bitArray = new(4);
             bitArray.Set(0, true);
             bitArray.Set(1, false);
             bitArray.Set(2, true);
             bitArray.Set(3, false);
 
-            bool[] array = bitArray.ToArray(3);
+            // Act
+            var result = bitArray.ToArray(3);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            // Assert
+            result.Should().BeEquivalentTo(
+            [
                 true, false, true
-            }, array);
+            ]);
         }
 
         [Test]
         public static void ToArray_LengthEqualToBitArrayLength_CopiesSet()
         {
+            // Arrange
             BitArray bitArray = new(4);
             bitArray.Set(0, true);
             bitArray.Set(1, false);
             bitArray.Set(2, true);
             bitArray.Set(3, true);
 
-            bool[] array = bitArray.ToArray(4);
+            // Act
+            var result = bitArray.ToArray(4);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            result.Should().BeEquivalentTo(
+            [
                 true, false, true, true
-            }, array);
+            ]);
         }
 
         [Test]
         public static void ToArray_LengthGreaterThanBitArrayLength_CopiesSet()
         {
+            // Arrange
             BitArray bitArray = new(4);
             bitArray.Set(0, true);
             bitArray.Set(1, false);
             bitArray.Set(2, true);
             bitArray.Set(3, true);
 
-            bool[] array = bitArray.ToArray(5);
+            // Act
+            var result = bitArray.ToArray(5);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            // Assert
+            result.Should().BeEquivalentTo(
+            [
                 true, false, true, true, false
-            }, array);
+            ]);
         }
 
         [TestCase("10000", ExpectedResult = 1)]

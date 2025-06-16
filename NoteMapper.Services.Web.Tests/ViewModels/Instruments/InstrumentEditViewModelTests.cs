@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NoteMapper.Core.Guitars;
 using NoteMapper.Core.MusicTheory;
 using NoteMapper.Services.Web.ViewModels.Instruments;
@@ -90,14 +91,19 @@ namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
         [TestCase(1, -2)]
         public static void MoveModifier_MovesModifierInCorrectDirection(int index, int direction)
         {
+            // Arrange
             InstrumentEditViewModel viewModel = CreateViewModel(modifiers: new[] { "A", "B" });
 
+            // Act
             viewModel.MoveModifier(viewModel.Modifiers.ElementAt(index), direction);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            // Assert
+            var actual = viewModel.Modifiers.Select(x => x.Name);
+
+            actual.Should().BeEquivalentTo(
+            [
                 "B", "A"
-            }, viewModel.Modifiers.Select(x => x.Name));
+            ]);
         }
 
         [TestCase(0, -1)]
@@ -106,19 +112,25 @@ namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
         [TestCase(1, 2)]
         public static void MoveModifier_DoesNotMoveModifierOutOfBounds(int index, int direction)
         {
+            // Arrange
             InstrumentEditViewModel viewModel = CreateViewModel(modifiers: new[] { "A", "B" });
 
+            // Act
             viewModel.MoveModifier(viewModel.Modifiers.ElementAt(index), direction);
 
-            CollectionAssert.AreEqual(new[]
+            // Assert
+            var actual = viewModel.Modifiers.Select(x => x.Name);
+
+            actual.Should().BeEquivalentTo(new[]
             {
                 "A", "B"
-            }, viewModel.Modifiers.Select(x => x.Name));
+            });
         }
 
         [Test]
         public static void MoveModifier_MovesStringOffsets()
         {
+            // Arrange
             InstrumentEditViewModel viewModel = CreateViewModel(modifiers: new[] { "A", "B" },
                 strings: new[] { 9, 11 });
 
@@ -130,21 +142,23 @@ namespace NoteMapper.Services.Web.Tests.ViewModels.Instruments
             viewModel.Strings.ElementAt(0).ModifierOffsets.ElementAt(1).Offset = -1;
             viewModel.Strings.ElementAt(1).ModifierOffsets.ElementAt(1).Offset = -1;
 
+            // Act
             // switch the 2 modifiers
             viewModel.MoveModifier(viewModel.Modifiers.ElementAt(0), 1);
-                
+
+            // Assert
             // expect that modifier 0 has offset of -1, modifier 1 has offset of +1
-            CollectionAssert.AreEqual(new[] { -1, -1 }, new[]
+            new[]
             {
                 viewModel.Strings.ElementAt(0).ModifierOffsets.ElementAt(0).Offset = -1,
                 viewModel.Strings.ElementAt(1).ModifierOffsets.ElementAt(0).Offset = -1
-            });
+            }.Should().BeEquivalentTo(new[] { -1, -1 });
 
-            CollectionAssert.AreEqual(new[] { 1, 1 }, new[]
+            new[]
             {
                 viewModel.Strings.ElementAt(0).ModifierOffsets.ElementAt(1).Offset = 1,
                 viewModel.Strings.ElementAt(1).ModifierOffsets.ElementAt(1).Offset = 1
-            });
+            }.Should().BeEquivalentTo(new[] { 1, 1 });
         }
 
         [Test]

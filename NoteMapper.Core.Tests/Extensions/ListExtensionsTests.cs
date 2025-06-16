@@ -1,4 +1,5 @@
-﻿using NoteMapper.Core.Extensions;
+﻿using FluentAssertions;
+using NoteMapper.Core.Extensions;
 
 namespace NoteMapper.Core.Tests.Extensions
 {
@@ -7,49 +8,58 @@ namespace NoteMapper.Core.Tests.Extensions
         [Test]
         public static void SetCount_SameCount_DoesNotAlter()
         {
+            // Arrange
             List<int> list = new()
             {
                 1, 2, 3
             };
 
+            // Act
             list.SetCount(3, 0);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            // Assert
+            list.Should().BeEquivalentTo(
+            [
                 1, 2, 3
-            }, list);
+            ]);
         }
 
         [Test]
         public static void SetCount_AddItems()
         {
+            // Arrange
             List<int> list = new()
             {
                 1, 2
             };
 
+            // Act
             list.SetCount(3, 0);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            // Assert
+            list.Should().BeEquivalentTo(
+            [
                 1, 2, 0
-            }, list);
+            ]);
         }
 
         [Test]
         public static void SetCount_RemoveItems()
         {
+            // Arrange
             List<int> list = new()
             {
                 1, 2, 3, 4
             };
 
+            // Act
             list.SetCount(3, 0);
 
-            CollectionAssert.AreEqual(new[]
-            {
+            // Assert
+            list.Should().BeEquivalentTo(
+            [
                 1, 2, 3
-            }, list);
+            ]);
         }
     }
 }
